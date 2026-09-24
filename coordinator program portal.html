@@ -203,17 +203,17 @@
         font-size: 10px; font-weight: 900; color: #9B26B6; letter-spacing: .15em; text-transform: uppercase;
         padding-bottom: 8px; border-bottom: 2px solid #FDB913; margin-bottom: 16px; display: inline-block;
     }
-    
+
     /* List item styling */
     .portal-link-item {
-        display: flex; 
-        align-items: center; 
-        gap: 12px; 
-        padding: 14px 8px; 
-        background: transparent; 
-        color: #002D62; 
-        font-size: 13px; 
-        font-weight: 700; 
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 8px;
+        background: transparent;
+        color: #002D62;
+        font-size: 13px;
+        font-weight: 700;
         text-decoration: none;
         border-bottom: 1px solid #E2E8F0;
         transition: all .2s ease;
@@ -226,11 +226,11 @@
         color: #9B26B6;
         padding-left: 16px;
     }
-    .portal-link-item i { 
-        color: #9B26B6; 
-        font-size: 14px; 
-        width: 20px; 
-        text-align: center; 
+    .portal-link-item i {
+        color: #9B26B6;
+        font-size: 14px;
+        width: 20px;
+        text-align: center;
     }
 
     /* Activity Trail */
@@ -968,6 +968,25 @@
                 <a href="#" onclick="document.getElementById('settingsBtn').click(); return false;" class="portal-link-item">
                     <i class="fas fa-user-cog"></i>
                     <span data-i18n="portal_settings">Account Settings</span>
+                </a>
+            </div>
+
+            <!-- ============================================================
+                 NEW: LAB & CHEMICAL SERVICES SECTION
+            ============================================================ -->
+            <div class="portal-section-title mt-6" data-i18n="portal_lab_label">Laboratory Services</div>
+            <div class="flex flex-col">
+                <a href="pinjaman_alat_radas.html" class="portal-link-item">
+                    <i class="fas fa-screwdriver-wrench"></i>
+                    <span data-i18n="portal_loan_equipment">Pinjaman Alat Radas</span>
+                </a>
+                <a href="permohonan_bahan_kimia.html" class="portal-link-item">
+                    <i class="fas fa-flask-vial"></i>
+                    <span data-i18n="portal_chemical_request">Permohonan Bahan Kimia</span>
+                </a>
+                <a href="permohonan_peralatan_makmal.html" class="portal-link-item">
+                    <i class="fas fa-microscope"></i>
+                    <span data-i18n="portal_lab_equipment_request">Permohonan Peralatan Makmal</span>
                 </a>
             </div>
         </div>
@@ -1721,6 +1740,11 @@
             portal_menu_title: "Portal Menu", portal_menu_sub: "Quick Access To All Systems",
             portal_menu_updated: "UPDATED 2026", portal_admin_label: "Administration",
             portal_resume: "Resume", portal_settings: "Account Settings",
+            /* NEW */
+            portal_lab_label: "Laboratory Services",
+            portal_loan_equipment: "Equipment & Apparatus Loan",
+            portal_chemical_request: "Chemical Substance Request",
+            portal_lab_equipment_request: "Laboratory Equipment Request",
             news_tag: "Latest Updates", news_title: "Newsroom & Events", btn_archive: "View Archive",
             news_1_title: "FKK Researchers Secure RM500k Grant for Green Hydrogen.",
             news_2_title: "Dean's List Ceremony: Celebrating Academic Excellence.",
@@ -1826,6 +1850,11 @@
             portal_menu_title: "Menu Portal", portal_menu_sub: "Akses Pantas Ke Semua Sistem",
             portal_menu_updated: "DIKEMAS KINI 2026", portal_admin_label: "Pentadbiran",
             portal_resume: "Resume", portal_settings: "Tetapan Akaun",
+            /* NEW */
+            portal_lab_label: "Perkhidmatan Makmal",
+            portal_loan_equipment: "Pinjaman Alat Radas",
+            portal_chemical_request: "Permohonan Bahan Kimia",
+            portal_lab_equipment_request: "Permohonan Peralatan Makmal",
             news_tag: "Terkini", news_title: "Berita & Acara", btn_archive: "Lihat Arkib",
             news_1_title: "Penyelidik FKK Raih Geran RM500k untuk Hidrogen Hijau.",
             news_2_title: "Majlis Anugerah Dekan: Meraikan Kecemerlangan Akademik.",
