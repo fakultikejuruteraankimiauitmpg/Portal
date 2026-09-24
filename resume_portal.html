@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Academic Profile System — AI-Powered</title>
+<title>Academic Profile System</title>
 <style>
 :root{
   --bg:#f4f6fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e5e9f2;
@@ -205,30 +205,34 @@ tbody tr:hover{background:#fafbff}
     <header class="topbar">
       <div>
         <h1 id="pageTitle">Dashboard</h1>
-        <p id="pageSub">Ringkasan profil akademik anda</p>
+        <p id="pageSub">—</p>
       </div>
       <div class="tb-right">
-        <select class="role-sel" id="roleSelect" onchange="setRole(this.value)" title="Peranan anda">
+        <select class="role-sel" id="langSelect" onchange="setLang(this.value)" title="Language / Bahasa">
+          <option value="ms">🇲🇾 BM</option>
+          <option value="en">🇬🇧 EN</option>
+        </select>
+        <select class="role-sel" id="roleSelect" onchange="setRole(this.value)" title="Role">
           <option value="Student">🎓 Student</option>
           <option value="Lecturer">👨‍🏫 Lecturer</option>
           <option value="Lab Staff">🔬 Lab Staff</option>
           <option value="Head">👨‍💼 Head / Coordinator</option>
           <option value="Admin">🔐 Admin</option>
         </select>
-        <div class="sync-status" onclick="go('cloudSync')" title="Auto Cloud Sync Status">
+        <div class="sync-status" onclick="go('cloudSync')" title="Cloud Sync">
           <span class="sync-dot off" id="syncDot"></span>
           <span id="syncLabel">Cloud idle</span>
         </div>
         <button class="icon-btn" onclick="quickCloudPush()" title="Force Sync Now">☁️</button>
         <button class="icon-btn" onclick="go('notifications')" title="Notifications">🔔<span class="dot" id="notifDot"></span></button>
-        <div class="user-badge" onclick="go('profile')" title="Profil Saya">
+        <div class="user-badge" onclick="go('profile')" title="Profile">
           <div class="avatar" id="tbAvatar">AR</div>
           <div class="uinfo">
             <span class="uname" id="tbName">—</span>
             <span class="urole" id="tbRole">—</span>
           </div>
         </div>
-        <button class="icon-btn" onclick="doLogout()" title="Log Keluar">🚪</button>
+        <button class="icon-btn" onclick="doLogout()" title="Log Out">🚪</button>
       </div>
     </header>
     <div class="view" id="view"></div>
@@ -241,16 +245,9 @@ tbody tr:hover{background:#fafbff}
 
 <script>
 /* =========================================================
-   AUTH GUARD — roles yang dibenarkan edit resume
-   student, academic_staff, lab_staff, coordinator, admin
+   AUTH GUARD
    ========================================================= */
-const ALLOWED_AUTH_ROLES = [
-  'student',
-  'academic_staff',
-  'lab_staff',
-  'coordinator',
-  'admin'
-];
+const ALLOWED_AUTH_ROLES = ['student','academic_staff','lab_staff','coordinator','admin'];
 
 const session = (window.FMSAuth && FMSAuth.requireAuth(ALLOWED_AUTH_ROLES));
 
@@ -259,8 +256,8 @@ if (!session) {
     <div style="min-height:100vh;display:grid;place-items:center;font-family:system-ui;color:#64748b;background:#f4f6fb">
       <div style="text-align:center">
         <div style="font-size:44px">🔒</div>
-        <h2 style="color:#0f172a;margin:10px 0 6px">Mengalih ke halaman log masuk…</h2>
-        <p style="font-size:13px">Sila tunggu sebentar.</p>
+        <h2 style="color:#0f172a;margin:10px 0 6px">Redirecting to login…</h2>
+        <p style="font-size:13px">Please wait.</p>
       </div>
     </div>`;
   throw new Error('Unauthenticated — redirecting');
@@ -278,31 +275,19 @@ const CURRENT_USER = {
   unit:     (session.user && session.user.unit)     || ''
 };
 
-// Role sebenar dari auth.js
 const CURRENT_ROLE = (session.role || session.userRole || 'academic_staff');
 
-// Peta role auth -> role UI (NAV / canSee)
 const AUTH_TO_APP_ROLE = {
-  student:        'Student',
-  academic_staff: 'Lecturer',
-  lab_staff:      'Lab Staff',
-  coordinator:    'Head',
-  admin:          'Admin'
+  student:'Student', academic_staff:'Lecturer', lab_staff:'Lab Staff',
+  coordinator:'Head', admin:'Admin'
 };
 const CURRENT_APP_ROLE = AUTH_TO_APP_ROLE[CURRENT_ROLE] || 'Lecturer';
 
-/* =========================================================
-   0a. ROLE → DEFAULT POSITION (fix: elak lab_staff jadi "Senior Lecturer")
-   ========================================================= */
 const ROLE_DEFAULT_POSITION = {
-  student:        'Student',
-  academic_staff: 'Lecturer',
-  lab_staff:      'Lab Staff',
-  coordinator:    'Coordinator',
-  admin:          'Administrator'
+  student:'Student', academic_staff:'Lecturer', lab_staff:'Lab Staff',
+  coordinator:'Coordinator', admin:'Administrator'
 };
 
-// Nilai profile yang WAJIB ikut akaun login (source of truth)
 function authDerivedProfile(){
   return {
     name:       CURRENT_USER.name  || 'User',
@@ -314,7 +299,7 @@ function authDerivedProfile(){
 }
 
 /* =========================================================
-   0. HELPERS
+   HELPERS
    ========================================================= */
 const $ = s => document.querySelector(s);
 const esc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -334,12 +319,714 @@ function toast(msg){
 }
 
 /* =========================================================
-   0b. CLOUD ENDPOINT
+   LANGUAGE (i18n)
+   ========================================================= */
+let LANG = localStorage.getItem('aps_lang') || 'ms';
+
+const I18N = {
+  ms: {
+    'app.name':'Academic Profile',
+    'app.tagline':'Sistem Profil Akademik',
+
+    'nav.group.main':'Utama',
+    'nav.group.academic':'Akademik',
+    'nav.group.career':'Kerjaya',
+    'nav.group.tools':'Alat & Sistem',
+    'nav.group.analytics':'Analitik',
+    'nav.group.system':'Sistem',
+
+    'nav.dashboard':'Dashboard',
+    'nav.profile':'Profil Saya',
+    'nav.expertise':'Kepakaran & Penyelidikan',
+    'nav.qualifications':'Kelayakan Akademik',
+    'nav.teaching':'Pengajaran',
+    'nav.projects':'Projek Penyelidikan',
+    'nav.grants':'Geran Penyelidikan',
+    'nav.publications':'Penerbitan',
+    'nav.conferences':'Persidangan',
+    'nav.books':'Buku & Bab',
+    'nav.awards':'Anugerah & Pengiktirafan',
+    'nav.media':'Majalah / Media',
+    'nav.adminExp':'Pentadbiran',
+    'nav.supervision':'Penyeliaan',
+    'nav.consultancy':'Perundingan',
+    'nav.memberships':'Keahlian Profesional',
+    'nav.community':'Penglibatan Komuniti',
+    'nav.innovation':'Inovasi / Produk',
+    'nav.ip':'Harta Intelek',
+    'nav.cloudSync':'Segerak Resume Cloud',
+    'nav.cv':'CV Saya',
+    'nav.public':'Profil Akademik Awam',
+    'nav.search':'Carian Fakulti',
+    'nav.analytics':'Analitik Fakulti',
+    'nav.kpi':'Papan Pemuka KPI',
+    'nav.quality':'Kualiti Data',
+    'nav.notifications':'Notifikasi',
+    'nav.admin':'Panel Admin',
+    'nav.audit':'Jejak Audit',
+
+    'title.dashboard':'Dashboard',
+    'sub.dashboard':'Ringkasan profil akademik anda',
+    'title.profile':'Profil Saya',
+    'sub.profile':'Maklumat peribadi, pengecam akademik & biografi',
+    'title.expertise':'Kepakaran & Minat Penyelidikan',
+    'sub.expertise':'Kepakaran, minat penyelidikan, kata kunci & SDG',
+    'title.cloudSync':'Segerak Resume Cloud',
+    'sub.cloudSync':'Auto-sync ke Google Sheets setiap kali data berubah',
+    'title.cv':'CV Saya',
+    'sub.cv':'Jana CV akademik daripada satu sumber data',
+    'title.public':'Profil Akademik Awam',
+    'sub.public':'Profil awam yang boleh dikongsi',
+    'title.search':'Carian Fakulti',
+    'sub.search':'Cari kepakaran merentas semua rekod',
+    'title.analytics':'Analitik Fakulti',
+    'sub.analytics':'Statistik penerbitan, penyelidikan & akademik',
+    'title.kpi':'Papan Pemuka KPI',
+    'sub.kpi':'Petunjuk prestasi utama fakulti',
+    'title.quality':'Kualiti Data',
+    'sub.quality':'Semakan data tidak lengkap & pertindihan',
+    'title.notifications':'Notifikasi',
+    'sub.notifications':'Makluman sistem & peringatan',
+    'title.admin':'Panel Admin',
+    'sub.admin':'Pengurusan pengguna, sistem & data',
+    'title.audit':'Jejak Audit',
+    'sub.audit':'Sejarah perubahan data',
+    'sub.records':'Pengurusan rekod',
+
+    'sync.idle':'Cloud sedia',
+    'sync.pending':'Menunggu sync…',
+    'sync.busy':'Menyegerak…',
+    'sync.ok':'☁️ Auto-synced',
+    'sync.error':'⚠️ Sync gagal',
+    'sync.offline':'📴 Offline',
+    'sync.retry':'⟳ Cuba semula…',
+
+    'role.label':'Peranan anda',
+
+    'btn.save':'💾 Simpan',
+    'btn.cancel':'Batal',
+    'btn.add':'＋ Tambah',
+    'btn.addManual':'＋ Tambah Manual',
+    'btn.edit':'✏️',
+    'btn.delete':'🗑',
+    'btn.print':'🖨 Cetak / Simpan PDF',
+    'btn.download':'⬇ Muat Turun',
+    'btn.search':'🔎 Cari',
+    'btn.forceSync':'⚡ Force Sync Now',
+    'btn.pullCloud':'⬇ Tarik dari Cloud',
+    'btn.testConn':'🔌 Test Sambungan',
+    'btn.generateCV':'📄 JANA CV',
+    'btn.share':'🔗 Kongsi Profil',
+    'btn.viewCV':'📄 Lihat CV',
+    'btn.updateResume':'☁️ Update Resume',
+    'btn.logoutOnly':'Log Out Sahaja',
+    'btn.stay':'❌ Kekal di Halaman',
+    'btn.updateLogout':'☁️ Update Resume & Log Out',
+    'btn.updateExit':'☁️ Update Resume & Keluar',
+    'btn.tryAgain':'☁️ Cuba Lagi',
+    'btn.saveProfile':'💾 Simpan Profil (auto-sync ☁️)',
+    'btn.saveExpertise':'💾 Simpan (auto-sync ☁️)',
+    'btn.aiBio':'✨ AI Jana Biografi',
+    'btn.exportJSON':'⬇ Export JSON',
+    'btn.openQuality':'Buka Kualiti Data →',
+    'btn.close':'✕',
+    'btn.markAllRead':'Tanda semua dibaca',
+    'btn.clear':'Clear',
+
+    'dash.profileStatus':'Status Profil',
+    'dash.complete':'Complete',
+    'dash.role':'Peranan',
+    'dash.totalGrant':'Jumlah Geran',
+    'dash.synced':'☁️ Auto-synced',
+    'dash.notSynced':'☁️ Belum sync',
+    'dash.addInfo':'＋ Tambah Maklumat',
+    'dash.cloudSync':'☁️ Segerak Cloud',
+    'dash.genCV':'📄 Jana CV',
+    'dash.editProfile':'✏️ Edit Profil',
+    'dash.autoSync.title':'Auto Cloud Sync — Aktif ✅',
+    'dash.autoSync.desc':'Setiap <b>edit / tambah / padam</b> akan <b>auto-push</b> ke Google Sheets. Bila <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b>, atau <b>refresh</b> — sistem akan minta anda update resume dahulu.',
+    'dash.forceSync':'⚡ Force Sync Now',
+    'dash.syncPanel':'⚙️ Panel Sync',
+    'dash.stats':'📊 Statistik Peribadi',
+    'dash.reminders':'🔔 Peringatan & Tugasan',
+    'dash.pubByYear':'📈 Penerbitan Mengikut Tahun',
+    'dash.recentActivity':'🕘 Aktiviti Terkini (Audit)',
+    'dash.noIssues':'Tiada isu data. Profil anda lengkap! 🎉',
+    'dash.noActivity':'Tiada aktiviti lagi.',
+    'dash.incompleteProfile':'👤 Maklumat profil belum lengkap',
+    'dash.missingDOI':'publication belum mempunyai DOI.',
+    'dash.missingYear':'rekod tiada tahun.',
+    'dash.dupRecords':'rekod berkemungkinan duplicate.',
+    'dash.noOrcid':'ORCID belum diisi.',
+
+    'coll.records':'rekod',
+    'coll.autoSyncOn':'Auto-sync aktif ☁️',
+    'coll.searchPlaceholder':'🔎 Cari dalam',
+    'coll.noRecords':'Tiada rekod',
+    'coll.lagi':'lagi.',
+    'coll.add':'Tambah',
+    'coll.addManually':'＋ Tambah Manual',
+    'coll.autoCalc':'Auto kiraan:',
+    'coll.totalGrantObtained':'Jumlah Geran Diperoleh',
+
+    'form.dataAutoSync':'Data akan <b>auto-sync</b> ke Cloud selepas Save.',
+    'form.choose':'— pilih —',
+    'form.add':'Add',
+    'form.edit':'Edit',
+
+    'profile.signedInAs':'Signed in as',
+    'profile.personalInfo':'👤 A. Maklumat Peribadi',
+    'profile.lockedHint':'🔒 Field bertanda kunci diambil automatik dari <b>akaun login</b> anda (source of truth). Untuk tukar, kemas kini dalam sistem HR / auth.',
+    'profile.academicId':'🆔 B. Pengecam Akademik',
+    'profile.biography':'✍️ C. Biografi',
+    'profile.autoSaveHint':'💡 <b>Auto-save aktif:</b> setiap kali anda taip, data disimpan lokal + auto-push ke Cloud.',
+    'profile.logout':'🚪 Log Keluar',
+
+    'exp.expertise':'🔬 Kepakaran',
+    'exp.expertiseHint':'Senarai kepakaran (pisah dengan koma)',
+    'exp.interest':'🎯 Minat Penyelidikan',
+    'exp.interestHint':'Minat penyelidikan (pisah dengan koma)',
+    'exp.keywords':'🏷️ Kata Kunci',
+    'exp.keywordsHint':'Kata kunci (pisah dengan koma)',
+    'exp.sdg':'🌱 Penjajaran SDG',
+    'exp.sdgHint':'SDG (pisah dengan koma)',
+
+    'cv.options':'📄 Pilihan CV',
+    'cv.type':'Jenis CV',
+    'cv.order':'Susunan',
+    'cv.newest':'Terbaru → Terlama',
+    'cv.oldest':'Terlama → Terbaru',
+    'cv.pickSection':'Pilih Section',
+
+    'cloud.autoTitle':'Auto Cloud Sync — Google Sheets',
+    'cloud.endpoint':'Endpoint:',
+    'cloud.lastAuto':'Terakhir auto-sync:',
+    'cloud.never':'Belum pernah sync',
+    'cloud.lastPull':'Terakhir tarik:',
+    'cloud.exitGuardTitle':'Auto-sync + Exit Guard Aktif',
+    'cloud.exitGuardDesc':'Setiap <b>edit / tambah / padam</b> akan auto-push ke Google Sheets.<br>Bila anda <b>Log Out</b>, tekan <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b> — sistem akan minta anda tekan <b>Update Resume</b> dahulu.',
+    'cloud.dataSent':'📦 Data Yang Dihantar (Auto)',
+    'cloud.settings':'⚙️ Tetapan Sync',
+    'cloud.autoSyncLabel':'<b>Auto-sync aktif</b> — setiap edit / tambah / padam akan auto-push ke Google Sheets',
+    'cloud.exitGuardHint':'<b>✅ Exit Guard Aktif:</b> Bila anda tekan <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b>, sistem akan minta anda tekan <b>Update Resume</b> dahulu sebelum keluar.',
+    'cloud.deployHint':'<b>Penting:</b> Apps Script mesti di-deploy <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.',
+    'cloud.syncLog':'🪵 Log Sync',
+    'cloud.profile':'Profil',
+    'cloud.viewCV':'📄 Lihat CV',
+    'cloud.ready':'Auto-sync engine sedia.',
+
+    'search.title':'🔎 Carian Fakulti — Cari Kepakaran',
+    'search.placeholder':'Contoh: Waste Cooking Oil, Polyurethane, Catalysis...',
+    'search.enter':'Masukkan kata kunci untuk mencari.',
+    'search.matches':'padanan',
+    'search.noMatch':'Tiada padanan untuk',
+    'search.expertiseMatch':'🎯 Padanan Kepakaran',
+    'search.viewProfile':'Lihat Profil →',
+
+    'quality.missingDOI':'Missing DOI',
+    'quality.missingYear':'Missing Year',
+    'quality.missingORCID':'Missing ORCID',
+    'quality.duplicates':'Possible Duplicates',
+    'quality.missingData':'🔍 Data Tidak Lengkap',
+    'quality.possibleDup':'⚠️ Kemungkinan Duplicate',
+    'quality.noDOI':'Tiada isu DOI. 👍',
+    'quality.noDup':'Tiada pertindihan dikesan. 👍',
+    'quality.complete':'Lengkapkan',
+    'quality.merge':'Merge (auto-sync)',
+    'quality.keepSeparate':'Kekalkan Berasingan',
+    'quality.orcidMissing':'🆔 ORCID belum diisi pada profil.',
+    'quality.addOrcid':'Tambah ORCID',
+    'quality.noDOIpill':'No DOI',
+    'quality.noYearpill':'No Year',
+    'quality.dupPill':'Possible duplicate publication detected',
+
+    'notif.title':'Notifikasi',
+    'notif.read':'Read',
+    'notif.new':'New',
+
+    'pub.share':'🔗 Kongsi Profil',
+    'pub.viewCV':'📄 Lihat CV',
+    'pub.bio':'👤 Biografi',
+    'pub.expertise':'🔬 Kepakaran',
+    'pub.interest':'🎯 Minat Penyelidikan',
+    'pub.sdg':'🌱 SDG',
+    'pub.recentPubs':'📚 Penerbitan Terkini',
+    'pub.noPubs':'Tiada penerbitan.',
+    'pub.contact':'📞 Hubungan',
+    'pub.links':'🔗 Pautan Akademik',
+    'pub.email':'Email',
+    'pub.phone':'Telefon',
+    'pub.office':'Pejabat',
+
+    'analytics.pubBreakdown':'📚 Pecahan Penerbitan',
+    'analytics.pubGrowth':'📈 Pertumbuhan Penerbitan Mengikut Tahun',
+    'analytics.research':'🔬 Penyelidikan',
+    'analytics.academic':'🎓 Akademik',
+    'analytics.awardsLevel':'🏆 Anugerah Mengikut Tahap',
+    'analytics.supervision':'👨‍🎓 Penyeliaan',
+    'analytics.numProjects':'Bilangan Projek',
+    'analytics.activeProjects':'Projek Aktif',
+    'analytics.completedProjects':'Projek Selesai',
+    'analytics.totalGrant':'Jumlah Geran',
+    'analytics.asPI':'Sebagai PI',
+    'analytics.asCo':'Sebagai Co-Researcher',
+    'analytics.numLecturers':'Bilangan Pensyarah',
+    'analytics.phdQualified':'Berkelayakan PhD',
+    'analytics.masterQualified':'Berkelayakan Master',
+    'analytics.researchActive':'Staf Aktif Penyelidikan',
+    'analytics.profileComplete':'Kelengkapan Profil',
+    'analytics.totalStudents':'Jumlah Pelajar',
+    'analytics.active':'Aktif',
+    'analytics.completed':'Selesai',
+
+    'kpi.yearCompare':'📈 Perbandingan Tahun',
+    'kpi.grantByYear':'📊 Geran Mengikut Tahun',
+    'kpi.notEnoughData':'Data tahun belum mencukupi.',
+    'kpi.noData':'Tiada data.',
+
+    'audit.title':'📝 Jejak Audit — Tadbir Urus Data',
+    'audit.desc':'Setiap perubahan direkodkan: siapa, bila, sumber (Manual / Cloud Sync) dan tahap keyakinan.',
+    'audit.noActivity':'Tiada aktiviti direkodkan lagi.',
+    'audit.user':'Pengguna',
+    'audit.activity':'Aktiviti',
+    'audit.source':'Sumber',
+    'audit.confidence':'Confidence',
+    'audit.date':'Tarikh',
+
+    'admin.lecturers':'👥 Pensyarah',
+    'admin.faculty':'🏛️ Fakulti',
+    'admin.department':'🏢 Jabatan',
+    'admin.manageLecturers':'👨‍💼 Urus Pensyarah',
+    'admin.addLecturer':'＋ Tambah Pensyarah',
+    'admin.editLecturer':'✏️ Edit Pensyarah',
+    'admin.disableAcc':'🚫 Nyahaktifkan Akaun',
+    'admin.manageFaculty':'🏛️ Urus Fakulti & Jabatan',
+    'admin.manageFacultyBtn':'Urus Fakulti',
+    'admin.manageDeptBtn':'Urus Jabatan',
+    'admin.manageCatBtn':'Urus Kategori',
+    'admin.dataReports':'📤 Data & Laporan',
+    'admin.exportData':'⬇ Export Data (JSON)',
+    'admin.genReport':'📊 Jana Laporan Fakulti',
+    'admin.rolesAccess':'🔐 Peranan & Akses',
+    'admin.reset':'🗑 Reset Data Saya',
+
+    'logout.confirm.title':'Update Resume Sebelum Log Keluar',
+    'logout.confirm.desc':'Anda mempunyai <b>perubahan yang belum disegerakkan</b> ke Google Sheets.',
+    'logout.confirm.instruction':'Sila tekan <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini ke cloud sebelum log keluar. Selepas selesai sync, anda akan dilog keluar secara automatik.',
+    'logout.sending':'⏳ Menghantar data ke Google Sheets…',
+    'logout.sent':'✅ Resume berjaya dihantar. Melog keluar…',
+    'logout.failed':'❌ Sync gagal. Sila cuba lagi atau pilih "Log Out Sahaja".',
+    'logout.sendingBtn':'Menghantar ke Cloud…',
+    'logout.retryBtn':'☁️ Cuba Lagi & Log Out',
+    'logout.exitTitle':'Update Resume Terlebih Dahulu',
+    'logout.exitBack':'tekan butang Back (←)',
+    'logout.exitClose':'tutup tab',
+    'logout.exitRefresh':'refresh halaman',
+    'logout.exitDesc':'Anda cuba <b>{reason}</b> tetapi ada <b>perubahan yang belum disegerakkan</b> ke Google Sheets.',
+    'logout.exitInstruction':'Sila tekan butang <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini. Selepas sync berjaya, anda akan dibenarkan keluar.',
+    'logout.exitSent':'✅ Resume berjaya dihantar. Anda boleh keluar sekarang.',
+    'logout.exitDone':'✅ Update selesai — anda boleh tekan Back / tutup tab / refresh sekarang.',
+    'logout.sendingShort':'Menghantar…',
+
+    'toast.roleChanged':'Peranan ditukar:',
+    'toast.noPermRole':'🔒 Anda tiada kebenaran menukar peranan',
+    'toast.saved':'Disimpan ✔ — sync…',
+    'toast.profileSaved':'Profil disimpan ✔ — sync…',
+    'toast.recordSaved':'Rekod disimpan ✔ — sync…',
+    'toast.recordDeleted':'Rekod dipadam — sync…',
+    'toast.aiBio':'✨ Biografi dijana — sync…',
+    'toast.merged':'Rekod digabungkan ✔ — sync…',
+    'toast.dataReset':'Data direset — sync…',
+    'toast.allRead':'Semua notifikasi ditanda dibaca',
+    'toast.exported':'Data dieksport ✔',
+    'toast.deleted':'Rekod dipadam',
+    'toast.online':'🌐 Online — sync semula',
+    'toast.offline':'📴 Offline',
+    'toast.syncing':'☁️ Force sync…',
+    'toast.synced':'☁️ Resume disegerakkan ✔',
+    'toast.syncFailed':'Sync gagal — semak log',
+    'toast.pullFailed':'Tarik gagal',
+    'toast.pullSuccess':'⬇ Data Cloud dimuatkan ✔',
+    'toast.testOK':'Sambungan OK ✔',
+    'toast.testFail':'Sambungan gagal ✖',
+    'toast.copied':'Pautan disalin ✔',
+    'toast.cvDownloaded':'CV dimuat turun',
+    'toast.langChanged':'Bahasa ditukar:',
+
+    'confirm.deleteRecord':'Padam rekod ini? Sistem akan auto-sync perubahan ke Cloud.',
+    'confirm.replaceProfile':'Ganti profil dengan data Cloud?',
+    'confirm.reset':'Reset data profil ANDA kepada keadaan asal? (Hanya data anda sahaja)',
+    'confirm.demoAddLecturer':'Demo: tambah pensyarah baharu',
+    'confirm.demoDisable':'Demo: akaun dinyahaktifkan',
+    'confirm.demoManageFaculty':'Demo: urus fakulti',
+    'confirm.demoManageDept':'Demo: urus jabatan',
+    'confirm.demoManageCat':'Demo: urus kategori',
+    'confirm.keepSeparate':'Rekod dikekalkan berasingan'
+  },
+  en: {
+    'app.name':'Academic Profile',
+    'app.tagline':'Academic Profile System',
+
+    'nav.group.main':'Main',
+    'nav.group.academic':'Academic',
+    'nav.group.career':'Career',
+    'nav.group.tools':'Tools & System',
+    'nav.group.analytics':'Analytics',
+    'nav.group.system':'System',
+
+    'nav.dashboard':'Dashboard',
+    'nav.profile':'My Profile',
+    'nav.expertise':'Expertise & Research',
+    'nav.qualifications':'Academic Qualification',
+    'nav.teaching':'Teaching',
+    'nav.projects':'Research Project',
+    'nav.grants':'Research Grants',
+    'nav.publications':'Publications',
+    'nav.conferences':'Conference',
+    'nav.books':'Book & Chapter',
+    'nav.awards':'Awards & Recognition',
+    'nav.media':'Magazine / Media',
+    'nav.adminExp':'Administrative',
+    'nav.supervision':'Supervision',
+    'nav.consultancy':'Consultancy',
+    'nav.memberships':'Professional Membership',
+    'nav.community':'Community Engagement',
+    'nav.innovation':'Innovation / Product',
+    'nav.ip':'Intellectual Property',
+    'nav.cloudSync':'Cloud Resume Sync',
+    'nav.cv':'My CV',
+    'nav.public':'Public Academic Profile',
+    'nav.search':'Faculty Search',
+    'nav.analytics':'Faculty Analytics',
+    'nav.kpi':'KPI Dashboard',
+    'nav.quality':'Data Quality',
+    'nav.notifications':'Notifications',
+    'nav.admin':'Admin Panel',
+    'nav.audit':'Audit Trail',
+
+    'title.dashboard':'Dashboard',
+    'sub.dashboard':'Overview of your academic profile',
+    'title.profile':'My Profile',
+    'sub.profile':'Personal information, academic identifiers & biography',
+    'title.expertise':'Expertise & Research Interest',
+    'sub.expertise':'Expertise, research interest, keywords & SDG',
+    'title.cloudSync':'Cloud Resume Sync',
+    'sub.cloudSync':'Auto-sync to Google Sheets on every data change',
+    'title.cv':'My CV',
+    'sub.cv':'Generate academic CV from a single source of data',
+    'title.public':'Public Academic Profile',
+    'sub.public':'Shareable public profile',
+    'title.search':'Faculty Search',
+    'sub.search':'Search expertise across all records',
+    'title.analytics':'Faculty Analytics',
+    'sub.analytics':'Publication, research & academic statistics',
+    'title.kpi':'KPI Dashboard',
+    'sub.kpi':'Faculty key performance indicators',
+    'title.quality':'Data Quality',
+    'sub.quality':'Incomplete data & duplicate checks',
+    'title.notifications':'Notifications',
+    'sub.notifications':'System alerts & reminders',
+    'title.admin':'Admin Panel',
+    'sub.admin':'User, system & data management',
+    'title.audit':'Audit Trail',
+    'sub.audit':'Data change history',
+    'sub.records':'Record management',
+
+    'sync.idle':'Cloud idle',
+    'sync.pending':'Sync pending…',
+    'sync.busy':'Syncing…',
+    'sync.ok':'☁️ Auto-synced',
+    'sync.error':'⚠️ Sync failed',
+    'sync.offline':'📴 Offline',
+    'sync.retry':'⟳ Retrying…',
+
+    'role.label':'Your role',
+
+    'btn.save':'💾 Save',
+    'btn.cancel':'Cancel',
+    'btn.add':'＋ Add',
+    'btn.addManual':'＋ Add Manually',
+    'btn.edit':'✏️',
+    'btn.delete':'🗑',
+    'btn.print':'🖨 Print / Save as PDF',
+    'btn.download':'⬇ Download',
+    'btn.search':'🔎 Search',
+    'btn.forceSync':'⚡ Force Sync Now',
+    'btn.pullCloud':'⬇ Pull from Cloud',
+    'btn.testConn':'🔌 Test Connection',
+    'btn.generateCV':'📄 GENERATE CV',
+    'btn.share':'🔗 Share Profile',
+    'btn.viewCV':'📄 View CV',
+    'btn.updateResume':'☁️ Update Resume',
+    'btn.logoutOnly':'Log Out Only',
+    'btn.stay':'❌ Stay on Page',
+    'btn.updateLogout':'☁️ Update Resume & Log Out',
+    'btn.updateExit':'☁️ Update Resume & Exit',
+    'btn.tryAgain':'☁️ Try Again',
+    'btn.saveProfile':'💾 Save Profile (auto-sync ☁️)',
+    'btn.saveExpertise':'💾 Save (auto-sync ☁️)',
+    'btn.aiBio':'✨ AI Generate Biography',
+    'btn.exportJSON':'⬇ Export JSON',
+    'btn.openQuality':'Open Data Quality →',
+    'btn.close':'✕',
+    'btn.markAllRead':'Mark all as read',
+    'btn.clear':'Clear',
+
+    'dash.profileStatus':'Profile Status',
+    'dash.complete':'Complete',
+    'dash.role':'Role',
+    'dash.totalGrant':'Total Grant',
+    'dash.synced':'☁️ Auto-synced',
+    'dash.notSynced':'☁️ Not synced',
+    'dash.addInfo':'＋ Add Information',
+    'dash.cloudSync':'☁️ Cloud Sync',
+    'dash.genCV':'📄 Generate CV',
+    'dash.editProfile':'✏️ Edit Profile',
+    'dash.autoSync.title':'Auto Cloud Sync — Active ✅',
+    'dash.autoSync.desc':'Every <b>edit / add / delete</b> will <b>auto-push</b> to Google Sheets. When you <b>Log Out</b>, press <b>Back</b>, <b>close tab</b>, or <b>refresh</b> — the system will ask you to update resume first.',
+    'dash.forceSync':'⚡ Force Sync Now',
+    'dash.syncPanel':'⚙️ Sync Panel',
+    'dash.stats':'📊 Personal Statistics',
+    'dash.reminders':'🔔 Reminders & Tasks',
+    'dash.pubByYear':'📈 Publications by Year',
+    'dash.recentActivity':'🕘 Recent Activity (Audit)',
+    'dash.noIssues':'No data issues. Your profile is complete! 🎉',
+    'dash.noActivity':'No activity yet.',
+    'dash.incompleteProfile':'👤 Profile information incomplete',
+    'dash.missingDOI':'publication(s) missing DOI.',
+    'dash.missingYear':'record(s) missing year.',
+    'dash.dupRecords':'possible duplicate record(s).',
+    'dash.noOrcid':'ORCID not filled in.',
+
+    'coll.records':'records',
+    'coll.autoSyncOn':'Auto-sync active ☁️',
+    'coll.searchPlaceholder':'🔎 Search in',
+    'coll.noRecords':'No records',
+    'coll.lagi':'yet.',
+    'coll.add':'Add',
+    'coll.addManually':'＋ Add Manually',
+    'coll.autoCalc':'Auto calculation:',
+    'coll.totalGrantObtained':'Total Grant Obtained',
+
+    'form.dataAutoSync':'Data will <b>auto-sync</b> to Cloud after Save.',
+    'form.choose':'— select —',
+    'form.add':'Add',
+    'form.edit':'Edit',
+
+    'profile.signedInAs':'Signed in as',
+    'profile.personalInfo':'👤 A. Personal Information',
+    'profile.lockedHint':'🔒 Fields marked with a lock are automatically taken from your <b>login account</b> (source of truth). To change, update in the HR / auth system.',
+    'profile.academicId':'🆔 B. Academic Identifier',
+    'profile.biography':'✍️ C. Biography',
+    'profile.autoSaveHint':'💡 <b>Auto-save active:</b> every time you type, data is saved locally + auto-pushed to Cloud.',
+    'profile.logout':'🚪 Log Out',
+
+    'exp.expertise':'🔬 Expertise',
+    'exp.expertiseHint':'List of expertise (comma separated)',
+    'exp.interest':'🎯 Research Interest',
+    'exp.interestHint':'Research interest (comma separated)',
+    'exp.keywords':'🏷️ Keywords',
+    'exp.keywordsHint':'Keywords (comma separated)',
+    'exp.sdg':'🌱 SDG Alignment',
+    'exp.sdgHint':'SDG (comma separated)',
+
+    'cv.options':'📄 CV Options',
+    'cv.type':'CV Type',
+    'cv.order':'Order',
+    'cv.newest':'Newest → Oldest',
+    'cv.oldest':'Oldest → Newest',
+    'cv.pickSection':'Pick Section',
+
+    'cloud.autoTitle':'Auto Cloud Sync — Google Sheets',
+    'cloud.endpoint':'Endpoint:',
+    'cloud.lastAuto':'Last auto-sync:',
+    'cloud.never':'Never synced',
+    'cloud.lastPull':'Last pull:',
+    'cloud.exitGuardTitle':'Auto-sync + Exit Guard Active',
+    'cloud.exitGuardDesc':'Every <b>edit / add / delete</b> auto-pushes to Google Sheets.<br>When you <b>Log Out</b>, press <b>Back</b>, <b>close tab</b> or <b>refresh</b> — the system will ask you to press <b>Update Resume</b> first.',
+    'cloud.dataSent':'📦 Data Being Sent (Auto)',
+    'cloud.settings':'⚙️ Sync Settings',
+    'cloud.autoSyncLabel':'<b>Auto-sync active</b> — every edit / add / delete auto-pushes to Google Sheets',
+    'cloud.exitGuardHint':'<b>✅ Exit Guard Active:</b> When you press <b>Log Out</b>, <b>Back</b>, <b>close tab</b> or <b>refresh</b>, the system will ask you to press <b>Update Resume</b> first before exiting.',
+    'cloud.deployHint':'<b>Important:</b> Apps Script must be deployed <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.',
+    'cloud.syncLog':'🪵 Sync Log',
+    'cloud.profile':'Profile',
+    'cloud.viewCV':'📄 View CV',
+    'cloud.ready':'Auto-sync engine ready.',
+
+    'search.title':'🔎 Faculty Search — Find Expertise',
+    'search.placeholder':'Example: Waste Cooking Oil, Polyurethane, Catalysis...',
+    'search.enter':'Enter a keyword to search.',
+    'search.matches':'matches',
+    'search.noMatch':'No matches for',
+    'search.expertiseMatch':'🎯 Expertise Matches',
+    'search.viewProfile':'View Profile →',
+
+    'quality.missingDOI':'Missing DOI',
+    'quality.missingYear':'Missing Year',
+    'quality.missingORCID':'Missing ORCID',
+    'quality.duplicates':'Possible Duplicates',
+    'quality.missingData':'🔍 Missing Data',
+    'quality.possibleDup':'⚠️ Possible Duplicates',
+    'quality.noDOI':'No DOI issues. 👍',
+    'quality.noDup':'No duplicates detected. 👍',
+    'quality.complete':'Complete',
+    'quality.merge':'Merge (auto-sync)',
+    'quality.keepSeparate':'Keep Separate',
+    'quality.orcidMissing':'🆔 ORCID not filled in on profile.',
+    'quality.addOrcid':'Add ORCID',
+    'quality.noDOIpill':'No DOI',
+    'quality.noYearpill':'No Year',
+    'quality.dupPill':'Possible duplicate publication detected',
+
+    'notif.title':'Notifications',
+    'notif.read':'Read',
+    'notif.new':'New',
+
+    'pub.share':'🔗 Share Profile',
+    'pub.viewCV':'📄 View CV',
+    'pub.bio':'👤 Biography',
+    'pub.expertise':'🔬 Expertise',
+    'pub.interest':'🎯 Research Interest',
+    'pub.sdg':'🌱 SDG',
+    'pub.recentPubs':'📚 Recent Publications',
+    'pub.noPubs':'No publications.',
+    'pub.contact':'📞 Contact',
+    'pub.links':'🔗 Academic Links',
+    'pub.email':'Email',
+    'pub.phone':'Phone',
+    'pub.office':'Office',
+
+    'analytics.pubBreakdown':'📚 Publication Breakdown',
+    'analytics.pubGrowth':'📈 Publication Growth by Year',
+    'analytics.research':'🔬 Research',
+    'analytics.academic':'🎓 Academic',
+    'analytics.awardsLevel':'🏆 Awards by Level',
+    'analytics.supervision':'👨‍🎓 Supervision',
+    'analytics.numProjects':'Number of Projects',
+    'analytics.activeProjects':'Active Projects',
+    'analytics.completedProjects':'Completed Projects',
+    'analytics.totalGrant':'Total Grant',
+    'analytics.asPI':'As PI',
+    'analytics.asCo':'As Co-Researcher',
+    'analytics.numLecturers':'Number of Lecturers',
+    'analytics.phdQualified':'PhD Qualified',
+    'analytics.masterQualified':'Master Qualified',
+    'analytics.researchActive':'Research Active Staff',
+    'analytics.profileComplete':'Profile Completeness',
+    'analytics.totalStudents':'Total Students',
+    'analytics.active':'Active',
+    'analytics.completed':'Completed',
+
+    'kpi.yearCompare':'📈 Year Comparison',
+    'kpi.grantByYear':'📊 Grant by Year',
+    'kpi.notEnoughData':'Not enough yearly data.',
+    'kpi.noData':'No data.',
+
+    'audit.title':'📝 Audit Trail — Data Governance',
+    'audit.desc':'Every change is recorded: who, when, source (Manual / Cloud Sync) and confidence level.',
+    'audit.noActivity':'No activity recorded yet.',
+    'audit.user':'User',
+    'audit.activity':'Activity',
+    'audit.source':'Source',
+    'audit.confidence':'Confidence',
+    'audit.date':'Date',
+
+    'admin.lecturers':'👥 Lecturers',
+    'admin.faculty':'🏛️ Faculty',
+    'admin.department':'🏢 Department',
+    'admin.manageLecturers':'👨‍💼 Manage Lecturers',
+    'admin.addLecturer':'＋ Add Lecturer',
+    'admin.editLecturer':'✏️ Edit Lecturer',
+    'admin.disableAcc':'🚫 Disable Account',
+    'admin.manageFaculty':'🏛️ Manage Faculty & Department',
+    'admin.manageFacultyBtn':'Manage Faculty',
+    'admin.manageDeptBtn':'Manage Department',
+    'admin.manageCatBtn':'Manage Categories',
+    'admin.dataReports':'📤 Data & Reports',
+    'admin.exportData':'⬇ Export Data (JSON)',
+    'admin.genReport':'📊 Generate Faculty Report',
+    'admin.rolesAccess':'🔐 Roles & Access',
+    'admin.reset':'🗑 Reset My Data',
+
+    'logout.confirm.title':'Update Resume Before Logging Out',
+    'logout.confirm.desc':'You have <b>unsynced changes</b> to Google Sheets.',
+    'logout.confirm.instruction':'Please press <b>☁️ Update Resume</b> below to save all latest changes to the cloud before logging out. After sync completes, you will be logged out automatically.',
+    'logout.sending':'⏳ Sending data to Google Sheets…',
+    'logout.sent':'✅ Resume sent successfully. Logging out…',
+    'logout.failed':'❌ Sync failed. Please try again or choose "Log Out Only".',
+    'logout.sendingBtn':'Sending to Cloud…',
+    'logout.retryBtn':'☁️ Try Again & Log Out',
+    'logout.exitTitle':'Update Resume First',
+    'logout.exitBack':'press Back button (←)',
+    'logout.exitClose':'close tab',
+    'logout.exitRefresh':'refresh page',
+    'logout.exitDesc':'You tried to <b>{reason}</b> but there are <b>unsynced changes</b> to Google Sheets.',
+    'logout.exitInstruction':'Please press the <b>☁️ Update Resume</b> button below to save all latest changes. After sync succeeds, you will be allowed to exit.',
+    'logout.exitSent':'✅ Resume sent successfully. You can exit now.',
+    'logout.exitDone':'✅ Update complete — you can now press Back / close tab / refresh.',
+    'logout.sendingShort':'Sending…',
+
+    'toast.roleChanged':'Role changed:',
+    'toast.noPermRole':'🔒 You do not have permission to change roles',
+    'toast.saved':'Saved ✔ — syncing…',
+    'toast.profileSaved':'Profile saved ✔ — syncing…',
+    'toast.recordSaved':'Record saved ✔ — syncing…',
+    'toast.recordDeleted':'Record deleted — syncing…',
+    'toast.aiBio':'✨ Biography generated — syncing…',
+    'toast.merged':'Records merged ✔ — syncing…',
+    'toast.dataReset':'Data reset — syncing…',
+    'toast.allRead':'All notifications marked as read',
+    'toast.exported':'Data exported ✔',
+    'toast.deleted':'Record deleted',
+    'toast.online':'🌐 Online — re-syncing',
+    'toast.offline':'📴 Offline',
+    'toast.syncing':'☁️ Force sync…',
+    'toast.synced':'☁️ Resume synced ✔',
+    'toast.syncFailed':'Sync failed — check log',
+    'toast.pullFailed':'Pull failed',
+    'toast.pullSuccess':'⬇ Cloud data loaded ✔',
+    'toast.testOK':'Connection OK ✔',
+    'toast.testFail':'Connection failed ✖',
+    'toast.copied':'Link copied ✔',
+    'toast.cvDownloaded':'CV downloaded',
+    'toast.langChanged':'Language changed:',
+
+    'confirm.deleteRecord':'Delete this record? The system will auto-sync the change to Cloud.',
+    'confirm.replaceProfile':'Replace profile with Cloud data?',
+    'confirm.reset':'Reset YOUR profile data to original state? (Your data only)',
+    'confirm.demoAddLecturer':'Demo: add new lecturer',
+    'confirm.demoDisable':'Demo: account disabled',
+    'confirm.demoManageFaculty':'Demo: manage faculty',
+    'confirm.demoManageDept':'Demo: manage department',
+    'confirm.demoManageCat':'Demo: manage categories',
+    'confirm.keepSeparate':'Records kept separate'
+  }
+};
+
+function L(key, fallback){
+  return (I18N[LANG] && I18N[LANG][key]) || (I18N.ms[key]) || fallback || key;
+}
+window.L = L;
+
+function setLang(lang){
+  LANG = (lang === 'en') ? 'en' : 'ms';
+  localStorage.setItem('aps_lang', LANG);
+  document.documentElement.lang = LANG;
+  render();
+  toast(L('toast.langChanged') + ' ' + (LANG === 'en' ? 'English' : 'Bahasa Melayu'));
+}
+window.setLang = setLang;
+
+document.documentElement.lang = LANG;
+
+/* =========================================================
+   CLOUD ENDPOINT
    ========================================================= */
 const CLOUD_URL = 'https://script.google.com/macros/s/AKfycbwTf6R87uxIhon3uB5ZW4E2M3o37J58UMRDu494bBQESo1YmaAT0gPDTnmYgmd4gh2IKg/exec';
 
 /* =========================================================
-   1. SCHEMA
+   SCHEMA
    ========================================================= */
 const SCHEMA = {
   qualifications:{ label:'Academic Qualification', icon:'🎓', singular:'Qualification', dateKey:'gradYear', cols:['university','gradYear'],
@@ -458,7 +1145,7 @@ const SCHEMA = {
     fields:[
       {k:'type',l:'Type',type:'select',opts:['Book','Book Chapter']},
       {k:'title',l:'Title',req:true,full:true},
-      {k:'bookTitle',l:'Book Title (untuk chapter)'},
+      {k:'bookTitle',l:'Book Title (for chapter)'},
       {k:'authors',l:'Author(s)',full:true},
       {k:'editors',l:'Editor(s)'},
       {k:'publisher',l:'Publisher'},
@@ -600,7 +1287,7 @@ const SCHEMA = {
 };
 
 /* =========================================================
-   2. SEED DATA — guna authDerivedProfile() sebagai asas
+   SEED
    ========================================================= */
 function seed(){
   const d = authDerivedProfile();
@@ -625,7 +1312,7 @@ function seed(){
 }
 
 /* =========================================================
-   3. PERSISTENCE
+   PERSISTENCE
    ========================================================= */
 const LS_KEY = 'academic_profile_system_v2_' + (CURRENT_USER.id || 'anon');
 let DB;
@@ -647,105 +1334,90 @@ function load(){
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
 DB = load() || seed();
 
-/* Setiap kali load, role UI diambil dari role auth (elak naik pangkat sendiri) */
 DB.role = CURRENT_APP_ROLE;
 
-/* =========================================================
-   FIX: hydrateProfile() — SELALU sync identity fields dari akaun login
-   (sebelum ini hanya isi kalau kosong, jadi data lama kekal salah)
-   ========================================================= */
 (function hydrateProfile(){
   const d = authDerivedProfile();
-
-  // WAJIB ikut akaun — name, staffId, position (based on role)
   if(d.name)     DB.profile.name     = d.name;
   if(d.staffId)  DB.profile.staffId  = d.staffId;
   if(d.position) DB.profile.position = d.position;
-
-  // Optional — hanya timpa kalau auth ada nilai
   if(d.email)      DB.profile.email      = d.email;
   if(d.department) DB.profile.department = d.department;
-
-  // faculty/campus/centre: kekalkan user-set (auth.js tak provide)
   if(!DB.profile.faculty) DB.profile.faculty = '';
   if(!DB.profile.campus)  DB.profile.campus  = '';
   if(!DB.profile.centre)  DB.profile.centre  = '';
-
-  // Simpan perubahan
   try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){}
 })();
 
 /* =========================================================
-   4. NAVIGATION
+   NAVIGATION
    ========================================================= */
 const NAV = [
-  {group:'Utama'},
-  {id:'dashboard',      label:'Dashboard',            icon:'🏠'},
-  {id:'profile',        label:'My Profile',           icon:'👤'},
-  {id:'expertise',      label:'Expertise & Research', icon:'🔬'},
-  {id:'qualifications', label:'Academic Qualification', icon:'🎓', coll:true},
-  {group:'Akademik'},
-  {id:'teaching',       label:'Teaching',             icon:'👨‍🏫', coll:true},
-  {id:'projects',       label:'Research Project',     icon:'🔬', coll:true},
-  {id:'grants',         label:'Research Grants',      icon:'💰', coll:true},
-  {id:'publications',   label:'Publications',         icon:'📚', coll:true},
-  {id:'conferences',    label:'Conference',           icon:'🎤', coll:true},
-  {id:'books',          label:'Book & Chapter',       icon:'📖', coll:true},
-  {id:'awards',         label:'Awards & Recognition', icon:'🏆', coll:true},
-  {id:'media',          label:'Magazine / Media',     icon:'📰', coll:true},
-  {group:'Kerjaya'},
-  {id:'adminExp',       label:'Administrative',       icon:'💼', coll:true},
-  {id:'supervision',    label:'Supervision',          icon:'👨‍🎓', coll:true},
-  {id:'consultancy',    label:'Consultancy',          icon:'🏢', coll:true},
-  {id:'memberships',    label:'Professional Membership', icon:'👔', coll:true},
-  {id:'community',      label:'Community Engagement', icon:'🌍', coll:true},
-  {id:'innovation',     label:'Innovation / Product', icon:'💡', coll:true},
-  {id:'ip',             label:'Intellectual Property',icon:'📜', coll:true},
-  {group:'AI & Tools'},
-  {id:'scanner',        label:'AI Document Scanner',  icon:'🤖'},
-  {id:'cloudSync',      label:'Cloud Resume Sync',    icon:'☁️'},
-  {id:'cv',             label:'My CV',                icon:'📄'},
-  {id:'public',         label:'Public Academic Profile', icon:'🌐'},
-  {group:'Analitik'},
-  {id:'search',         label:'Faculty Search',       icon:'🔎'},
-  {id:'analytics',      label:'Faculty Analytics',    icon:'📊', roles:['Head','Admin']},
-  {id:'kpi',            label:'KPI Dashboard',        icon:'📈', roles:['Head','Admin']},
-  {id:'quality',        label:'Data Quality',         icon:'⚠️'},
-  {group:'Sistem'},
-  {id:'notifications',  label:'Notifications',        icon:'🔔'},
-  {id:'admin',          label:'Admin Panel',          icon:'👨‍💼', roles:['Admin']},
-  {id:'audit',          label:'Audit Trail',          icon:'📝'}
+  {group:'nav.group.main'},
+  {id:'dashboard',      label:'nav.dashboard',      icon:'🏠'},
+  {id:'profile',        label:'nav.profile',        icon:'👤'},
+  {id:'expertise',      label:'nav.expertise',      icon:'🔬'},
+  {id:'qualifications', label:'nav.qualifications', icon:'🎓', coll:true},
+  {group:'nav.group.academic'},
+  {id:'teaching',       label:'nav.teaching',       icon:'👨‍🏫', coll:true},
+  {id:'projects',       label:'nav.projects',       icon:'🔬', coll:true},
+  {id:'grants',         label:'nav.grants',         icon:'💰', coll:true},
+  {id:'publications',   label:'nav.publications',   icon:'📚', coll:true},
+  {id:'conferences',    label:'nav.conferences',    icon:'🎤', coll:true},
+  {id:'books',          label:'nav.books',          icon:'📖', coll:true},
+  {id:'awards',         label:'nav.awards',         icon:'🏆', coll:true},
+  {id:'media',          label:'nav.media',          icon:'📰', coll:true},
+  {group:'nav.group.career'},
+  {id:'adminExp',       label:'nav.adminExp',       icon:'💼', coll:true},
+  {id:'supervision',    label:'nav.supervision',    icon:'👨‍🎓', coll:true},
+  {id:'consultancy',    label:'nav.consultancy',    icon:'🏢', coll:true},
+  {id:'memberships',    label:'nav.memberships',    icon:'👔', coll:true},
+  {id:'community',      label:'nav.community',      icon:'🌍', coll:true},
+  {id:'innovation',     label:'nav.innovation',     icon:'💡', coll:true},
+  {id:'ip',             label:'nav.ip',             icon:'📜', coll:true},
+  {group:'nav.group.tools'},
+  {id:'cloudSync',      label:'nav.cloudSync',      icon:'☁️'},
+  {id:'cv',             label:'nav.cv',             icon:'📄'},
+  {id:'public',         label:'nav.public',         icon:'🌐'},
+  {group:'nav.group.analytics'},
+  {id:'search',         label:'nav.search',         icon:'🔎'},
+  {id:'analytics',      label:'nav.analytics',      icon:'📊', roles:['Head','Admin']},
+  {id:'kpi',            label:'nav.kpi',            icon:'📈', roles:['Head','Admin']},
+  {id:'quality',        label:'nav.quality',        icon:'⚠️'},
+  {group:'nav.group.system'},
+  {id:'notifications',  label:'nav.notifications',  icon:'🔔'},
+  {id:'admin',          label:'nav.admin',          icon:'👨‍💼', roles:['Admin']},
+  {id:'audit',          label:'nav.audit',          icon:'📝'}
 ];
 
 const TITLES = {
-  dashboard:['Dashboard','Ringkasan profil akademik anda'],
-  profile:['My Profile','Maklumat peribadi, pengecam akademik & biografi'],
-  expertise:['Expertise & Research Interest','Kepakaran, minat penyelidikan, kata kunci & SDG'],
-  scanner:['AI Document Scanner','Upload Once, Extract Automatically, Verify Once, Use Everywhere'],
-  cloudSync:['Cloud Resume Sync','Auto-sync ke Google Sheets setiap kali data berubah'],
-  cv:['My CV','Jana CV akademik daripada satu sumber data'],
-  public:['Public Academic Profile','Profil awam yang boleh dikongsi'],
-  search:['Faculty Search','Cari kepakaran merentas semua rekod'],
-  analytics:['Faculty Analytics','Statistik penerbitan, penyelidikan & akademik'],
-  kpi:['KPI Dashboard','Petunjuk prestasi utama fakulti'],
-  quality:['Data Quality','Semakan data tidak lengkap & pertindihan'],
-  notifications:['Notifications','Makluman sistem & peringatan'],
-  admin:['Admin Panel','Pengurusan pengguna, sistem & AI'],
-  audit:['Audit Trail','Sejarah perubahan data']
+  dashboard:['title.dashboard','sub.dashboard'],
+  profile:['title.profile','sub.profile'],
+  expertise:['title.expertise','sub.expertise'],
+  cloudSync:['title.cloudSync','sub.cloudSync'],
+  cv:['title.cv','sub.cv'],
+  public:['title.public','sub.public'],
+  search:['title.search','sub.search'],
+  analytics:['title.analytics','sub.analytics'],
+  kpi:['title.kpi','sub.kpi'],
+  quality:['title.quality','sub.quality'],
+  notifications:['title.notifications','sub.notifications'],
+  admin:['title.admin','sub.admin'],
+  audit:['title.audit','sub.audit']
 };
 
 let state = { view:'dashboard', q:'' };
 
 function setRole(r){
   if(CURRENT_APP_ROLE !== 'Admin' && r !== CURRENT_APP_ROLE){
-    toast('🔒 Anda tiada kebenaran menukar peranan');
+    toast(L('toast.noPermRole'));
     render();
     return;
   }
   DB.role = r;
   save();
   render();
-  toast('Role ditukar: ' + r);
+  toast(L('toast.roleChanged') + ' ' + r);
 }
 window.setRole = setRole;
 
@@ -763,23 +1435,23 @@ function go(view, q){
 window.go = go;
 
 /* =========================================================
-   5. RENDER CORE
+   RENDER CORE
    ========================================================= */
 function renderSidebar(){
   const unread = notifications().filter(n=>!DB.readNotifs.includes(n.id)).length;
   let html = `<div class="brand">
       <div class="logo">🎓</div>
-      <div><h2>Academic Profile</h2><p>AI-Powered System</p></div>
+      <div><h2>${esc(L('app.name'))}</h2><p>${esc(L('app.tagline'))}</p></div>
     </div><nav class="nav">`;
   NAV.forEach(item=>{
-    if(item.group){ html += `<div class="nav-group">${item.group}</div>`; return; }
+    if(item.group){ html += `<div class="nav-group">${esc(L(item.group))}</div>`; return; }
     if(!canSee(item)) return;
     const active = state.view===item.id ? ' active' : '';
     let badge = '';
     if(item.id==='notifications' && unread) badge = `<span class="badge">${unread}</span>`;
     if(item.id==='quality'){ const n = qualityIssues().total; if(n) badge = `<span class="badge">${n}</span>`; }
     html += `<button class="nav-item${active}" onclick="go('${item.id}')">
-        <span class="ic">${item.icon}</span><span>${item.label}</span>${badge}
+        <span class="ic">${item.icon}</span><span>${esc(L(item.label))}</span>${badge}
       </button>`;
   });
   html += `</nav>`;
@@ -788,9 +1460,9 @@ function renderSidebar(){
 
 function render(){
   renderSidebar();
-  const t = TITLES[state.view] || (SCHEMA[state.view] ? [SCHEMA[state.view].label, 'Pengurusan rekod'] : ['Dashboard','']);
-  $('#pageTitle').textContent = t[0];
-  $('#pageSub').textContent = t[1];
+  const tt = TITLES[state.view] || (SCHEMA[state.view] ? ['nav.'+state.view, 'sub.records'] : ['nav.dashboard','']);
+  $('#pageTitle').textContent = L(tt[0]);
+  $('#pageSub').textContent = L(tt[1]);
 
   const p = DB.profile;
   $('#tbAvatar').textContent = initialsOf(p.name);
@@ -803,10 +1475,10 @@ function render(){
     roleSel.value = DB.role;
     const isAdmin = CURRENT_APP_ROLE === 'Admin';
     roleSel.disabled = !isAdmin;
-    roleSel.title = isAdmin
-      ? 'Tukar paparan peranan (demo)'
-      : 'Peranan anda: ' + DB.role;
+    roleSel.title = isAdmin ? 'Role (demo)' : L('role.label') + ': ' + DB.role;
   }
+  const langSel = $('#langSelect');
+  if(langSel) langSel.value = LANG;
 
   if(typeof SYNC !== 'undefined' && SYNC.setStatus){
     SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
@@ -821,7 +1493,7 @@ function render(){
 }
 
 /* =========================================================
-   6. UTILITIES
+   UTILITIES
    ========================================================= */
 function count(k){ return (DB[k]||[]).length; }
 function totalGrants(){ return (DB.grants||[]).reduce((s,g)=>s+Number(g.amount||0),0); }
@@ -865,16 +1537,39 @@ function qualityIssues(){
 function notifications(){
   const q = qualityIssues();
   const list = [];
-  if(DB.role==='Admin' || DB.role==='Head'){
-    list.push({id:'n-ai', icon:'🤖', title:'AI extraction completed', desc:'3 rekod baharu telah diekstrak dan menunggu pengesahan.', tone:'sky'});
-  }
-  if(q.missingDOI) list.push({id:'n-doi', icon:'🔍', title:`${q.missingDOI} publication(s) missing DOI`, desc:'Lengkapkan DOI untuk pengindeksan yang lebih baik.', tone:'amber'});
-  if(q.noOrcid) list.push({id:'n-orcid', icon:'🆔', title:'Profile missing ORCID', desc:'Tambah ORCID untuk penyegerakan penulis.', tone:'amber'});
-  if(q.dup) list.push({id:'n-dup', icon:'⚠️', title:'Possible duplicate publication detected', desc:'Sistem mengesan rekod yang mungkin bertindih.', tone:'red'});
+  const isMs = LANG === 'ms';
+
+  if(q.missingDOI) list.push({
+    id:'n-doi', icon:'🔍',
+    title: isMs ? `${q.missingDOI} penerbitan tiada DOI` : `${q.missingDOI} publication(s) missing DOI`,
+    desc: isMs ? 'Lengkapkan DOI untuk pengindeksan yang lebih baik.' : 'Complete DOI for better indexing.',
+    tone:'amber'});
+  if(q.noOrcid) list.push({
+    id:'n-orcid', icon:'🆔',
+    title: isMs ? 'Profil tiada ORCID' : 'Profile missing ORCID',
+    desc: isMs ? 'Tambah ORCID untuk penyegerakan penulis.' : 'Add ORCID for author synchronisation.',
+    tone:'amber'});
+  if(q.dup) list.push({
+    id:'n-dup', icon:'⚠️',
+    title: isMs ? 'Kemungkinan penerbitan bertindih' : 'Possible duplicate publication detected',
+    desc: isMs ? 'Sistem mengesan rekod yang mungkin bertindih.' : 'The system detected records that may overlap.',
+    tone:'red'});
   const pc = profileCompleteness();
-  if(pc < 100) list.push({id:'n-prof', icon:'👤', title:`Your profile is ${pc}% complete`, desc:'Lengkapkan maklumat untuk CV yang lebih baik.', tone:'sky'});
-  list.push({id:'n-cv', icon:'📄', title:'CV template ready', desc:'Academic CV anda boleh dijana pada bila-bila masa.', tone:'green'});
-  if(DB.cloud && DB.cloud.lastPush) list.push({id:'n-cloud', icon:'☁️', title:'Auto cloud sync aktif', desc:'Kali terakhir hantar: ' + fmtDateTime(DB.cloud.lastPush), tone:'green'});
+  if(pc < 100) list.push({
+    id:'n-prof', icon:'👤',
+    title: isMs ? `Profil anda ${pc}% lengkap` : `Your profile is ${pc}% complete`,
+    desc: isMs ? 'Lengkapkan maklumat untuk CV yang lebih baik.' : 'Complete the information for a better CV.',
+    tone:'sky'});
+  list.push({
+    id:'n-cv', icon:'📄',
+    title: isMs ? 'Templat CV sedia' : 'CV template ready',
+    desc: isMs ? 'CV akademik anda boleh dijana pada bila-bila masa.' : 'Your academic CV can be generated anytime.',
+    tone:'green'});
+  if(DB.cloud && DB.cloud.lastPush) list.push({
+    id:'n-cloud', icon:'☁️',
+    title: isMs ? 'Auto cloud sync aktif' : 'Auto cloud sync active',
+    desc: (isMs?'Kali terakhir hantar: ':'Last push: ') + fmtDateTime(DB.cloud.lastPush),
+    tone:'green'});
   return list;
 }
 
@@ -891,7 +1586,7 @@ function log(action, target, source, extra){
 }
 
 /* =========================================================
-   7. VIEW: DASHBOARD
+   VIEW: DASHBOARD
    ========================================================= */
 const VIEWS = {};
 
@@ -906,6 +1601,7 @@ VIEWS.dashboard = function(){
     ['community','🌍','Community Engagement'], ['memberships','👔','Professional Membership']
   ];
   const q = qualityIssues();
+  const isMs = LANG === 'ms';
 
   $('#view').innerHTML = `
   <div class="card card-pad" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
@@ -920,18 +1616,17 @@ VIEWS.dashboard = function(){
         </div>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <span class="pill ${pc>=85?'green':'amber'}">Status Profil: ${pc}% Complete</span>
-        <span class="pill sky">Role: ${DB.role}</span>
-        <span class="pill gray">Total Grant: ${money(totalGrants())}</span>
-        ${DB.cloud && DB.cloud.lastPush?`<span class="pill green">☁️ Auto-synced ${fmtDateTime(DB.cloud.lastPush)}</span>`:'<span class="pill amber">☁️ Belum sync</span>'}
+        <span class="pill ${pc>=85?'green':'amber'}">${esc(L('dash.profileStatus'))}: ${pc}% ${esc(L('dash.complete'))}</span>
+        <span class="pill sky">${esc(L('dash.role'))}: ${DB.role}</span>
+        <span class="pill gray">${esc(L('dash.totalGrant'))}: ${money(totalGrants())}</span>
+        ${DB.cloud && DB.cloud.lastPush?`<span class="pill green">${esc(L('dash.synced'))} ${fmtDateTime(DB.cloud.lastPush)}</span>`:`<span class="pill amber">${esc(L('dash.notSynced'))}</span>`}
       </div>
     </div>
     <div class="btn-row" style="align-items:flex-start">
-      <button class="btn btn-primary" onclick="openForm('publications')">＋ Add Information</button>
-      <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
-      <button class="btn btn-ok" onclick="go('cloudSync')">☁️ Cloud Sync</button>
-      <button class="btn" onclick="go('cv')">📄 Generate CV</button>
-      <button class="btn" onclick="go('profile')">✏️ Edit Profile</button>
+      <button class="btn btn-primary" onclick="openForm('publications')">${esc(L('dash.addInfo'))}</button>
+      <button class="btn btn-ok" onclick="go('cloudSync')">${esc(L('dash.cloudSync'))}</button>
+      <button class="btn" onclick="go('cv')">${esc(L('dash.genCV'))}</button>
+      <button class="btn" onclick="go('profile')">${esc(L('dash.editProfile'))}</button>
     </div>
   </div>
 
@@ -939,17 +1634,17 @@ VIEWS.dashboard = function(){
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <div style="font-size:26px">🔄</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800">Auto Cloud Sync — Aktif ✅</div>
-        <div class="muted small">Setiap <b>edit / tambah / padam</b> akan <b>auto-push</b> ke Google Sheets. Bila <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b>, atau <b>refresh</b> — sistem akan minta anda update resume dahulu.</div>
+        <div style="font-weight:800">${esc(L('dash.autoSync.title'))}</div>
+        <div class="muted small">${L('dash.autoSync.desc')}</div>
       </div>
       <div class="btn-row">
-        <button class="btn" onclick="quickCloudPush()">⚡ Force Sync Now</button>
-        <button class="btn" onclick="go('cloudSync')">⚙️ Panel Sync</button>
+        <button class="btn" onclick="quickCloudPush()">${esc(L('dash.forceSync'))}</button>
+        <button class="btn" onclick="go('cloudSync')">${esc(L('dash.syncPanel'))}</button>
       </div>
     </div>
   </div>
 
-  <div class="section-title">📊 Statistik Peribadi</div>
+  <div class="section-title">${esc(L('dash.stats'))}</div>
   <div class="grid g4" style="margin-bottom:20px">
     ${stats.map(([k,ic,l])=>`
       <button class="stat" onclick="go('${k}')">
@@ -961,31 +1656,31 @@ VIEWS.dashboard = function(){
 
   <div class="grid g2">
     <div class="card card-pad">
-      <div class="section-title">🔔 Reminder & Tugasan</div>
-      ${q.total===0 && pc===100 ? '<p class="muted small">Tiada isu data. Profil anda lengkap! 🎉</p>' : `
+      <div class="section-title">${esc(L('dash.reminders'))}</div>
+      ${q.total===0 && pc===100 ? `<p class="muted small">${esc(L('dash.noIssues'))}</p>` : `
       <div style="display:flex;flex-direction:column;gap:10px">
-        ${pc<100?`<div class="hint warn">👤 Maklumat profil belum lengkap — ${pc}% siap.</div>`:''}
-        ${q.missingDOI?`<div class="hint warn">🔍 ${q.missingDOI} publication belum mempunyai DOI.</div>`:''}
-        ${q.missingYear?`<div class="hint warn">📅 ${q.missingYear} rekod tiada tahun.</div>`:''}
-        ${q.dup?`<div class="hint warn">⚠️ ${q.dup} rekod berkemungkinan duplicate.</div>`:''}
-        ${q.noOrcid?`<div class="hint warn">🆔 ORCID belum diisi.</div>`:''}
-        <button class="btn btn-sm" style="align-self:flex-start" onclick="go('quality')">Buka Data Quality →</button>
+        ${pc<100?`<div class="hint warn">${esc(L('dash.incompleteProfile'))} — ${pc}%.</div>`:''}
+        ${q.missingDOI?`<div class="hint warn">🔍 ${q.missingDOI} ${esc(L('dash.missingDOI'))}</div>`:''}
+        ${q.missingYear?`<div class="hint warn">📅 ${q.missingYear} ${esc(L('dash.missingYear'))}</div>`:''}
+        ${q.dup?`<div class="hint warn">⚠️ ${q.dup} ${esc(L('dash.dupRecords'))}</div>`:''}
+        ${q.noOrcid?`<div class="hint warn">🆔 ${esc(L('dash.noOrcid'))}</div>`:''}
+        <button class="btn btn-sm" style="align-self:flex-start" onclick="go('quality')">${esc(L('btn.openQuality'))}</button>
       </div>`}
     </div>
 
     <div class="card card-pad">
-      <div class="section-title">📈 Penerbitan Mengikut Tahun</div>
+      <div class="section-title">${esc(L('dash.pubByYear'))}</div>
       ${barChart(pubByYear())}
     </div>
   </div>
 
   <div class="card card-pad" style="margin-top:18px">
-    <div class="section-title">🕘 Aktiviti Terkini (Audit)</div>
-    ${DB.audit.length===0 ? '<p class="muted small">Tiada aktiviti lagi.</p>' : `
+    <div class="section-title">${esc(L('dash.recentActivity'))}</div>
+    ${DB.audit.length===0 ? `<p class="muted small">${esc(L('dash.noActivity'))}</p>` : `
     <table><tbody>
       ${DB.audit.slice(0,5).map(a=>`<tr>
         <td><b>${esc(a.who)}</b><br><span class="muted small">${esc(a.action)} — ${esc(a.target||'')}</span></td>
-        <td style="text-align:right"><span class="pill ${a.source.includes('AI')?'sky':a.source.includes('Cloud')?'green':'gray'}">${esc(a.source)}</span><br>
+        <td style="text-align:right"><span class="pill ${a.source.includes('Cloud')?'green':'gray'}">${esc(a.source)}</span><br>
         <span class="muted small">${fmtDate(a.date)}</span></td>
       </tr>`).join('')}
     </tbody></table>`}
@@ -994,7 +1689,7 @@ VIEWS.dashboard = function(){
 
 function barChart(map){
   const entries = Object.entries(map).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
-  if(!entries.length) return '<p class="muted small">Tiada data.</p>';
+  if(!entries.length) return `<p class="muted small">${esc(L('kpi.noData'))}</p>`;
   const max = Math.max(...entries.map(e=>e[1]));
   return entries.map(([k,v])=>`
     <div class="bar-row">
@@ -1005,13 +1700,13 @@ function barChart(map){
 }
 
 /* =========================================================
-   8. VIEW: PROFILE
+   VIEW: PROFILE
    ========================================================= */
 VIEWS.profile = function(){
   const p = DB.profile;
   const f = (k,l,type,locked) => `<label class="fld"><span>${l}${locked?' 🔒':''}</span>
       <input type="${type||'text'}" data-p="${k}" value="${esc(p[k]||'')}" ${locked?'readonly style="background:#f8fafc;cursor:not-allowed"':''}></label>`;
-  const t = (k,l) => `<label class="fld full"><span>${l}</span>
+  const ta = (k,l) => `<label class="fld full"><span>${l}</span>
       <textarea rows="3" data-p="${k}">${esc(p[k]||'')}</textarea></label>`;
 
   $('#view').innerHTML = `
@@ -1019,18 +1714,16 @@ VIEWS.profile = function(){
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
       <div style="font-size:28px">🔐</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800">Signed in as ${esc(CURRENT_USER.name)}</div>
+        <div style="font-weight:800">${esc(L('profile.signedInAs'))} ${esc(CURRENT_USER.name)}</div>
         <div class="muted small">${esc(CURRENT_USER.email||'')} · ID: <b>${esc(CURRENT_USER.id)}</b> · Role: <b>${esc(CURRENT_ROLE)}</b></div>
       </div>
-      <button class="btn btn-danger btn-sm" onclick="doLogout()">🚪 Log Keluar</button>
+      <button class="btn btn-danger btn-sm" onclick="doLogout()">${esc(L('profile.logout'))}</button>
     </div>
   </div>
 
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">👤 A. Personal Information</div>
-    <div class="hint" style="margin-bottom:14px">
-      🔒 Field bertanda kunci diambil automatik dari <b>akaun login</b> anda (source of truth). Untuk tukar, kemas kini dalam sistem HR / auth.
-    </div>
+    <div class="section-title">${esc(L('profile.personalInfo'))}</div>
+    <div class="hint" style="margin-bottom:14px">${L('profile.lockedHint')}</div>
     <div class="form-grid">
       ${f('name','Full Name','text',true)} ${f('prefName','Preferred Name')}
       ${f('title','Title')} ${f('staffId','Staff ID','text',true)}
@@ -1039,13 +1732,13 @@ VIEWS.profile = function(){
       ${f('department','Department','text',true)} ${f('centre','Centre / Unit')}
       ${f('email','Email','email',true)} ${f('officeTel','Office Telephone')}
       ${f('mobile','Mobile Telephone')} ${f('officeLoc','Office Location')}
-      <label class="fld"><span>Profile Photo (emoji atau URL)</span>
+      <label class="fld"><span>Profile Photo (emoji or URL)</span>
         <input type="text" data-p="photo" value="${esc(p.photo||'')}"></label>
     </div>
   </div>
 
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🆔 B. Academic Identifier</div>
+    <div class="section-title">${esc(L('profile.academicId'))}</div>
     <div class="form-grid">
       ${f('orcid','ORCID')} ${f('scopus','Scopus Author ID')}
       ${f('wos','Web of Science Researcher ID')} ${f('scholar','Google Scholar')}
@@ -1055,26 +1748,24 @@ VIEWS.profile = function(){
   </div>
 
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">✍️ C. Biography</div>
+    <div class="section-title">${esc(L('profile.biography'))}</div>
     <div class="form-grid">
-      ${t('shortBio','Short Biography')}
-      ${t('longBio','Long Biography')}
-      ${t('academicProfile','Academic Profile')}
-      ${t('researchProfile','Research Profile')}
+      ${ta('shortBio','Short Biography')}
+      ${ta('longBio','Long Biography')}
+      ${ta('academicProfile','Academic Profile')}
+      ${ta('researchProfile','Research Profile')}
     </div>
     <div class="btn-row" style="margin-top:14px">
-      <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile (auto-sync ☁️)</button>
-      <button class="btn" onclick="aiBiography()">✨ AI Generate Biography</button>
+      <button class="btn btn-primary" onclick="saveProfile()">${esc(L('btn.saveProfile'))}</button>
+      <button class="btn" onclick="aiBiography()">${esc(L('btn.aiBio'))}</button>
     </div>
-    <div class="hint ok" style="margin-top:12px">
-      💡 <b>Auto-save aktif:</b> setiap kali anda taip, data disimpan lokal + auto-push ke Cloud.
-    </div>
+    <div class="hint ok" style="margin-top:12px">${L('profile.autoSaveHint')}</div>
   </div>`;
 };
 
 function saveProfile(){
   document.querySelectorAll('[data-p]').forEach(el=>{
-    if(el.readOnly) return; // Jangan timpa field yang dikunci dari auth
+    if(el.readOnly) return;
     DB.profile[el.dataset.p] = el.value;
   });
   try {
@@ -1086,7 +1777,7 @@ function saveProfile(){
     }
   } catch(e){}
   log('Updated Profile','My Profile','Manual Entry');
-  save(); render(); toast('Profil disimpan ✔ — sync…');
+  save(); render(); toast(L('toast.profileSaved'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-profile-save');
 }
@@ -1112,63 +1803,64 @@ function aiBiography(){
 
   p.researchProfile = `Research interests: ${interests.join(', ')||'—'}. Keywords: ${p.keywords||'—'}. SDG alignment: ${p.sdg||'—'}.`;
 
-  log('AI Generated Biography','My Profile','AI Generator',{confidence:94, verified:false});
-  save(); render(); toast('✨ Biografi dijana oleh AI — sync…');
+  log('Generated Biography','My Profile','Auto Generator',{confidence:94, verified:false});
+  save(); render(); toast(L('toast.aiBio'));
   clearTimeout(SYNC.timer);
-  SYNC.flush('after-ai-bio');
+  SYNC.flush('after-bio');
 }
 window.aiBiography = aiBiography;
 
 /* =========================================================
-   9. VIEW: EXPERTISE
+   VIEW: EXPERTISE
    ========================================================= */
 VIEWS.expertise = function(){
   const p = DB.profile;
   const chips = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>`<span class="pill">${esc(x)}</span>`).join(' ');
   $('#view').innerHTML = `
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🔬 Expertise</div>
-    <label class="fld"><span>Senarai kepakaran (pisah dengan koma)</span>
+    <div class="section-title">${esc(L('exp.expertise'))}</div>
+    <label class="fld"><span>${esc(L('exp.expertiseHint'))}</span>
       <textarea rows="2" data-e="expertise">${esc(p.expertise||'')}</textarea></label>
     <div style="margin-top:10px">${chips(p.expertise)}</div>
   </div>
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🎯 Research Interest</div>
-    <label class="fld"><span>Minat penyelidikan (pisah dengan koma)</span>
+    <div class="section-title">${esc(L('exp.interest'))}</div>
+    <label class="fld"><span>${esc(L('exp.interestHint'))}</span>
       <textarea rows="2" data-e="researchInterest">${esc(p.researchInterest||'')}</textarea></label>
     <div style="margin-top:10px">${chips(p.researchInterest)}</div>
   </div>
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🏷️ Keywords</div>
-    <label class="fld"><span>Kata kunci (pisah dengan koma)</span>
+    <div class="section-title">${esc(L('exp.keywords'))}</div>
+    <label class="fld"><span>${esc(L('exp.keywordsHint'))}</span>
       <textarea rows="2" data-e="keywords">${esc(p.keywords||'')}</textarea></label>
     <div style="margin-top:10px">${chips(p.keywords)}</div>
   </div>
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🌱 SDG Alignment</div>
-    <label class="fld"><span>SDG (pisah dengan koma)</span>
+    <div class="section-title">${esc(L('exp.sdg'))}</div>
+    <label class="fld"><span>${esc(L('exp.sdgHint'))}</span>
       <input type="text" data-e="sdg" value="${esc(p.sdg||'')}"></label>
     <div style="margin-top:10px">${chips(p.sdg)}</div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="saveExpertise()">💾 Save (auto-sync ☁️)</button>
+    <button class="btn btn-primary" onclick="saveExpertise()">${esc(L('btn.saveExpertise'))}</button>
   </div>`;
 };
 
 function saveExpertise(){
   document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
   log('Updated Expertise','Expertise & Research','Manual Entry');
-  save(); render(); toast('Disimpan ✔ — sync…');
+  save(); render(); toast(L('toast.saved'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-expertise');
 }
 window.saveExpertise = saveExpertise;
 
 /* =========================================================
-   10. GENERIC COLLECTION VIEW
+   GENERIC COLLECTION VIEW
    ========================================================= */
 function viewCollection(key){
   const sch = SCHEMA[key];
+  const labelText = L('nav.'+key, sch.label);
   const rows = DB[key] || [];
   const q = (state.q||'').toLowerCase();
   let list = [...rows];
@@ -1182,39 +1874,38 @@ function viewCollection(key){
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
       <div style="font-size:30px">${sch.icon}</div>
       <div style="flex:1;min-width:200px">
-        <div style="font-weight:800;font-size:16px">${sch.label}</div>
-        <div class="muted small">${rows.length} rekod · Auto-sync aktif ☁️</div>
+        <div style="font-weight:800;font-size:16px">${esc(labelText)}</div>
+        <div class="muted small">${rows.length} ${esc(L('coll.records'))} · ${esc(L('coll.autoSyncOn'))}</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="openForm('${key}')">＋ Add Manually</button>
-        <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
+        <button class="btn btn-primary" onclick="openForm('${key}')">${esc(L('coll.addManually'))}</button>
       </div>
     </div>
     <div style="margin-top:14px">
       <input class="fld" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px"
-        placeholder="🔎 Cari dalam ${sch.label}..." value="${esc(state.q||'')}"
+        placeholder="${esc(L('coll.searchPlaceholder'))} ${esc(labelText)}..."
+        value="${esc(state.q||'')}"
         oninput="state.q=this.value; clearTimeout(window._t); window._t=setTimeout(()=>{viewCollection('${key}')},250)">
     </div>
   </div>
 
-  ${key==='grants' ? `<div class="hint" style="margin-bottom:16px"><b>Auto calculation:</b> Total Grant Obtained = <b>${money(totalGrants())}</b></div>` : ''}
+  ${key==='grants' ? `<div class="hint" style="margin-bottom:16px"><b>${esc(L('coll.autoCalc'))}</b> ${esc(L('coll.totalGrantObtained'))} = <b>${money(totalGrants())}</b></div>` : ''}
 
   <div class="card">
     ${list.length===0 ? `<div class="empty"><div class="big">${sch.icon}</div>
-        <p>Tiada rekod ${sch.label} lagi.</p>
+        <p>${esc(L('coll.noRecords'))} ${esc(labelText)} ${esc(L('coll.lagi'))}</p>
         <div class="btn-row" style="justify-content:center;margin-top:14px">
-          <button class="btn btn-primary" onclick="openForm('${key}')">＋ Add ${sch.singular}</button>
-          <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
+          <button class="btn btn-primary" onclick="openForm('${key}')">${esc(L('btn.add'))} ${esc(sch.singular)}</button>
         </div></div>`
       : `<div class="tbl-wrap"><table>
           <thead><tr><th>${sch.singular}</th>${cols.map(c=>`<th>${labelOf(sch,c)}</th>`).join('')}<th></th></tr></thead>
           <tbody>${list.map(r=>`
             <tr>
-              <td><b>${esc(sch.title(r)||'(tanpa tajuk)')}</b>${r.authors?`<br><span class="muted small">${esc(r.authors)}</span>`:''}</td>
+              <td><b>${esc(sch.title(r)||'(no title)')}</b>${r.authors?`<br><span class="muted small">${esc(r.authors)}</span>`:''}</td>
               ${cols.map(c=>`<td>${cellVal(sch,c,r)}</td>`).join('')}
               <td><div class="row-actions">
-                <button class="btn btn-sm" onclick="openForm('${key}','${r.id}')">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="delRec('${key}','${r.id}')">🗑</button>
+                <button class="btn btn-sm" onclick="openForm('${key}','${r.id}')">${esc(L('btn.edit'))}</button>
+                <button class="btn btn-sm btn-danger" onclick="delRec('${key}','${r.id}')">${esc(L('btn.delete'))}</button>
               </div></td>
             </tr>`).join('')}</tbody>
         </table></div>`}
@@ -1237,18 +1928,18 @@ function cellVal(sch, key, r){
 }
 
 function delRec(key, id){
-  if(!confirm('Padam rekod ini? Sistem akan auto-sync perubahan ke Cloud.')) return;
+  if(!confirm(L('confirm.deleteRecord'))) return;
   const rec = DB[key].find(r=>r.id===id);
   DB[key] = DB[key].filter(r=>r.id!==id);
   log('Deleted Record', (SCHEMA[key].title(rec)||key), 'Manual Entry');
-  save(); render(); toast('Rekod dipadam — sync…');
+  save(); render(); toast(L('toast.recordDeleted'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-delete');
 }
 window.delRec = delRec;
 
 /* =========================================================
-   11. MODAL FORM
+   MODAL FORM
    ========================================================= */
 function openForm(key, id){
   const sch = SCHEMA[key];
@@ -1260,7 +1951,7 @@ function openForm(key, id){
         <textarea name="${f.k}" rows="3">${esc(v)}</textarea></label>`;
     if(f.type==='select')
       return `<label class="fld ${f.full?'full':''}"><span>${f.l}${f.req?' *':''}</span>
-        <select name="${f.k}">${['',...f.opts].map(o=>`<option value="${esc(o)}" ${o==v?'selected':''}>${o||'— pilih —'}</option>`).join('')}</select></label>`;
+        <select name="${f.k}">${['',...f.opts].map(o=>`<option value="${esc(o)}" ${o==v?'selected':''}>${o||L('form.choose')}</option>`).join('')}</select></label>`;
     return `<label class="fld ${f.full?'full':''}"><span>${f.l}${f.req?' *':''}</span>
       <input type="${f.type||'text'}" name="${f.k}" value="${esc(v)}" ${f.req?'required':''}></label>`;
   }).join('');
@@ -1270,16 +1961,16 @@ function openForm(key, id){
     <form class="modal" onsubmit="submitForm(event,'${key}','${id||''}')">
       <div class="modal-head">
         <div style="font-size:22px">${sch.icon}</div>
-        <h3>${id?'Edit':'Add'} ${sch.singular}</h3>
-        <button type="button" class="btn btn-sm" style="margin-left:auto" onclick="closeModal()">✕</button>
+        <h3>${id?L('form.edit'):L('form.add')} ${sch.singular}</h3>
+        <button type="button" class="btn btn-sm" style="margin-left:auto" onclick="closeModal()">${esc(L('btn.close'))}</button>
       </div>
       <div class="modal-body">
-        <div class="hint" style="margin-bottom:16px">💡 Data akan <b>auto-sync</b> ke Cloud selepas Save.</div>
+        <div class="hint" style="margin-bottom:16px">${L('form.dataAutoSync')}</div>
         <div class="form-grid">${body}</div>
       </div>
       <div class="modal-foot">
-        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary">💾 Save ${sch.singular}</button>
+        <button type="button" class="btn" onclick="closeModal()">${esc(L('btn.cancel'))}</button>
+        <button type="submit" class="btn btn-primary">${esc(L('btn.save'))} ${sch.singular}</button>
       </div>
     </form>
   </div>`;
@@ -1303,299 +1994,14 @@ function submitForm(e, key, id){
     DB[key].push(data);
     log('Added Record', SCHEMA[key].title(data)||key, 'Manual Entry');
   }
-  closeModal(); save(); render(); toast('Rekod disimpan ✔ — sync…');
+  closeModal(); save(); render(); toast(L('toast.recordSaved'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-save');
 }
 window.submitForm = submitForm;
 
 /* =========================================================
-   12. VIEW: AI DOCUMENT SCANNER
-   ========================================================= */
-let scanResult = null;
-
-VIEWS.scanner = function(){
-  $('#view').innerHTML = `
-  <div class="grid g2" style="margin-bottom:18px">
-    <div class="card card-pad">
-      <div class="section-title">🤖 AI Document Scanner</div>
-      <div class="hint" style="margin-bottom:14px">
-        <b>"Upload Once, Extract Automatically, Verify Once, Use Everywhere."</b><br>
-        Dokumen asal <b>tidak disimpan secara kekal</b>.
-      </div>
-
-      <div class="fld" style="margin-bottom:12px">
-        <span>Jenis Dokumen</span>
-        <select id="scanType">
-          <option value="auto">Auto Detect</option>
-          <option value="publications">Journal Article</option>
-          <option value="conferences">Conference Paper</option>
-          <option value="books">Book / Book Chapter</option>
-          <option value="awards">Award / Certificate</option>
-          <option value="grants">Grant Document</option>
-          <option value="adminExp">Appointment Letter</option>
-          <option value="media">Magazine / Media</option>
-        </select>
-      </div>
-
-      <div class="drop" onclick="document.getElementById('scanFile').click()">
-        <div style="font-size:34px">📄</div>
-        <div style="font-weight:700;margin-top:8px">Drag &amp; Drop Document</div>
-        <div class="muted small">atau klik untuk pilih fail</div>
-        <input type="file" id="scanFile" hidden onchange="handleFile(this)">
-      </div>
-
-      <div class="fld" style="margin-top:14px">
-        <span>Atau tampal teks dokumen di sini</span>
-        <textarea id="scanText" rows="6" placeholder="Paste abstract / metadata dokumen di sini..."></textarea>
-      </div>
-
-      <div class="btn-row" style="margin-top:14px">
-        <button class="btn btn-primary" onclick="runScan()">🤖 Scan Document</button>
-        <button class="btn" onclick="loadSample()">📋 Muat Contoh Dokumen</button>
-      </div>
-    </div>
-
-    <div class="card card-pad">
-      <div class="section-title">⚙️ Proses AI</div>
-      <div id="steps">
-        ${['Upload','AI membaca dokumen','AI mengenal pasti jenis dokumen','AI extract information','Confidence score','Pensyarah verify','Save & Auto-sync']
-          .map((s,i)=>`<div class="step" id="step${i}"><div class="num">${i+1}</div><div><b>${s}</b></div></div>`).join('')}
-      </div>
-      <div class="hint" style="margin-top:12px">
-        Field dengan <b>confidence rendah</b> akan ditandakan untuk semakan manual.
-      </div>
-    </div>
-  </div>
-
-  <div id="scanOutput"></div>`;
-};
-
-function handleFile(input){
-  const file = input.files[0];
-  if(!file) return;
-  if(/\.(txt|md|csv|json)$/i.test(file.name) || file.type.startsWith('text')){
-    const fr = new FileReader();
-    fr.onload = e => { $('#scanText').value = e.target.result; toast('Fail dibaca ✔'); };
-    fr.readAsText(file);
-  } else {
-    $('#scanText').value = `[Dokumen: ${file.name}]\n\nJournal of Cleaner Production\nSustainable Polyurethane from Waste Cooking Oil via Epoxidation Route\nA. Roslan, M. Hafiz, S. Tan\n2026, Volume 15, Issue 2, pages 120-134\nDOI: 10.1016/j.jclepro.2026.120134`;
-    toast('Fail dikesan — teks contoh dimuatkan');
-  }
-}
-window.handleFile = handleFile;
-
-function loadSample(){
-  $('#scanText').value =
-`Journal of Cleaner Production
-Sustainable Polyurethane from Waste Cooking Oil via Epoxidation Route
-Authors: A. Roslan, M. Hafiz, S. Tan
-Affiliation: Faculty of Chemical Engineering
-Year: 2026  Volume: 15  Issue: 2  Pages: 120-134
-DOI: 10.1016/j.jclepro.2026.120134
-ISSN: 0959-6526
-Abstract: This study investigates the conversion of waste cooking oil into bio-based polyol for rigid polyurethane foam applications using a heterogeneous TiO2 catalyst.
-Keywords: Waste Cooking Oil; Polyurethane; Epoxidation; Biopolyol`;
-  toast('Contoh dokumen dimuatkan');
-}
-window.loadSample = loadSample;
-
-function runScan(){
-  const text = $('#scanText').value.trim();
-  if(!text){ toast('Sila masukkan teks dokumen'); return; }
-
-  let i = 0;
-  const timer = setInterval(()=>{
-    const el = document.getElementById('step'+i);
-    if(el) el.classList.add('done');
-    i++;
-    if(i>3){ clearInterval(timer); doExtract(text); }
-  }, 260);
-  doExtract(text);
-}
-window.runScan = runScan;
-
-function detectType(text){
-  const t = text.toLowerCase();
-  if(/appointment|lantikan|letter of appointment/.test(t)) return 'adminExp';
-  if(/grant|funding agency|grant number|rm\s?\d/.test(t)) return 'grants';
-  if(/award|certificate of|anugerah|recognition/.test(t)) return 'awards';
-  if(/conference|proceedings|symposium|colloquium/.test(t)) return 'conferences';
-  if(/isbn|book chapter|publisher/.test(t) && !/journal/.test(t)) return 'books';
-  if(/magazine|newspaper|online media/.test(t)) return 'media';
-  if(/journal|doi|abstract|issn/.test(t)) return 'publications';
-  return 'publications';
-}
-
-function doExtract(text){
-  const forced = $('#scanType').value;
-  const detected = forced === 'auto' ? detectType(text) : forced;
-
-  const lines = text.split('\n').map(s=>s.trim()).filter(Boolean);
-  const flat = text.replace(/\s+/g,' ');
-
-  const doi = (flat.match(/\b10\.\d{4,9}\/[^\s"<>]+/)||[''])[0].replace(/[.,;]$/,'');
-  const years = (flat.match(/\b(19|20)\d{2}\b/g)||[]);
-  const year = years.length ? years.sort().pop() : '';
-  const vol = (flat.match(/volume[:\s]+([0-9]+)/i)||[])[1] || '';
-  const iss = (flat.match(/issue[:\s]+([0-9]+)/i)||[])[1] || '';
-  const pages = (flat.match(/pages?[:\s]+([0-9]+\s*[-–]\s*[0-9]+)/i)||[])[1] || '';
-  const issn = (flat.match(/issn[:\s]+([0-9Xx\-]+)/)||[])[1] || '';
-  const isbn = (flat.match(/isbn[:\s]+([0-9Xx\-]+)/)||[])[1] || '';
-  const title = lines.find(l => l.length > 25 && !/^(journal|authors?|abstract|keywords|doi|volume|year)/i.test(l)) || lines[0] || '';
-  const authorLine = lines.find(l => /^authors?[:\s]/i.test(l)) || lines.find(l=>/^[A-Z]\.\s?[A-Za-z]+/.test(l) && l!==title) || '';
-  const journal = lines.find(l => /journal|proceedings|publisher/i.test(l) && l!==title) || '';
-  const kwLine = lines.find(l => /^keywords?[:\s]/i.test(l)) || '';
-
-  const f = (k, label, val, conf) => ({ k, label, value: val || '', conf: val ? conf : 0, low: !!val && conf < 85 });
-
-  let fields = [];
-  if(detected === 'publications'){
-    fields = [
-      f('type','Publication Type','Journal Article',96),
-      f('title','Title',title,97),
-      f('authors','Authors',authorLine.replace(/^authors?[:\s]*/i,''),93),
-      f('journal','Journal Name',journal,88),
-      f('year','Year',year,94),
-      f('volume','Volume',vol,72),
-      f('issue','Issue',iss,68),
-      f('pages','Pages',pages,80),
-      f('doi','DOI',doi,97),
-      f('issn','ISSN',issn,90),
-      f('keywords','Keywords',kwLine.replace(/^keywords?[:\s]*/i,''),86),
-      f('indexing','Indexing','Scopus',75),
-      f('quartile','Quartile','Q1',62)
-    ];
-  } else if(detected === 'conferences'){
-    fields = [
-      f('paperTitle','Paper Title',title,95),
-      f('authors','Authors',authorLine,90),
-      f('conferenceName','Conference Name',journal,84),
-      f('year','Year',year,92),
-      f('country','Country','Malaysia',70),
-      f('doi','DOI',doi,95)
-    ];
-  } else if(detected === 'awards'){
-    fields = [
-      f('awardTitle','Award Title',title,92),
-      f('organisation','Awarding Organisation',journal,80),
-      f('year','Year',year,90),
-      f('level','Level','International',74)
-    ];
-  } else if(detected === 'grants'){
-    fields = [
-      f('grantName','Grant Name',title,90),
-      f('grantNumber','Grant Number',(flat.match(/\b[A-Z]{2,6}\/\d[A-Za-z0-9\/\-]+/)||[''])[0],82),
-      f('fundingAgency','Funding Agency',journal,78),
-      f('amount','Amount (RM)',((flat.match(/RM\s?([\d,]+)/i)||[])[1]||'').replace(/,/g,''),85),
-      f('year','Year',year,92),
-      f('status','Status','Active',70)
-    ];
-  } else if(detected === 'adminExp'){
-    fields = [
-      f('position','Position',title,88),
-      f('organisation','Organisation',journal,84),
-      f('startDate','Start Date',year?`${year}-01-01`:'',72),
-      f('appointmentType','Appointment Type','Contract',66)
-    ];
-  } else if(detected === 'books'){
-    fields = [
-      f('type','Type','Book Chapter',80),
-      f('title','Title',title,94),
-      f('authors','Authors',authorLine,88),
-      f('publisher','Publisher',journal,80),
-      f('isbn','ISBN',isbn,88),
-      f('year','Year',year,92)
-    ];
-  } else {
-    fields = [
-      f('articleTitle','Article Title',title,92),
-      f('outlet','Magazine/Newspaper',journal,78),
-      f('date','Date',year?`${year}-01-01`:'',70),
-      f('type','Type','Online Media',72)
-    ];
-  }
-
-  scanResult = { detected, fields };
-
-  const avg = Math.round(fields.filter(x=>x.value).reduce((s,x)=>s+x.conf,0) / Math.max(1, fields.filter(x=>x.value).length));
-
-  $('#scanOutput').innerHTML = `
-  <div class="card card-pad">
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-      <div class="section-title" style="margin:0">🧾 Hasil Ekstraksi AI</div>
-      <span class="pill sky">Jenis dikesan: ${SCHEMA[detected].icon} ${SCHEMA[detected].label}</span>
-      <span class="pill ${avg>=90?'green':avg>=80?'amber':'red'}">Purata Confidence: ${avg}%</span>
-      <div style="margin-left:auto" class="btn-row">
-        <select id="targetModule" class="role-sel" onchange="scanResult.detected=this.value; renderScanTable()">
-          ${Object.keys(SCHEMA).map(k=>`<option value="${k}" ${k===detected?'selected':''}>${SCHEMA[k].label}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div id="scanTable"></div>
-    <div class="btn-row" style="margin-top:16px">
-      <button class="btn btn-primary" onclick="confirmScan()">✅ Confirm &amp; Save (auto-sync ☁️)</button>
-      <button class="btn" onclick="scanResult=null; document.getElementById('scanOutput').innerHTML='';">✕ Batal</button>
-    </div>
-    <div class="hint warn" style="margin-top:12px">Field bertanda 🟠 mempunyai confidence rendah — sila semak sebelum simpan.</div>
-  </div>`;
-
-  renderScanTable();
-  [4,5].forEach(i=>document.getElementById('step'+i)?.classList.add('done'));
-}
-
-function renderScanTable(){
-  if(!scanResult) return;
-  const rows = scanResult.fields.map((f,i)=>`
-    <tr class="${f.low?'low':''}">
-      <td style="width:190px"><b>${esc(f.label)}</b></td>
-      <td><input style="width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px"
-            value="${esc(f.value)}" oninput="scanResult.fields[${i}].value=this.value"></td>
-      <td style="width:170px">
-        <div class="conf">
-          <div class="cbar"><i style="width:${f.conf}%;background:${f.conf>=90?'var(--ok)':f.conf>=80?'var(--warn)':'var(--danger)'}"></i></div>
-          <b>${f.conf}%</b>
-        </div>
-      </td>
-    </tr>`).join('');
-
-  $('#scanTable').innerHTML = `<div class="tbl-wrap"><table>
-    <thead><tr><th>Field</th><th>AI Result</th><th>Confidence</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>`;
-}
-window.renderScanTable = renderScanTable;
-
-function _commitScan(){
-  const key = scanResult.detected;
-  const rec = { id: uid(), _source:'AI Scanner' };
-  scanResult.fields.forEach(f=>{ if(f.value) rec[f.k] = f.value; });
-
-  if(key === 'publications' && rec.type) {
-    if(/journal/i.test(rec.type)) rec.quartile = rec.quartile || 'Q1';
-  }
-  DB[key].push(rec);
-
-  const avg = Math.round(scanResult.fields.filter(x=>x.value).reduce((s,x)=>s+x.conf,0) / Math.max(1, scanResult.fields.filter(x=>x.value).length));
-  log('Added Record via AI', SCHEMA[key].title(rec)||key, 'AI Scanner', { confidence: avg, verified: true });
-
-  scanResult = null;
-  save();
-  $('#scanOutput').innerHTML = `<div class="hint ok"><b>✅ Rekod berjaya disimpan ke ${SCHEMA[key].label}.</b> Auto-sync ke Cloud sedang dijalankan.</div>`;
-  renderSidebar();
-  toast('Rekod AI disimpan ✔ — sync…');
-  clearTimeout(SYNC.timer);
-  SYNC.flush('after-ai-scan');
-  return key;
-}
-
-function confirmScan(){
-  if(!scanResult) return;
-  _commitScan();
-}
-window.confirmScan = confirmScan;
-
-/* =========================================================
-   13. SYNC ENGINE v4 — AUTO + RETRY + KEEPALIVE
+   SYNC ENGINE
    ========================================================= */
 const SYNC = {
   timer:null, inflight:false, retries:0,
@@ -1647,12 +2053,8 @@ const SYNC = {
     const lbl = document.getElementById('syncLabel');
     if(!dot || !lbl) return;
     const map  = { idle:'off', pending:'busy', busy:'busy', ok:'on', error:'off', offline:'off', retry:'busy' };
-    const text = {
-      idle:'Cloud idle', pending:'Sync pending…', busy:'Syncing…',
-      ok:'☁️ Auto-synced', error:'⚠️ Sync failed', offline:'📴 Offline', retry:'⟳ Retrying…'
-    };
     dot.className = 'sync-dot ' + (map[s]||'off');
-    lbl.textContent = text[s] || s;
+    lbl.textContent = L('sync.'+s, s);
   },
 
   flushKeepalive(){
@@ -1698,11 +2100,10 @@ const SYNC = {
 };
 window.SYNC = SYNC;
 
-/* Auto-save setiap input Profile & Expertise */
 document.addEventListener('input', (e) => {
   const el = e.target;
   if(!el || !el.dataset) return;
-  if(el.readOnly) return; // skip field yang dikunci dari auth
+  if(el.readOnly) return;
   let changed = false;
   if(el.dataset.p){ DB.profile[el.dataset.p] = el.value; changed = true; }
   if(el.dataset.e){ DB.profile[el.dataset.e] = el.value; changed = true; }
@@ -1727,8 +2128,8 @@ document.addEventListener('visibilitychange', ()=>{
   }
 });
 window.addEventListener('pagehide',     ()=>{ SYNC.flushKeepalive(); });
-window.addEventListener('online',  ()=>{ toast('🌐 Online — sync semula'); SYNC.flush('online'); });
-window.addEventListener('offline', ()=>{ SYNC.setStatus('offline'); toast('📴 Offline'); });
+window.addEventListener('online',  ()=>{ toast(L('toast.online')); SYNC.flush('online'); });
+window.addEventListener('offline', ()=>{ SYNC.setStatus('offline'); toast(L('toast.offline')); });
 
 setInterval(()=>{
   if(DB.cloud.autoSync && navigator.onLine &&
@@ -1738,7 +2139,7 @@ setInterval(()=>{
 }, 3*60*1000);
 
 /* =========================================================
-   13b. LOGOUT MODAL
+   LOGOUT MODAL
    ========================================================= */
 let _logoutBypass = false;
 let _allowExit = false;
@@ -1762,39 +2163,32 @@ function doLogout(){
     <div class="modal" style="max-width:560px">
       <div class="modal-head">
         <div style="font-size:22px">⚠️</div>
-        <h3>Update Resume Sebelum Log Keluar</h3>
-        <button type="button" class="btn btn-sm" style="margin-left:auto" onclick="closeLogoutModal()">✕</button>
+        <h3>${esc(L('logout.confirm.title'))}</h3>
+        <button type="button" class="btn btn-sm" style="margin-left:auto" onclick="closeLogoutModal()">${esc(L('btn.close'))}</button>
       </div>
       <div class="modal-body">
-        <div class="hint warn">
-          Anda mempunyai <b>perubahan yang belum disegerakkan</b> ke Google Sheets.
-        </div>
-        <p style="margin-top:14px;font-size:13px">
-          Sila tekan <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini ke cloud
-          sebelum log keluar. Selepas selesai sync, anda akan dilog keluar secara automatik.
-        </p>
+        <div class="hint warn">${L('logout.confirm.desc')}</div>
+        <p style="margin-top:14px;font-size:13px">${L('logout.confirm.instruction')}</p>
         <div id="logoutProgress" class="logout-progress" style="display:none"></div>
       </div>
       <div class="modal-foot">
-        <button type="button" class="btn" onclick="closeLogoutModal()">❌ Batal</button>
-        <button type="button" class="btn btn-danger" onclick="forceLogout()">Log Out Sahaja</button>
-        <button type="button" class="btn btn-ok" id="btnUpdateAndLogout" onclick="syncAndLogout()">☁️ Update Resume &amp; Log Out</button>
+        <button type="button" class="btn" onclick="closeLogoutModal()">${esc(L('btn.cancel'))}</button>
+        <button type="button" class="btn btn-danger" onclick="forceLogout()">${esc(L('btn.logoutOnly'))}</button>
+        <button type="button" class="btn btn-ok" id="btnUpdateAndLogout" onclick="syncAndLogout()">${esc(L('btn.updateLogout'))}</button>
       </div>
     </div>
   </div>`;
 }
 window.doLogout = doLogout;
 
-function closeLogoutModal(){
-  $('#logoutRoot').innerHTML = '';
-}
+function closeLogoutModal(){ $('#logoutRoot').innerHTML = ''; }
 window.closeLogoutModal = closeLogoutModal;
 
 async function syncAndLogout(){
   const btn = document.getElementById('btnUpdateAndLogout');
   const prog = document.getElementById('logoutProgress');
-  if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Menghantar ke Cloud…`; }
-  if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = `⏳ Menghantar data ke Google Sheets…`; }
+  if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${esc(L('logout.sendingBtn'))}`; }
+  if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = L('logout.sending'); }
 
   try{
     clearTimeout(SYNC.timer);
@@ -1802,16 +2196,16 @@ async function syncAndLogout(){
     const ok = await cloudPush({ silent:true, reason:'logout' });
 
     if(ok){
-      if(prog){ prog.className='logout-progress done'; prog.innerHTML = `✅ Resume berjaya dihantar. Melog keluar…`; }
+      if(prog){ prog.className='logout-progress done'; prog.innerHTML = L('logout.sent'); }
       SYNC.dirty = false;
       setTimeout(()=>forceLogout(), 900);
     } else {
-      if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ Sync gagal. Sila cuba lagi atau pilih "Log Out Sahaja".`; }
-      if(btn){ btn.disabled = false; btn.innerHTML = `☁️ Cuba Lagi & Log Out`; }
+      if(prog){ prog.className='logout-progress err'; prog.innerHTML = L('logout.failed'); }
+      if(btn){ btn.disabled = false; btn.innerHTML = esc(L('logout.retryBtn')); }
     }
   }catch(err){
-    if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ Ralat: ${esc(err.message)}`; }
-    if(btn){ btn.disabled = false; btn.innerHTML = `☁️ Cuba Lagi & Log Out`; }
+    if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ ${esc(err.message)}`; }
+    if(btn){ btn.disabled = false; btn.innerHTML = esc(L('logout.retryBtn')); }
   }
 }
 window.syncAndLogout = syncAndLogout;
@@ -1826,36 +2220,31 @@ function forceLogout(){
 window.forceLogout = forceLogout;
 
 /* =========================================================
-   13c. EXIT GUARD — Back / Close / Refresh
+   EXIT GUARD
    ========================================================= */
 function showExitGuardModal(reason){
   if(_exitGuardShown) return;
   _exitGuardShown = true;
 
-  const reasonText = reason === 'back'  ? 'tekan butang Back (←)'
-                   : reason === 'close' ? 'tutup tab'
-                   : 'refresh halaman';
+  const reasonText = reason === 'back'  ? L('logout.exitBack')
+                   : reason === 'close' ? L('logout.exitClose')
+                   : L('logout.exitRefresh');
 
   $('#logoutRoot').innerHTML = `
   <div class="modal-bg" onclick="event.stopPropagation()">
     <div class="modal" style="max-width:560px">
       <div class="modal-head">
         <div style="font-size:22px">🛑</div>
-        <h3>Update Resume Terlebih Dahulu</h3>
+        <h3>${esc(L('logout.exitTitle'))}</h3>
       </div>
       <div class="modal-body">
-        <div class="hint warn">
-          Anda cuba <b>${reasonText}</b> tetapi ada <b>perubahan yang belum disegerakkan</b> ke Google Sheets.
-        </div>
-        <p style="margin-top:14px;font-size:13px">
-          Sila tekan butang <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini.
-          Selepas sync berjaya, anda akan dibenarkan keluar.
-        </p>
+        <div class="hint warn">${L('logout.exitDesc').replace('{reason}', reasonText)}</div>
+        <p style="margin-top:14px;font-size:13px">${L('logout.exitInstruction')}</p>
         <div id="exitGuardProgress" class="logout-progress" style="display:none"></div>
       </div>
       <div class="modal-foot">
-        <button type="button" class="btn" onclick="cancelExitGuard()">❌ Kekal di Halaman</button>
-        <button type="button" class="btn btn-ok" id="btnExitUpdate" onclick="syncThenExit()">☁️ Update Resume &amp; Keluar</button>
+        <button type="button" class="btn" onclick="cancelExitGuard()">${esc(L('btn.stay'))}</button>
+        <button type="button" class="btn btn-ok" id="btnExitUpdate" onclick="syncThenExit()">${esc(L('btn.updateExit'))}</button>
       </div>
     </div>
   </div>`;
@@ -1870,8 +2259,8 @@ window.cancelExitGuard = cancelExitGuard;
 async function syncThenExit(){
   const btn  = document.getElementById('btnExitUpdate');
   const prog = document.getElementById('exitGuardProgress');
-  if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Menghantar…`; }
-  if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = `⏳ Menghantar data ke Google Sheets…`; }
+  if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${esc(L('logout.sendingShort'))}`; }
+  if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = L('logout.sending'); }
 
   try{
     clearTimeout(SYNC.timer);
@@ -1881,25 +2270,24 @@ async function syncThenExit(){
     if(ok){
       SYNC.dirty = false;
       SYNC.setStatus('ok');
-      if(prog){ prog.className='logout-progress done'; prog.innerHTML = `✅ Resume berjaya dihantar. Anda boleh keluar sekarang.`; }
+      if(prog){ prog.className='logout-progress done'; prog.innerHTML = L('logout.exitSent'); }
       setTimeout(() => {
         _exitGuardShown = false;
         _allowExit = true;
         $('#logoutRoot').innerHTML = '';
-        toast('✅ Update selesai — anda boleh tekan Back / tutup tab / refresh sekarang.');
+        toast(L('logout.exitDone'));
       }, 1200);
     } else {
-      if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ Sync gagal. Sila cuba lagi atau semak sambungan.`; }
-      if(btn){ btn.disabled = false; btn.innerHTML = `☁️ Cuba Lagi`; }
+      if(prog){ prog.className='logout-progress err'; prog.innerHTML = L('logout.failed'); }
+      if(btn){ btn.disabled = false; btn.innerHTML = esc(L('btn.tryAgain')); }
     }
   } catch(err){
-    if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ Ralat: ${esc(err.message)}`; }
-    if(btn){ btn.disabled = false; btn.innerHTML = `☁️ Cuba Lagi`; }
+    if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ ${esc(err.message)}`; }
+    if(btn){ btn.disabled = false; btn.innerHTML = esc(L('btn.tryAgain')); }
   }
 }
 window.syncThenExit = syncThenExit;
 
-/* ---- Trap Back Button ---- */
 (function trapBack(){
   try{ history.pushState(null, '', location.href); }catch(e){}
   window.addEventListener('popstate', () => {
@@ -1914,21 +2302,22 @@ window.syncThenExit = syncThenExit;
   });
 })();
 
-/* ---- Native prompt untuk Close / Refresh ---- */
 window.addEventListener('beforeunload', (e) => {
   if(_allowExit || _logoutBypass) return;
 
   if(hasUnsavedCloudChanges()){
     SYNC.flushKeepalive();
     e.preventDefault();
-    const msg = 'Data belum disegerakkan ke Google Sheets. Sila tekan "Update Resume" dahulu.';
+    const msg = LANG === 'ms'
+      ? 'Data belum disegerakkan ke Google Sheets. Sila tekan "Update Resume" dahulu.'
+      : 'Data has not been synced to Google Sheets. Please press "Update Resume" first.';
     e.returnValue = msg;
     return msg;
   }
 });
 
 /* =========================================================
-   14. VIEW: Cloud Sync Panel
+   VIEW: Cloud Sync Panel
    ========================================================= */
 VIEWS.cloudSync = function(){
   const c = DB.cloud;
@@ -1940,19 +2329,19 @@ VIEWS.cloudSync = function(){
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <div style="font-size:32px">🔄</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800;font-size:16px">Auto Cloud Sync — Google Sheets</div>
-        <div class="muted small">Endpoint: <code style="font-size:11px">${esc(CLOUD_URL.slice(0,62))}…</code></div>
+        <div style="font-weight:800;font-size:16px">${esc(L('cloud.autoTitle'))}</div>
+        <div class="muted small">${esc(L('cloud.endpoint'))} <code style="font-size:11px">${esc(CLOUD_URL.slice(0,62))}…</code></div>
         <div style="margin-top:8px;font-size:12px">
           <span class="sync-dot ${status}"></span>
-          ${c.lastPush ? `Terakhir auto-sync: <b>${fmtDateTime(c.lastPush)}</b>` : '<b>Belum pernah sync</b>'}
-          ${c.lastPull ? ` · Terakhir tarik: <b>${fmtDateTime(c.lastPull)}</b>` : ''}
+          ${c.lastPush ? `${esc(L('cloud.lastAuto'))} <b>${fmtDateTime(c.lastPush)}</b>` : `<b>${esc(L('cloud.never'))}</b>`}
+          ${c.lastPull ? ` · ${esc(L('cloud.lastPull'))} <b>${fmtDateTime(c.lastPull)}</b>` : ''}
         </div>
         <div class="muted small" style="margin-top:6px">👤 ${esc(CURRENT_USER.name)} (${esc(CURRENT_USER.id)}) · ${esc(CURRENT_ROLE)}</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ok" id="btnPush" onclick="SYNC.flush('manual')">⚡ Force Sync Now</button>
-        <button class="btn" id="btnPull" onclick="cloudPull()">⬇ Tarik dari Cloud</button>
-        <button class="btn" id="btnTest" onclick="cloudTest()">🔌 Test Connection</button>
+        <button class="btn btn-ok" id="btnPush" onclick="SYNC.flush('manual')">${esc(L('btn.forceSync'))}</button>
+        <button class="btn" id="btnPull" onclick="cloudPull()">${esc(L('btn.pullCloud'))}</button>
+        <button class="btn" id="btnTest" onclick="cloudTest()">${esc(L('btn.testConn'))}</button>
       </div>
     </div>
   </div>
@@ -1961,11 +2350,8 @@ VIEWS.cloudSync = function(){
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <div style="font-size:26px">✅</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800">Auto-sync + Exit Guard Aktif</div>
-        <div class="muted small">
-          Setiap <b>edit / tambah / padam</b> akan auto-push ke Google Sheets.<br>
-          Bila anda <b>Log Out</b>, tekan <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b> — sistem akan minta anda tekan <b>Update Resume</b> dahulu.
-        </div>
+        <div style="font-weight:800">${esc(L('cloud.exitGuardTitle'))}</div>
+        <div class="muted small">${L('cloud.exitGuardDesc')}</div>
       </div>
     </div>
   </div>
@@ -1978,9 +2364,9 @@ VIEWS.cloudSync = function(){
 
   <div class="grid g2" style="margin-bottom:16px">
     <div class="card card-pad">
-      <div class="section-title">📦 Data Yang Dihantar (Auto)</div>
+      <div class="section-title">${esc(L('cloud.dataSent'))}</div>
       <dl class="kv">
-        <dt>Profil</dt><dd>${esc(DB.profile.name||'—')} (${profileCompleteness()}%)</dd>
+        <dt>${esc(L('cloud.profile'))}</dt><dd>${esc(DB.profile.name||'—')} (${profileCompleteness()}%)</dd>
         <dt>Qualifications</dt><dd>${count('qualifications')}</dd>
         <dt>Teaching</dt><dd>${count('teaching')}</dd>
         <dt>Projects</dt><dd>${count('projects')}</dd>
@@ -1996,33 +2382,29 @@ VIEWS.cloudSync = function(){
     </div>
 
     <div class="card card-pad">
-      <div class="section-title">⚙️ Tetapan Sync</div>
+      <div class="section-title">${esc(L('cloud.settings'))}</div>
       <label class="fld" style="margin-bottom:12px">
         <span>
           <input type="checkbox" id="autoSync" ${DB.cloud.autoSync?'checked':''}
             onchange="DB.cloud.autoSync=this.checked; save(); SYNC.setStatus(this.checked?'ok':'idle'); toast('Auto-sync: '+(this.checked?'ON ✅':'OFF ⛔')); if(this.checked) SYNC.flush('manual-enable')"
             style="accent-color:var(--brand);margin-right:6px">
-          <b>Auto-sync aktif</b> — setiap edit / tambah / padam akan auto-push ke Google Sheets</span>
+          ${L('cloud.autoSyncLabel')}</span>
       </label>
       <div class="btn-row">
-        <button class="btn" onclick="exportData()">⬇ Export JSON</button>
-        <button class="btn" onclick="go('cv')">📄 Lihat CV</button>
+        <button class="btn" onclick="exportData()">${esc(L('btn.exportJSON'))}</button>
+        <button class="btn" onclick="go('cv')">${esc(L('cloud.viewCV'))}</button>
       </div>
-      <div class="hint ok" style="margin-top:14px">
-        <b>✅ Exit Guard Aktif:</b> Bila anda tekan <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b>, sistem akan minta anda tekan <b>Update Resume</b> dahulu sebelum keluar.
-      </div>
-      <div class="hint warn" style="margin-top:10px">
-        <b>Penting:</b> Apps Script mesti di-deploy <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.
-      </div>
+      <div class="hint ok" style="margin-top:14px">${L('cloud.exitGuardHint')}</div>
+      <div class="hint warn" style="margin-top:10px">${L('cloud.deployHint')}</div>
     </div>
   </div>
 
   <div class="card card-pad">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="section-title" style="margin:0">🪵 Log Sync</div>
-      <button class="btn btn-sm" style="margin-left:auto" onclick="document.getElementById('syncLog').innerHTML=''">Clear</button>
+      <div class="section-title" style="margin:0">${esc(L('cloud.syncLog'))}</div>
+      <button class="btn btn-sm" style="margin-left:auto" onclick="document.getElementById('syncLog').innerHTML=''">${esc(L('btn.clear'))}</button>
     </div>
-    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> Auto-sync engine v4 sedia.</div>
+    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> ${esc(L('cloud.ready'))}</div>
   </div>`;
 };
 
@@ -2033,9 +2415,9 @@ function cloudSummary(){
 function syncLog(msg, cls){
   const el = document.getElementById('syncLog');
   if(!el) return;
-  const t = new Date().toLocaleTimeString();
+  const tt = new Date().toLocaleTimeString();
   const line = document.createElement('div');
-  line.innerHTML = `<span class="t">[${t}]</span> <span class="${cls||''}">${msg}</span>`;
+  line.innerHTML = `<span class="t">[${tt}]</span> <span class="${cls||''}">${msg}</span>`;
   el.appendChild(line);
   el.scrollTop = el.scrollHeight;
 }
@@ -2045,6 +2427,7 @@ function buildCloudPayload(){
     action: 'updateResume',
     timestamp: new Date().toISOString(),
     source: 'Academic Profile System',
+    lang: LANG,
     key: DB.cloud.key || '',
     sheet: DB.cloud.sheet || 'Resume',
     auth: { userId: CURRENT_USER.id, name: CURRENT_USER.name, email: CURRENT_USER.email, role: CURRENT_ROLE },
@@ -2113,17 +2496,17 @@ function setBusy(id, busy, label){
 
 async function cloudTest(){
   setBusy('btnTest', true, 'Testing…');
-  syncLog('🔌 Menyemak sambungan…','in');
+  syncLog('🔌 Testing connection…','in');
   try{
     const url = CLOUD_URL + '?action=ping&t=' + Date.now();
     const res = await fetch(url, { method:'GET', redirect:'follow' });
     const text = await res.text();
-    syncLog(`✅ Sambungan OK (HTTP ${res.status}). ${esc(text.slice(0,120))}`,'ok');
-    toast('Sambungan OK ✔');
+    syncLog(`✅ Connection OK (HTTP ${res.status}). ${esc(text.slice(0,120))}`,'ok');
+    toast(L('toast.testOK'));
   }catch(err){
-    syncLog(`❌ Gagal: ${esc(err.message)}`,'er');
-    syncLog('💡 Semak: Deploy → Execute as "Me", Who has access "Anyone".','t');
-    toast('Sambungan gagal ✖');
+    syncLog(`❌ Failed: ${esc(err.message)}`,'er');
+    syncLog('💡 Check: Deploy → Execute as "Me", Who has access "Anyone".','t');
+    toast(L('toast.testFail'));
   }finally{ setBusy('btnTest', false); }
 }
 window.cloudTest = cloudTest;
@@ -2131,7 +2514,7 @@ window.cloudTest = cloudTest;
 async function cloudPush(opts){
   opts = opts || {};
   const silent = !!opts.silent;
-  if(!silent) setBusy('btnPush', true, 'Menghantar…');
+  if(!silent) setBusy('btnPush', true, 'Uploading…');
   syncLog(`⬆ Push${opts.reason?' ('+opts.reason+')':''}…`,'in');
 
   const payload = buildCloudPayload();
@@ -2145,19 +2528,19 @@ async function cloudPush(opts){
       log('Cloud Sync — Pushed', DB.profile.name||'Profile', 'Cloud Sync', { confidence:100, verified:true });
       save();
       syncLog(r.opaque
-        ? '✅ Hantar berjaya (respons opaque).'
-        : `✅ Berjaya. ${esc((r.text||'').slice(0,160))}`,'ok');
-      if(!silent) toast('☁️ Resume dihantar ✔');
+        ? '✅ Push successful (opaque response).'
+        : `✅ Success. ${esc((r.text||'').slice(0,160))}`,'ok');
+      if(!silent) toast(L('toast.synced'));
       if(state.view==='cloudSync') render(); else renderSidebar();
       return true;
     } else {
       syncLog(`❌ HTTP ${r.status}: ${esc((r.text||'').slice(0,200))}`,'er');
-      if(!silent) toast('Sync gagal ✖');
+      if(!silent) toast(L('toast.syncFailed'));
       return false;
     }
   }catch(err){
-    syncLog(`❌ Ralat: ${esc(err.message)}`,'er');
-    if(!silent) toast('Sync gagal ✖');
+    syncLog(`❌ Error: ${esc(err.message)}`,'er');
+    if(!silent) toast(L('toast.syncFailed'));
     return false;
   }finally{
     if(!silent) setBusy('btnPush', false);
@@ -2166,27 +2549,26 @@ async function cloudPush(opts){
 window.cloudPush = cloudPush;
 
 async function quickCloudPush(){
-  toast('☁️ Force sync…');
+  toast(L('toast.syncing'));
   clearTimeout(SYNC.timer);
   const ok = await SYNC.flush('manual-force');
-  toast(ok ? '☁️ Resume disegerakkan ✔' : 'Sync gagal — semak log');
+  toast(ok ? L('toast.synced') : L('toast.syncFailed'));
 }
 window.quickCloudPush = quickCloudPush;
 
 async function cloudPull(){
-  setBusy('btnPull', true, 'Menarik…');
-  syncLog('⬇ Menarik…','in');
+  setBusy('btnPull', true, 'Pulling…');
+  syncLog('⬇ Pulling…','in');
   try{
     const url = CLOUD_URL + '?action=getResume&userId=' + encodeURIComponent(CURRENT_USER.id) +
                 '&key=' + encodeURIComponent(DB.cloud.key||'') + '&t=' + Date.now();
     const res = await fetch(url, { method:'GET', redirect:'follow' });
     const text = await res.text();
     let json = null; try { json = JSON.parse(text); } catch(e){}
-    if(!json){ syncLog(`⚠️ Bukan JSON: ${esc(text.slice(0,200))}`,'er'); toast('Tarik gagal'); return; }
+    if(!json){ syncLog(`⚠️ Not JSON: ${esc(text.slice(0,200))}`,'er'); toast(L('toast.pullFailed')); return; }
 
     const incoming = json.data || json.profile || json;
-    // NOTE: jangan timpa identity fields dari auth walaupun pull dari cloud
-    if(incoming.profile && confirm('Ganti profil dengan data Cloud?')){
+    if(incoming.profile && confirm(L('confirm.replaceProfile'))){
       const d = authDerivedProfile();
       DB.profile = { ...DB.profile, ...incoming.profile };
       DB.profile.name     = d.name     || DB.profile.name;
@@ -2198,17 +2580,17 @@ async function cloudPull(){
     DB.cloud.lastPull = new Date().toISOString();
     log('Cloud Sync — Pulled', DB.profile.name||'Profile', 'Cloud Sync');
     save(); render();
-    syncLog('✅ Data ditarik.','ok');
-    toast('⬇ Data Cloud dimuatkan ✔');
+    syncLog('✅ Data pulled.','ok');
+    toast(L('toast.pullSuccess'));
   }catch(err){
     syncLog(`❌ ${esc(err.message)}`,'er');
-    toast('Tarik gagal ✖');
+    toast(L('toast.pullFailed'));
   }finally{ setBusy('btnPull', false); }
 }
 window.cloudPull = cloudPull;
 
 /* =========================================================
-   15. VIEW: MY CV
+   VIEW: MY CV
    ========================================================= */
 VIEWS.cv = function(){
   const sections = [
@@ -2222,27 +2604,27 @@ VIEWS.cv = function(){
   $('#view').innerHTML = `
   <div class="no-print">
     <div class="card card-pad" style="margin-bottom:16px">
-      <div class="section-title">📄 Pilihan CV</div>
+      <div class="section-title">${esc(L('cv.options'))}</div>
       <div class="form-grid">
-        <label class="fld"><span>Jenis CV</span>
+        <label class="fld"><span>${esc(L('cv.type'))}</span>
           <select id="cvType">
             <option>Academic CV</option><option>Research CV</option><option>Teaching CV</option>
             <option>Professional CV</option><option>Short CV</option><option>2-page CV</option><option>Full CV</option>
           </select></label>
-        <label class="fld"><span>Susunan</span>
-          <select><option>Newest → Oldest</option><option>Oldest → Newest</option></select></label>
+        <label class="fld"><span>${esc(L('cv.order'))}</span>
+          <select><option>${esc(L('cv.newest'))}</option><option>${esc(L('cv.oldest'))}</option></select></label>
       </div>
 
-      <div class="section-title" style="margin-top:18px">Pilih Section</div>
+      <div class="section-title" style="margin-top:18px">${esc(L('cv.pickSection'))}</div>
       <div class="sec-pick">
         ${sections.map(([k,l])=>`<label><input type="checkbox" class="cv-sec" value="${k}" checked> ${l}</label>`).join('')}
       </div>
 
       <div class="btn-row" style="margin-top:18px">
-        <button class="btn btn-primary" onclick="generateCV()">📄 GENERATE CV</button>
-        <button class="btn btn-ok" onclick="pushCvToCloud()">☁️ Force Sync Now</button>
-        <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
-        <button class="btn" onclick="downloadCV()">⬇ Download HTML</button>
+        <button class="btn btn-primary" onclick="generateCV()">${esc(L('btn.generateCV'))}</button>
+        <button class="btn btn-ok" onclick="pushCvToCloud()">${esc(L('btn.forceSync'))}</button>
+        <button class="btn" onclick="window.print()">${esc(L('btn.print'))}</button>
+        <button class="btn" onclick="downloadCV()">${esc(L('btn.download'))}</button>
       </div>
     </div>
     <div id="cvDoc"></div>
@@ -2404,12 +2786,12 @@ function downloadCV(){
   a.href = URL.createObjectURL(blob);
   a.download = 'CV_' + (DB.profile.name||'profile').replace(/\s+/g,'_') + '.html';
   a.click();
-  toast('CV dimuat turun');
+  toast(L('toast.cvDownloaded'));
 }
 window.downloadCV = downloadCV;
 
 /* =========================================================
-   16. VIEW: PUBLIC PROFILE
+   VIEW: PUBLIC PROFILE
    ========================================================= */
 VIEWS.public = function(){
   const p = DB.profile;
@@ -2428,40 +2810,40 @@ VIEWS.public = function(){
       <div style="margin-top:10px;font-size:12px;opacity:.95">🔗 ${esc(url)}</div>
     </div>
     <div class="btn-row">
-      <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.35)" onclick="copyLink('${esc(url)}')">🔗 Share Profile</button>
-      <button class="btn" style="background:#fff" onclick="go('cv')">📄 View CV</button>
+      <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.35)" onclick="copyLink('${esc(url)}')">${esc(L('btn.share'))}</button>
+      <button class="btn" style="background:#fff" onclick="go('cv')">${esc(L('pub.viewCV'))}</button>
     </div>
   </div>
 
   <div class="grid g2">
     <div class="card card-pad">
-      <div class="section-title">👤 Biography</div>
+      <div class="section-title">${esc(L('pub.bio'))}</div>
       <p class="small">${esc(p.shortBio||p.longBio||'—')}</p>
-      <div class="section-title" style="margin-top:18px">🔬 Expertise</div>
+      <div class="section-title" style="margin-top:18px">${esc(L('pub.expertise'))}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${chips(p.expertise)}</div>
-      <div class="section-title" style="margin-top:18px">🎯 Research Interest</div>
+      <div class="section-title" style="margin-top:18px">${esc(L('pub.interest'))}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${chips(p.researchInterest)}</div>
-      <div class="section-title" style="margin-top:18px">🌱 SDG</div>
+      <div class="section-title" style="margin-top:18px">${esc(L('pub.sdg'))}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${chips(p.sdg)}</div>
     </div>
 
     <div class="card card-pad">
-      <div class="section-title">📚 Publications Terkini</div>
+      <div class="section-title">${esc(L('pub.recentPubs'))}</div>
       ${topPubs.length? topPubs.map((x,i)=>`
         <div style="padding:10px 0;border-bottom:1px solid #f1f5f9">
           <b class="small">${i+1}. ${esc(x.title||'')}</b>
           <div class="muted small">${esc(x.journal||'')} · ${esc(x.year||'')} ${x.quartile&&x.quartile!=='None'?`<span class="pill">${esc(x.quartile)}</span>`:''}</div>
-        </div>`).join('') : '<p class="muted small">Tiada penerbitan.</p>'}
+        </div>`).join('') : `<p class="muted small">${esc(L('pub.noPubs'))}</p>`}
 
-      <div class="section-title" style="margin-top:18px">📞 Contact</div>
+      <div class="section-title" style="margin-top:18px">${esc(L('pub.contact'))}</div>
       <dl class="kv">
-        <dt>Email</dt><dd>${esc(p.email||'—')}</dd>
-        <dt>Telefon</dt><dd>${esc(p.officeTel||'—')}</dd>
-        <dt>Pejabat</dt><dd>${esc(p.officeLoc||'—')}</dd>
+        <dt>${esc(L('pub.email'))}</dt><dd>${esc(p.email||'—')}</dd>
+        <dt>${esc(L('pub.phone'))}</dt><dd>${esc(p.officeTel||'—')}</dd>
+        <dt>${esc(L('pub.office'))}</dt><dd>${esc(p.officeLoc||'—')}</dd>
         <dt>ORCID</dt><dd>${esc(p.orcid||'—')}</dd>
         <dt>Scopus</dt><dd>${esc(p.scopus||'—')}</dd>
       </dl>
-      <div class="section-title" style="margin-top:18px">🔗 Pautan Akademik</div>
+      <div class="section-title" style="margin-top:18px">${esc(L('pub.links'))}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${['scholar','researchgate','linkedin','website'].filter(k=>p[k]).map(k=>`<span class="pill sky">${esc(p[k])}</span>`).join('') || '<span class="muted small">—</span>'}
       </div>
@@ -2470,28 +2852,28 @@ VIEWS.public = function(){
 };
 
 function copyLink(url){
-  navigator.clipboard?.writeText(url).then(()=>toast('Pautan disalin ✔')).catch(()=>toast(url));
+  navigator.clipboard?.writeText(url).then(()=>toast(L('toast.copied'))).catch(()=>toast(url));
 }
 window.copyLink = copyLink;
 
 /* =========================================================
-   17. VIEW: FACULTY SEARCH
+   VIEW: FACULTY SEARCH
    ========================================================= */
 VIEWS.search = function(){
   $('#view').innerHTML = `
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🔎 Faculty Search — Cari Kepakaran</div>
+    <div class="section-title">${esc(L('search.title'))}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <input id="sq" placeholder="Contoh: Waste Cooking Oil, Polyurethane, Catalysis..."
+      <input id="sq" placeholder="${esc(L('search.placeholder'))}"
         style="flex:1;min-width:240px;padding:11px 14px;border:1px solid var(--line);border-radius:11px"
         value="${esc(state.q||'')}" onkeydown="if(event.key==='Enter')doSearch()">
-      <button class="btn btn-primary" onclick="doSearch()">🔎 Search</button>
+      <button class="btn btn-primary" onclick="doSearch()">${esc(L('btn.search'))}</button>
     </div>
     <div class="btn-row" style="margin-top:12px">
-      ${['Waste Cooking Oil','Polyurethane','Catalysis','Waste Valorisation','Green Chemistry'].map(t=>`<button class="btn btn-sm" onclick="document.getElementById('sq').value='${t}';doSearch()">${t}</button>`).join('')}
+      ${['Waste Cooking Oil','Polyurethane','Catalysis','Waste Valorisation','Green Chemistry'].map(tt=>`<button class="btn btn-sm" onclick="document.getElementById('sq').value='${tt}';doSearch()">${tt}</button>`).join('')}
     </div>
   </div>
-  <div id="searchRes"><div class="empty"><div class="big">🔎</div><p>Masukkan kata kunci untuk mencari.</p></div></div>`;
+  <div id="searchRes"><div class="empty"><div class="big">🔎</div><p>${esc(L('search.enter'))}</p></div></div>`;
   if(state.q) doSearch();
 };
 
@@ -2523,13 +2905,13 @@ function doSearch(){
         <div style="font-weight:800;font-size:16px">${esc(p.title||'')} ${esc(p.name||'')}</div>
         <div class="muted small">${esc(p.position||'')} · ${esc(p.faculty||'')}</div>
       </div>
-      <span class="pill ${total?'green':'gray'}">${total} padanan</span>
-      <button class="btn btn-sm" onclick="go('public')">Lihat Profil →</button>
+      <span class="pill ${total?'green':'gray'}">${total} ${esc(L('search.matches'))}</span>
+      <button class="btn btn-sm" onclick="go('public')">${esc(L('search.viewProfile'))}</button>
     </div>
   </div>
 
   ${matches.length ? `<div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🎯 Padanan Kepakaran</div>
+    <div class="section-title">${esc(L('search.expertiseMatch'))}</div>
     ${matches.map(([l,v])=>`<div style="margin-bottom:8px"><span class="pill sky">${l}</span> <span class="small">${esc(v)}</span></div>`).join('')}
   </div>`:''}
 
@@ -2540,7 +2922,7 @@ function doSearch(){
   ${resultBlock('💡 Innovation', innov, x=>x.title, x=>`${x.category||''} · ${x.year||''}`)}
   ${resultBlock('🌍 Community', comm, x=>x.programmeName, x=>`${x.organisation||''} · ${x.sdg||''}`)}
 
-  ${total===0 ? `<div class="card"><div class="empty"><div class="big">🤷</div><p>Tiada padanan untuk "${esc(q)}".</p></div></div>`:''}`;
+  ${total===0 ? `<div class="card"><div class="empty"><div class="big">🤷</div><p>${esc(L('search.noMatch'))} "${esc(q)}".</p></div></div>`:''}`;
 }
 window.doSearch = doSearch;
 
@@ -2556,7 +2938,7 @@ function resultBlock(title, arr, tFn, sFn){
 }
 
 /* =========================================================
-   18. VIEW: FACULTY ANALYTICS
+   VIEW: FACULTY ANALYTICS
    ========================================================= */
 VIEWS.analytics = function(){
   const pubs = DB.publications||[];
@@ -2573,7 +2955,7 @@ VIEWS.analytics = function(){
 
   <div class="grid g2" style="margin-bottom:18px">
     <div class="card card-pad">
-      <div class="section-title">📚 Publication Breakdown</div>
+      <div class="section-title">${esc(L('analytics.pubBreakdown'))}</div>
       <div class="bar-row"><span class="muted">Scopus</span><div class="bar"><i style="width:${pct(indexingCount('Scopus'), pubs.length)}%"></i></div><b>${indexingCount('Scopus')}</b></div>
       <div class="bar-row"><span class="muted">Web of Science</span><div class="bar"><i style="width:${pct(indexingCount('Web of Science'), pubs.length)}%"></i></div><b>${indexingCount('Web of Science')}</b></div>
       <div class="bar-row"><span class="muted">MyCite</span><div class="bar"><i style="width:${pct(indexingCount('MyCite'), pubs.length)}%"></i></div><b>${indexingCount('MyCite')}</b></div>
@@ -2586,44 +2968,44 @@ VIEWS.analytics = function(){
     </div>
 
     <div class="card card-pad">
-      <div class="section-title">📈 Publication Growth by Year</div>
+      <div class="section-title">${esc(L('analytics.pubGrowth'))}</div>
       ${barChart(pubByYear())}
       <div style="height:1px;background:var(--line);margin:16px 0"></div>
-      <div class="section-title">🔬 Research</div>
+      <div class="section-title">${esc(L('analytics.research'))}</div>
       <dl class="kv">
-        <dt>Number of Projects</dt><dd>${projs.length}</dd>
-        <dt>Active Projects</dt><dd>${projs.filter(p=>p.status==='Active').length}</dd>
-        <dt>Completed Projects</dt><dd>${projs.filter(p=>p.status==='Completed').length}</dd>
-        <dt>Total Grant</dt><dd><b>${money(totalGrants())}</b></dd>
-        <dt>As PI</dt><dd>${projs.filter(p=>p.role==='Principal Investigator').length}</dd>
-        <dt>As Co-Researcher</dt><dd>${projs.filter(p=>p.role==='Co-Researcher').length}</dd>
+        <dt>${esc(L('analytics.numProjects'))}</dt><dd>${projs.length}</dd>
+        <dt>${esc(L('analytics.activeProjects'))}</dt><dd>${projs.filter(p=>p.status==='Active').length}</dd>
+        <dt>${esc(L('analytics.completedProjects'))}</dt><dd>${projs.filter(p=>p.status==='Completed').length}</dd>
+        <dt>${esc(L('analytics.totalGrant'))}</dt><dd><b>${money(totalGrants())}</b></dd>
+        <dt>${esc(L('analytics.asPI'))}</dt><dd>${projs.filter(p=>p.role==='Principal Investigator').length}</dd>
+        <dt>${esc(L('analytics.asCo'))}</dt><dd>${projs.filter(p=>p.role==='Co-Researcher').length}</dd>
       </dl>
     </div>
   </div>
 
   <div class="grid g2">
     <div class="card card-pad">
-      <div class="section-title">🎓 Academic</div>
+      <div class="section-title">${esc(L('analytics.academic'))}</div>
       <dl class="kv">
-        <dt>Number of Lecturers</dt><dd>1</dd>
-        <dt>PhD Qualified</dt><dd>${(DB.qualifications||[]).some(q=>q.qualification==='PhD')?1:0}</dd>
-        <dt>Master Qualified</dt><dd>${(DB.qualifications||[]).some(q=>q.qualification==='Master')?1:0}</dd>
-        <dt>Research Active Staff</dt><dd>${projs.length?1:0}</dd>
-        <dt>Profile Completeness</dt><dd>${pc}%</dd>
+        <dt>${esc(L('analytics.numLecturers'))}</dt><dd>1</dd>
+        <dt>${esc(L('analytics.phdQualified'))}</dt><dd>${(DB.qualifications||[]).some(q=>q.qualification==='PhD')?1:0}</dd>
+        <dt>${esc(L('analytics.masterQualified'))}</dt><dd>${(DB.qualifications||[]).some(q=>q.qualification==='Master')?1:0}</dd>
+        <dt>${esc(L('analytics.researchActive'))}</dt><dd>${projs.length?1:0}</dd>
+        <dt>${esc(L('analytics.profileComplete'))}</dt><dd>${pc}%</dd>
       </dl>
     </div>
     <div class="card card-pad">
-      <div class="section-title">🏆 Awards by Level</div>
+      <div class="section-title">${esc(L('analytics.awardsLevel'))}</div>
       ${['International','National','University','Faculty','Professional'].map(l=>{
         const n = (DB.awards||[]).filter(a=>a.level===l).length;
         return `<div class="bar-row"><span class="muted">${l}</span><div class="bar"><i style="width:${pct(n,(DB.awards||[]).length)}%"></i></div><b>${n}</b></div>`;
       }).join('')}
       <div style="height:1px;background:var(--line);margin:16px 0"></div>
-      <div class="section-title">👨‍🎓 Supervision</div>
+      <div class="section-title">${esc(L('analytics.supervision'))}</div>
       <dl class="kv">
-        <dt>Total Students</dt><dd>${(DB.supervision||[]).length}</dd>
-        <dt>Active</dt><dd>${(DB.supervision||[]).filter(s=>s.status==='Active').length}</dd>
-        <dt>Completed</dt><dd>${(DB.supervision||[]).filter(s=>s.status==='Completed').length}</dd>
+        <dt>${esc(L('analytics.totalStudents'))}</dt><dd>${(DB.supervision||[]).length}</dd>
+        <dt>${esc(L('analytics.active'))}</dt><dd>${(DB.supervision||[]).filter(s=>s.status==='Active').length}</dd>
+        <dt>${esc(L('analytics.completed'))}</dt><dd>${(DB.supervision||[]).filter(s=>s.status==='Completed').length}</dd>
       </dl>
     </div>
   </div>`;
@@ -2635,7 +3017,7 @@ function statCard(ic, n, l){
 }
 
 /* =========================================================
-   19. VIEW: KPI DASHBOARD
+   VIEW: KPI DASHBOARD
    ========================================================= */
 VIEWS.kpi = function(){
   const pubs = DB.publications||[];
@@ -2645,16 +3027,16 @@ VIEWS.kpi = function(){
   const gp = (DB.grants||[]).reduce((m,g)=>{ const y=g.year||'—'; m[y]=(m[y]||0)+Number(g.amount||0); return m; },{});
 
   const kpis = [
-    ['Publication per Lecturer', pubs.length, 'sasaran ≥ 3/tahun'],
-    ['Q1/Q2 Publications', quartileCount('Q1')+quartileCount('Q2'), 'sasaran ≥ 50%'],
-    ['Grant per Lecturer', money(totalGrants()), 'sasaran ≥ RM100k'],
-    ['Total Research Funding', money(totalGrants()), 'kumulatif'],
-    ['Number of Awards', (DB.awards||[]).length, 'semua peringkat'],
-    ['Number of Supervision', (DB.supervision||[]).length, 'aktif + selesai'],
-    ['Consultancy Value', money((DB.consultancy||[]).reduce((s,c)=>s+Number(c.value||0),0)), 'kumulatif'],
-    ['Community Programmes', (DB.community||[]).length, 'kumulatif'],
-    ['Innovation', (DB.innovation||[]).length, 'produk/IP'],
-    ['Citations', pubs.reduce((s,p)=>s+Number(p.citation||0),0), 'jumlah sitasi']
+    ['Publication per Lecturer', pubs.length, 'target ≥ 3/year'],
+    ['Q1/Q2 Publications', quartileCount('Q1')+quartileCount('Q2'), 'target ≥ 50%'],
+    ['Grant per Lecturer', money(totalGrants()), 'target ≥ RM100k'],
+    ['Total Research Funding', money(totalGrants()), 'cumulative'],
+    ['Number of Awards', (DB.awards||[]).length, 'all levels'],
+    ['Number of Supervision', (DB.supervision||[]).length, 'active + completed'],
+    ['Consultancy Value', money((DB.consultancy||[]).reduce((s,c)=>s+Number(c.value||0),0)), 'cumulative'],
+    ['Community Programmes', (DB.community||[]).length, 'cumulative'],
+    ['Innovation', (DB.innovation||[]).length, 'product/IP'],
+    ['Citations', pubs.reduce((s,p)=>s+Number(p.citation||0),0), 'total citations']
   ];
 
   $('#view').innerHTML = `
@@ -2669,7 +3051,7 @@ VIEWS.kpi = function(){
 
   <div class="grid g2">
     <div class="card card-pad">
-      <div class="section-title">📈 Perbandingan Tahun</div>
+      <div class="section-title">${esc(L('kpi.yearCompare'))}</div>
       ${last ? `
       <div style="display:flex;gap:16px;flex-wrap:wrap">
         <div style="flex:1;min-width:160px;background:#f8faff;border:1px solid var(--line);border-radius:12px;padding:14px">
@@ -2682,21 +3064,21 @@ VIEWS.kpi = function(){
           <div style="font-size:20px;font-weight:800;margin-top:6px">Grants</div>
           <div style="font-size:18px;font-weight:700;color:var(--brand)">${money(gp[prev]||0)} → ${money(gp[last]||0)}</div>
         </div>
-      </div>` : '<p class="muted small">Data tahun belum mencukupi.</p>'}
+      </div>` : `<p class="muted small">${esc(L('kpi.notEnoughData'))}</p>`}
     </div>
 
     <div class="card card-pad">
-      <div class="section-title">📊 Grant by Year</div>
+      <div class="section-title">${esc(L('kpi.grantByYear'))}</div>
       ${Object.keys(gp).length? Object.entries(gp).sort().map(([y,v])=>`
         <div class="bar-row"><span class="muted">${esc(y)}</span>
           <div class="bar"><i style="width:${pct(v,Math.max(...Object.values(gp)))}%"></i></div>
-          <b style="font-size:10.5px">${(v/1000).toFixed(0)}k</b></div>`).join('') : '<p class="muted small">Tiada data.</p>'}
+          <b style="font-size:10.5px">${(v/1000).toFixed(0)}k</b></div>`).join('') : `<p class="muted small">${esc(L('kpi.noData'))}</p>`}
     </div>
   </div>`;
 };
 
 /* =========================================================
-   20. VIEW: DATA QUALITY
+   VIEW: DATA QUALITY
    ========================================================= */
 VIEWS.quality = function(){
   const q = qualityIssues();
@@ -2706,41 +3088,41 @@ VIEWS.quality = function(){
 
   $('#view').innerHTML = `
   <div class="grid g4" style="margin-bottom:18px">
-    ${statCard('🔍', q.missingDOI, 'Missing DOI')}
-    ${statCard('📅', q.missingYear, 'Missing Year')}
-    ${statCard('🆔', q.noOrcid, 'Missing ORCID')}
-    ${statCard('⚠️', q.dup, 'Possible Duplicates')}
+    ${statCard('🔍', q.missingDOI, esc(L('quality.missingDOI')))}
+    ${statCard('📅', q.missingYear, esc(L('quality.missingYear')))}
+    ${statCard('🆔', q.noOrcid, esc(L('quality.missingORCID')))}
+    ${statCard('⚠️', q.dup, esc(L('quality.duplicates')))}
   </div>
 
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">🔍 Missing Data</div>
+    <div class="section-title">${esc(L('quality.missingData'))}</div>
     ${noDoi.length? noDoi.map(p=>`<div style="padding:9px 0;border-bottom:1px solid #f1f5f9;display:flex;gap:10px;align-items:center">
         <span class="small" style="flex:1">${esc(p.title)}</span>
-        <span class="pill amber">No DOI</span>
-        <button class="btn btn-sm" onclick="openForm('publications','${p.id}')">Lengkapkan</button>
-      </div>`).join('') : '<p class="muted small">Tiada isu DOI. 👍</p>'}
+        <span class="pill amber">${esc(L('quality.noDOIpill'))}</span>
+        <button class="btn btn-sm" onclick="openForm('publications','${p.id}')">${esc(L('quality.complete'))}</button>
+      </div>`).join('') : `<p class="muted small">${esc(L('quality.noDOI'))}</p>`}
     ${noYear.length? `<div style="margin-top:14px">${noYear.map(p=>`<div style="padding:9px 0;border-bottom:1px solid #f1f5f9;display:flex;gap:10px;align-items:center">
         <span class="small" style="flex:1">${esc(p.title)}</span>
-        <span class="pill amber">No Year</span>
-        <button class="btn btn-sm" onclick="openForm('publications','${p.id}')">Lengkapkan</button>
+        <span class="pill amber">${esc(L('quality.noYearpill'))}</span>
+        <button class="btn btn-sm" onclick="openForm('publications','${p.id}')">${esc(L('quality.complete'))}</button>
       </div>`).join('')}</div>`:''}
-    ${!DB.profile.orcid ? `<div class="hint warn" style="margin-top:14px">🆔 ORCID belum diisi pada profil. <button class="btn btn-sm" onclick="go('profile')">Tambah ORCID</button></div>`:''}
+    ${!DB.profile.orcid ? `<div class="hint warn" style="margin-top:14px">${esc(L('quality.orcidMissing'))} <button class="btn btn-sm" onclick="go('profile')">${esc(L('quality.addOrcid'))}</button></div>`:''}
   </div>
 
   <div class="card card-pad">
-    <div class="section-title">⚠️ Possible Duplicate</div>
+    <div class="section-title">${esc(L('quality.possibleDup'))}</div>
     ${dups.length ? dups.map((group,gi)=>`
       <div style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px">
-        <div class="pill red" style="margin-bottom:10px">Possible duplicate publication detected</div>
+        <div class="pill red" style="margin-bottom:10px">${esc(L('quality.dupPill'))}</div>
         ${group.map(p=>`<div style="padding:7px 0;border-bottom:1px solid #f1f5f9">
             <b class="small">${esc(p.title)}</b>
             <div class="muted small">${esc(p.journal||'')} · ${esc(p.year||'')} · DOI: ${esc(p.doi||'—')}</div>
           </div>`).join('')}
         <div class="btn-row" style="margin-top:12px">
-          <button class="btn btn-sm btn-primary" onclick="mergeDup(${gi})">Merge (auto-sync)</button>
-          <button class="btn btn-sm" onclick="toast('Rekod dikekalkan berasingan')">Keep Separate</button>
+          <button class="btn btn-sm btn-primary" onclick="mergeDup(${gi})">${esc(L('quality.merge'))}</button>
+          <button class="btn btn-sm" onclick="toast('${esc(L('confirm.keepSeparate'))}')">${esc(L('quality.keepSeparate'))}</button>
         </div>
-      </div>`).join('') : '<p class="muted small">Tiada pertindihan dikesan. 👍</p>'}
+      </div>`).join('') : `<p class="muted small">${esc(L('quality.noDup'))}</p>`}
   </div>`;
 };
 
@@ -2752,21 +3134,21 @@ function mergeDup(gi){
   const dropIds = group.slice(1).map(g=>g.id);
   DB.publications = DB.publications.filter(p=>!dropIds.includes(p.id));
   log('Merged Duplicate', keep.title||'Publication', 'Data Quality');
-  save(); render(); toast('Rekod digabungkan ✔ — sync…');
+  save(); render(); toast(L('toast.merged'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-merge');
 }
 window.mergeDup = mergeDup;
 
 /* =========================================================
-   21. VIEW: NOTIFICATIONS
+   VIEW: NOTIFICATIONS
    ========================================================= */
 VIEWS.notifications = function(){
   const list = notifications();
   $('#view').innerHTML = `
   <div class="card card-pad" style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
-    <div class="section-title" style="margin:0">🔔 ${list.length} Notifikasi</div>
-    <button class="btn btn-sm" style="margin-left:auto" onclick="markAllRead()">Tanda semua dibaca</button>
+    <div class="section-title" style="margin:0">🔔 ${list.length} ${esc(L('notif.title'))}</div>
+    <button class="btn btn-sm" style="margin-left:auto" onclick="markAllRead()">${esc(L('btn.markAllRead'))}</button>
   </div>
   ${list.map(n=>{
     const read = DB.readNotifs.includes(n.id);
@@ -2776,80 +3158,64 @@ VIEWS.notifications = function(){
         <div style="font-weight:700">${esc(n.title)}</div>
         <div class="muted small">${esc(n.desc)}</div>
       </div>
-      <span class="pill ${n.tone}">${read?'Read':'New'}</span>
+      <span class="pill ${n.tone}">${read?esc(L('notif.read')):esc(L('notif.new'))}</span>
     </div>`;
   }).join('')}`;
 };
 
 function markAllRead(){
   DB.readNotifs = notifications().map(n=>n.id);
-  save(); render(); toast('Semua notifikasi ditanda dibaca');
+  save(); render(); toast(L('toast.allRead'));
 }
 window.markAllRead = markAllRead;
 
 /* =========================================================
-   22. VIEW: ADMIN PANEL
+   VIEW: ADMIN PANEL
    ========================================================= */
 VIEWS.admin = function(){
   $('#view').innerHTML = `
   <div class="grid g4" style="margin-bottom:18px">
-    ${statCard('👥', 1, 'Lecturers')}
-    ${statCard('🏛️', 1, 'Faculty')}
-    ${statCard('🏢', 1, 'Department')}
-    ${statCard('🤖', DB.audit.filter(a=>a.source==='AI Scanner').length, 'AI Processed')}
+    ${statCard('👥', 1, esc(L('admin.lecturers')))}
+    ${statCard('🏛️', 1, esc(L('admin.faculty')))}
+    ${statCard('🏢', 1, esc(L('admin.department')))}
+    ${statCard('📝', DB.audit.length, 'Audit Events')}
   </div>
 
   <div class="grid g2">
     <div class="card card-pad">
-      <div class="section-title">👨‍💼 Manage Lecturers</div>
+      <div class="section-title">${esc(L('admin.manageLecturers'))}</div>
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="toast('Demo: tambah pensyarah baharu')">＋ Add Lecturer</button>
-        <button class="btn" onclick="go('profile')">✏️ Edit Lecturer</button>
-        <button class="btn btn-danger" onclick="toast('Demo: akaun dinyahaktifkan')">🚫 Disable Account</button>
+        <button class="btn btn-primary" onclick="toast('${esc(L('confirm.demoAddLecturer'))}')">${esc(L('admin.addLecturer'))}</button>
+        <button class="btn" onclick="go('profile')">${esc(L('admin.editLecturer'))}</button>
+        <button class="btn btn-danger" onclick="toast('${esc(L('confirm.demoDisable'))}')">${esc(L('admin.disableAcc'))}</button>
       </div>
       <div style="height:1px;background:var(--line);margin:16px 0"></div>
-      <div class="section-title">🏛️ Manage Faculty &amp; Department</div>
+      <div class="section-title">${esc(L('admin.manageFaculty'))}</div>
       <div class="btn-row">
-        <button class="btn" onclick="toast('Demo: urus fakulti')">Manage Faculty</button>
-        <button class="btn" onclick="toast('Demo: urus jabatan')">Manage Department</button>
-        <button class="btn" onclick="toast('Demo: urus kategori')">Manage Categories</button>
+        <button class="btn" onclick="toast('${esc(L('confirm.demoManageFaculty'))}')">${esc(L('admin.manageFacultyBtn'))}</button>
+        <button class="btn" onclick="toast('${esc(L('confirm.demoManageDept'))}')">${esc(L('admin.manageDeptBtn'))}</button>
+        <button class="btn" onclick="toast('${esc(L('confirm.demoManageCat'))}')">${esc(L('admin.manageCatBtn'))}</button>
       </div>
     </div>
 
     <div class="card card-pad">
-      <div class="section-title">🤖 AI Processing Monitor</div>
-      <dl class="kv">
-        <dt>AI Processed</dt><dd>${DB.audit.filter(a=>a.source==='AI Scanner').length}</dd>
-        <dt>Failed Scans</dt><dd>0</dd>
-        <dt>Low Confidence Records</dt><dd>${DB.audit.filter(a=>a.confidence && a.confidence<85).length}</dd>
-        <dt>Unverified Records</dt><dd>${DB.audit.filter(a=>a.verified===false).length}</dd>
-      </dl>
-      <div class="btn-row" style="margin-top:14px">
-        <button class="btn" onclick="go('quality')">Review Low Confidence</button>
-        <button class="btn" onclick="go('quality')">Detect Duplicate</button>
-      </div>
-    </div>
-
-    <div class="card card-pad">
-      <div class="section-title">📤 Data &amp; Reports</div>
+      <div class="section-title">${esc(L('admin.dataReports'))}</div>
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="exportData()">⬇ Export Data (JSON)</button>
-        <button class="btn" onclick="go('analytics')">📊 Generate Faculty Report</button>
+        <button class="btn btn-primary" onclick="exportData()">${esc(L('admin.exportData'))}</button>
+        <button class="btn" onclick="go('analytics')">${esc(L('admin.genReport'))}</button>
       </div>
-    </div>
-
-    <div class="card card-pad">
-      <div class="section-title">🔐 Roles &amp; Access</div>
+      <div style="height:1px;background:var(--line);margin:16px 0"></div>
+      <div class="section-title">${esc(L('admin.rolesAccess'))}</div>
       <dl class="kv">
-        <dt>🎓 Student</dt><dd>Edit profil sendiri, tambah rekod akademik, scan dokumen, jana CV</dd>
-        <dt>👨‍🏫 Academic Staff (Lecturer)</dt><dd>Edit profil, tambah data, scan dokumen, jana CV, lihat analitik sendiri</dd>
-        <dt>🔬 Lab Staff</dt><dd>Edit profil, tambah rekod, scan dokumen, jana CV</dd>
-        <dt>👨‍💼 Coordinator (Head)</dt><dd>Lihat staf unit, statistik, jana laporan, sahkan rekod terpilih</dd>
-        <dt>🔐 Admin</dt><dd>Urus pengguna, sistem, data, kategori, AI monitoring, analitik fakulti</dd>
+        <dt>🎓 Student</dt><dd>Edit own profile, add academic records, generate CV</dd>
+        <dt>👨‍🏫 Lecturer</dt><dd>Edit profile, add data, generate CV, view own analytics</dd>
+        <dt>🔬 Lab Staff</dt><dd>Edit profile, add records, generate CV</dd>
+        <dt>👨‍💼 Coordinator</dt><dd>View unit staff, statistics, generate reports</dd>
+        <dt>🔐 Admin</dt><dd>Manage users, system, data, categories, faculty analytics</dd>
       </dl>
       <div style="height:1px;background:var(--line);margin:16px 0"></div>
       <div class="btn-row">
-        <button class="btn btn-danger" onclick="resetAll()">🗑 Reset Data Saya (Demo)</button>
+        <button class="btn btn-danger" onclick="resetAll()">${esc(L('admin.reset'))}</button>
       </div>
     </div>
   </div>`;
@@ -2861,39 +3227,39 @@ function exportData(){
   a.href = URL.createObjectURL(blob);
   a.download = 'academic_profile_' + (CURRENT_USER.id||'user') + '_export.json';
   a.click();
-  toast('Data dieksport ✔');
+  toast(L('toast.exported'));
 }
 window.exportData = exportData;
 
 function resetAll(){
-  if(!confirm('Reset data profil ANDA kepada keadaan asal? (Hanya data anda sahaja)')) return;
+  if(!confirm(L('confirm.reset'))) return;
   DB = seed();
   save();
   go('dashboard');
-  toast('Data direset — sync…');
+  toast(L('toast.dataReset'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-reset');
 }
 window.resetAll = resetAll;
 
 /* =========================================================
-   23. VIEW: AUDIT TRAIL
+   VIEW: AUDIT TRAIL
    ========================================================= */
 VIEWS.audit = function(){
   $('#view').innerHTML = `
   <div class="card card-pad" style="margin-bottom:16px">
-    <div class="section-title">📝 Audit Trail — Data Governance</div>
-    <p class="muted small">Setiap perubahan direkodkan: siapa, bila, sumber (Manual / AI Scanner / Cloud Sync) dan tahap keyakinan.</p>
+    <div class="section-title">${esc(L('audit.title'))}</div>
+    <p class="muted small">${esc(L('audit.desc'))}</p>
   </div>
   <div class="card">
-    ${DB.audit.length===0 ? '<div class="empty"><div class="big">📝</div><p>Tiada aktiviti direkodkan lagi.</p></div>' :
+    ${DB.audit.length===0 ? `<div class="empty"><div class="big">📝</div><p>${esc(L('audit.noActivity'))}</p></div>` :
     `<div class="tbl-wrap"><table>
-      <thead><tr><th>Pengguna</th><th>Aktiviti</th><th>Sumber</th><th>Confidence</th><th>Tarikh</th></tr></thead>
+      <thead><tr><th>${esc(L('audit.user'))}</th><th>${esc(L('audit.activity'))}</th><th>${esc(L('audit.source'))}</th><th>${esc(L('audit.confidence'))}</th><th>${esc(L('audit.date'))}</th></tr></thead>
       <tbody>${DB.audit.map(a=>`
         <tr>
           <td><b>${esc(a.who)}</b></td>
           <td>${esc(a.action)}<br><span class="muted small">${esc(a.target||'')}</span></td>
-          <td><span class="pill ${a.source==='AI Scanner'?'sky':a.source==='Data Quality'?'amber':a.source==='Cloud Sync'?'green':'gray'}">${esc(a.source)}</span></td>
+          <td><span class="pill ${a.source==='Data Quality'?'amber':a.source==='Cloud Sync'?'green':'gray'}">${esc(a.source)}</span></td>
           <td>${a.confidence?`<span class="pill ${a.confidence>=90?'green':'amber'}">${a.confidence}%</span>`:'<span class="muted">—</span>'}</td>
           <td class="muted small">${fmtDate(a.date)}</td>
         </tr>`).join('')}
@@ -2902,7 +3268,7 @@ VIEWS.audit = function(){
 };
 
 /* =========================================================
-   24. INIT
+   INIT
    ========================================================= */
 function bootApp(){
   if(!sessionStorage.getItem('apsSignedInLogged')){
