@@ -55,84 +55,127 @@ a{color:var(--brand);text-decoration:none}
 .sync-status .sync-dot.busy{background:#f59e0b;animation:pulse 1s infinite}
 @media(max-width:640px){.sync-status span:last-child{display:none}}
 
-/* ============ BATTERY UPLOAD / DOWNLOAD INDICATORS ============ */
-.battery-pair{display:flex;gap:6px;align-items:center}
-.upload-battery{
-  display:flex;align-items:center;gap:8px;padding:6px 10px;
-  background:#fff;border:1px solid var(--line);border-radius:10px;
-  font-size:11px;font-weight:700;cursor:pointer;transition:.15s;
+/* ============================================================
+   CLOUD UPLOAD / DOWNLOAD INDICATORS (side by side)
+   ============================================================ */
+.cloud-pair{display:flex;gap:8px;align-items:center}
+
+.cloud-ind{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px 4px 6px;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  cursor:pointer;
+  transition:transform .15s, border-color .2s, box-shadow .2s;
   user-select:none;
+  position:relative;
 }
-.upload-battery:hover{border-color:#c7d2fe;background:#f8faff}
-.upload-battery.is-download:hover{border-color:#7dd3fc;background:#f0f9ff}
-.upload-battery.is-upload:hover{border-color:#86efac;background:#f0fdf4}
-.battery-shell{
-  position:relative;width:42px;height:18px;
-  border:2px solid #475569;border-radius:4px;padding:2px;
-  background:#f8fafc;flex-shrink:0;
-  transition:border-color .25s;
-}
-.battery-shell::after{
-  content:'';position:absolute;right:-5px;top:5px;width:3px;height:8px;
-  background:#475569;border-radius:0 2px 2px 0;
-  transition:background .25s;
-}
-/* Upload direction: green theme */
-.battery-shell.uploading{border-color:#10b981}
-.battery-shell.uploading::after{background:#10b981}
-/* Download direction: blue theme */
-.battery-shell.downloading{border-color:#0ea5e9}
-.battery-shell.downloading::after{background:#0ea5e9}
+.cloud-ind:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.08)}
+.cloud-ind.is-upload:hover{border-color:#86efac}
+.cloud-ind.is-download:hover{border-color:#7dd3fc}
 
-.battery-fill{
-  height:100%;width:100%;
-  background:linear-gradient(90deg,#10b981,#34d399);
-  border-radius:2px;transition:width .35s ease,background .3s;
-  display:block;
+/* Icon wrapper — fixed square so arrow + cloud align */
+.cloud-icon{
+  position:relative;
+  width:44px;height:44px;
+  flex-shrink:0;
+  display:grid;place-items:center;
 }
-.battery-fill.charging{
-  background:linear-gradient(90deg,#10b981,#34d399);
-  animation:batteryPulse 1s ease-in-out infinite;
+.cloud-icon svg{
+  display:block;width:44px;height:44px;
+  overflow:visible;
 }
-.battery-fill.downloading{
-  background:linear-gradient(90deg,#0ea5e9,#38bdf8);
-  animation:batteryPulse 1s ease-in-out infinite;
-}
-.battery-fill.error{background:linear-gradient(90deg,#ef4444,#f87171)}
-.battery-fill.offline{background:linear-gradient(90deg,#94a3b8,#cbd5e1)}
-.battery-fill.low{background:linear-gradient(90deg,#ef4444,#f87171)}
-.battery-fill.mid{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-.battery-fill.high{background:linear-gradient(90deg,#10b981,#34d399)}
-/* Download-specific idle colors (blue tint) */
-.upload-battery.is-download .battery-fill.high{background:linear-gradient(90deg,#0ea5e9,#38bdf8)}
-.upload-battery.is-download .battery-fill.mid{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-.upload-battery.is-download .battery-fill.low{background:linear-gradient(90deg,#ef4444,#f87171)}
 
-.battery-pct{
-  font-size:11.5px;font-weight:800;color:var(--ink);
-  min-width:36px;text-align:right;font-variant-numeric:tabular-nums;
+/* Cloud base outline (always visible) */
+.cloud-base{
+  fill:#ffffff;
+  stroke:#94a3b8;
+  stroke-width:1.1;
+  transition:stroke .3s, fill .3s;
 }
-.battery-label{
-  font-size:10px;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.6px;font-weight:800;
+/* Cloud progress fill (clipped from bottom) */
+.cloud-fill{
+  fill:#cbd5e1;
+  transition:fill .3s;
 }
-.upload-battery.is-upload .battery-label{color:#059669}
-.upload-battery.is-download .battery-label{color:#0284c7}
-.upload-battery.is-error .battery-label{color:#dc2626}
-.upload-battery.is-offline .battery-label{color:#64748b}
+/* Arrow inside the cloud */
+.cloud-arrow{
+  fill:#475569;
+  transition:fill .3s;
+}
 
-@media(max-width:1100px){.battery-label{display:none}}
+/* ---------- UPLOAD (green) ---------- */
+.cloud-ind.is-upload .cloud-base{stroke:#10b981}
+.cloud-ind.is-upload .cloud-fill{fill:#a7f3d0}
+.cloud-ind.is-upload .cloud-arrow{fill:#047857}
+.cloud-ind.is-upload.is-active .cloud-base{stroke:#059669;stroke-width:1.4}
+.cloud-ind.is-upload.is-active .cloud-fill{fill:#10b981;animation:cloudPulse 1s ease-in-out infinite}
+.cloud-ind.is-upload.is-active .cloud-arrow{fill:#ffffff}
+
+/* ---------- DOWNLOAD (blue) ---------- */
+.cloud-ind.is-download .cloud-base{stroke:#0ea5e9}
+.cloud-ind.is-download .cloud-fill{fill:#bae6fd}
+.cloud-ind.is-download .cloud-arrow{fill:#0369a1}
+.cloud-ind.is-download.is-active .cloud-base{stroke:#0284c7;stroke-width:1.4}
+.cloud-ind.is-download.is-active .cloud-fill{fill:#0ea5e9;animation:cloudPulse 1s ease-in-out infinite}
+.cloud-ind.is-download.is-active .cloud-arrow{fill:#ffffff}
+
+/* ---------- ERROR ---------- */
+.cloud-ind.is-error .cloud-base{stroke:#ef4444}
+.cloud-ind.is-error .cloud-fill{fill:#fecaca}
+.cloud-ind.is-error .cloud-arrow{fill:#b91c1c}
+.cloud-ind.is-error.is-active .cloud-fill{fill:#ef4444;animation:cloudPulse 1s ease-in-out infinite}
+.cloud-ind.is-error.is-active .cloud-arrow{fill:#ffffff}
+
+/* ---------- OFFLINE ---------- */
+.cloud-ind.is-offline .cloud-base{stroke:#94a3b8}
+.cloud-ind.is-offline .cloud-fill{fill:#e2e8f0}
+.cloud-ind.is-offline .cloud-arrow{fill:#64748b}
+
+/* Percentage + label text */
+.cloud-info{display:flex;flex-direction:column;line-height:1.1;min-width:56px}
+.cloud-pct{
+  font-size:15px;font-weight:800;color:var(--ink);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.3px;
+}
+.cloud-lbl{
+  font-size:9px;font-weight:800;letter-spacing:.7px;
+  text-transform:uppercase;margin-top:1px;
+}
+.cloud-ind.is-upload .cloud-lbl{color:#059669}
+.cloud-ind.is-download .cloud-lbl{color:#0284c7}
+.cloud-ind.is-error .cloud-lbl{color:#dc2626}
+.cloud-ind.is-offline .cloud-lbl{color:#64748b}
+
+/* Responsive */
+@media(max-width:1180px){
+  .cloud-info{min-width:44px}
+  .cloud-pct{font-size:13.5px}
+  .cloud-lbl{font-size:8px}
+}
+@media(max-width:980px){
+  .cloud-icon,.cloud-icon svg{width:38px;height:38px}
+  .cloud-ind{padding:4px 8px 4px 4px;gap:4px}
+}
 @media(max-width:820px){
-  .battery-shell{width:34px;height:15px}
-  .battery-shell::after{top:3px;height:7px}
-  .upload-battery{padding:5px 7px;gap:6px}
+  .cloud-icon,.cloud-icon svg{width:34px;height:34px}
+  .cloud-info{min-width:40px}
 }
 @media(max-width:640px){
-  .battery-shell{width:28px;height:13px}
-  .battery-pct{font-size:10.5px;min-width:30px}
-  .upload-battery{padding:4px 6px}
+  .cloud-icon,.cloud-icon svg{width:30px;height:30px}
+  .cloud-ind{padding:3px 6px 3px 3px;gap:3px;border-radius:11px}
+  .cloud-pct{font-size:12px}
+  .cloud-lbl{display:none}
 }
-@keyframes batteryPulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media(max-width:480px){
+  .cloud-info{display:none}
+  .cloud-ind{padding:3px}
+}
+
+@keyframes cloudPulse{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .card-pad{padding:18px 20px}
@@ -239,7 +282,6 @@ tbody tr:hover{background:#fafbff}
 .sync-dot.on{background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.18)}
 .sync-dot.off{background:#94a3b8}
 .sync-dot.busy{background:#f59e0b;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
 .log{background:#0b1220;color:#cbd5e1;border-radius:10px;padding:12px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;max-height:240px;overflow:auto;line-height:1.7}
@@ -280,22 +322,61 @@ tbody tr:hover{background:#fafbff}
       </div>
       <div class="tb-right">
 
-        <!-- === BATTERY INDICATORS: UPLOAD (kiri) + DOWNLOAD (kanan) === -->
-        <div class="battery-pair">
-          <div class="upload-battery is-upload" id="uploadBattery" onclick="go('cloudSync')" title="Upload progress">
-            <div class="battery-shell">
-              <div class="battery-fill" id="uploadFill"></div>
+        <!-- === CLOUD INDICATORS: DOWNLOAD (kiri, biru) + UPLOAD (kanan, hijau) === -->
+        <div class="cloud-pair">
+
+          <!-- ===== DOWNLOAD cloud (arrow down, blue) ===== -->
+          <div class="cloud-ind is-download" id="downloadIndicator"
+               onclick="go('cloudSync')" title="Download progress">
+            <div class="cloud-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <clipPath id="downloadClip">
+                    <rect id="downloadClipRect" x="0" y="24" width="24" height="0"/>
+                  </clipPath>
+                </defs>
+                <!-- cloud outline -->
+                <path class="cloud-base"
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                <!-- cloud progress fill (clipped) -->
+                <path class="cloud-fill" clip-path="url(#downloadClip)"
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                <!-- arrow DOWN -->
+                <path class="cloud-arrow" d="M12 17.2l4-4.6h-2.4V7h-3.2v5.6H8z"/>
+              </svg>
             </div>
-            <span class="battery-pct" id="uploadPct">100%</span>
-            <span class="battery-label" id="uploadLabel">UPLOAD</span>
-          </div>
-          <div class="upload-battery is-download" id="downloadBattery" onclick="go('cloudSync')" title="Download progress">
-            <div class="battery-shell">
-              <div class="battery-fill" id="downloadFill"></div>
+            <div class="cloud-info">
+              <span class="cloud-pct" id="downloadPct">100%</span>
+              <span class="cloud-lbl" id="downloadLabel">DOWNLOAD</span>
             </div>
-            <span class="battery-pct" id="downloadPct">100%</span>
-            <span class="battery-label" id="downloadLabel">DOWNLOAD</span>
           </div>
+
+          <!-- ===== UPLOAD cloud (arrow up, green) ===== -->
+          <div class="cloud-ind is-upload" id="uploadIndicator"
+               onclick="go('cloudSync')" title="Upload progress">
+            <div class="cloud-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <clipPath id="uploadClip">
+                    <rect id="uploadClipRect" x="0" y="24" width="24" height="0"/>
+                  </clipPath>
+                </defs>
+                <!-- cloud outline -->
+                <path class="cloud-base"
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                <!-- cloud progress fill (clipped) -->
+                <path class="cloud-fill" clip-path="url(#uploadClip)"
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                <!-- arrow UP -->
+                <path class="cloud-arrow" d="M12 6.8L8 11.4h2.4V17h3.2v-5.6H16z"/>
+              </svg>
+            </div>
+            <div class="cloud-info">
+              <span class="cloud-pct" id="uploadPct">100%</span>
+              <span class="cloud-lbl" id="uploadLabel">UPLOAD</span>
+            </div>
+          </div>
+
         </div>
 
         <select class="role-sel" id="langSelect" onchange="setLang(this.value)" title="Language / Bahasa">
@@ -409,80 +490,76 @@ function toast(msg){
 }
 
 /* =========================================================
-   BATTERY INDICATORS (UPLOAD + DOWNLOAD) — TWO SIDE BY SIDE
+   CLOUD UPLOAD / DOWNLOAD INDICATORS
+   ---------------------------------------------------------
+   Setiap indikator guna SVG cloud dengan:
+   - outline (cloud-base) : sentiasa kelihatan
+   - fill   (cloud-fill)  : di-clip dari bawah ke atas ikut %
+   - arrow  (cloud-arrow) : di tengah cloud
    ========================================================= */
-function createBatteryIndicator(opts){
+function createCloudIndicator(opts){
+  const SVG_H = 24; // tinggi viewBox
+
   return {
-    dir: opts.dir,               // 'upload' | 'download'
+    dir: opts.dir,                 // 'upload' | 'download'
     pct: 100,
-    mode: 'ok',                  // 'ok' | 'charging' | 'error' | 'offline'
+    mode: 'ok',                    // 'ok' | 'active' | 'error' | 'offline'
     simulate: null,
 
     _cache(){
-      this.fillEl  = document.getElementById(opts.fillId);
-      this.pctEl   = document.getElementById(opts.pctId);
-      this.lblEl   = document.getElementById(opts.labelId);
-      this.wrapEl  = document.getElementById(opts.wrapId);
-      this.shellEl = this.wrapEl ? this.wrapEl.querySelector('.battery-shell') : null;
+      this.wrapEl   = document.getElementById(opts.wrapId);
+      this.pctEl    = document.getElementById(opts.pctId);
+      this.lblEl    = document.getElementById(opts.labelId);
+      this.clipRect = document.getElementById(opts.clipRectId);
     },
 
     render(){
-      if(!this.fillEl) this._cache();
-      if(!this.fillEl) return;
+      if(!this.wrapEl) this._cache();
+      if(!this.wrapEl) return;
 
       this.pct = Math.max(0, Math.min(100, Math.round(this.pct)));
 
-      this.fillEl.style.width = this.pct + '%';
-      this.pctEl.textContent = this.pct + '%';
-
-      // reset dynamic classes
-      this.fillEl.className = 'battery-fill';
-      if(this.shellEl) this.shellEl.className = 'battery-shell';
-      if(this.wrapEl)  this.wrapEl.classList.remove('is-error','is-offline');
-
-      const isDownload = this.dir === 'download';
-
-      if(this.mode === 'charging'){
-        if(isDownload){
-          this.fillEl.classList.add('downloading');
-          if(this.shellEl) this.shellEl.classList.add('downloading');
-        } else {
-          this.fillEl.classList.add('charging');
-          if(this.shellEl) this.shellEl.classList.add('uploading');
-        }
-      }
-      else if(this.mode === 'error'){
-        this.fillEl.classList.add('error');
-        if(this.wrapEl) this.wrapEl.classList.add('is-error');
-      }
-      else if(this.mode === 'offline'){
-        this.fillEl.classList.add('offline');
-        if(this.wrapEl) this.wrapEl.classList.add('is-offline');
-      }
-      else {
-        if(this.pct >= 80)      this.fillEl.classList.add('high');
-        else if(this.pct >= 40) this.fillEl.classList.add('mid');
-        else                    this.fillEl.classList.add('low');
+      // ---- Update SVG clip rect (fill from bottom up) ----
+      if(this.clipRect){
+        const h = SVG_H * this.pct / 100;
+        const y = SVG_H - h;
+        this.clipRect.setAttribute('y', y);
+        this.clipRect.setAttribute('height', h);
       }
 
-      // wrapper direction class (drives label color)
-      if(this.wrapEl) this.wrapEl.classList.add(isDownload ? 'is-download' : 'is-upload');
+      // ---- Percentage text ----
+      if(this.pctEl) this.pctEl.textContent = this.pct + '%';
 
+      // ---- Reset state classes ----
+      this.wrapEl.classList.remove('is-error','is-offline','is-active');
+
+      // ---- Mode classes ----
+      if(this.mode === 'active'){
+        this.wrapEl.classList.add('is-active');
+      } else if(this.mode === 'error'){
+        this.wrapEl.classList.add('is-error');
+      } else if(this.mode === 'offline'){
+        this.wrapEl.classList.add('is-offline');
+      }
+
+      // ---- Label text ----
       if(this.lblEl){
+        const isDownload = this.dir === 'download';
         this.lblEl.textContent =
-          this.mode === 'charging' ? (isDownload ? 'DOWNLOADING' : 'UPLOADING') :
-          this.mode === 'error'    ? 'FAILED' :
-          this.mode === 'offline'  ? 'OFFLINE' :
+          this.mode === 'active'  ? (isDownload ? 'DOWNLOADING' : 'UPLOADING') :
+          this.mode === 'error'   ? 'FAILED'  :
+          this.mode === 'offline' ? 'OFFLINE' :
           (isDownload ? 'DOWNLOAD' : 'UPLOAD');
       }
 
+      // ---- Tooltip ----
       if(this.wrapEl){
-        const dirCap = isDownload ? 'Download' : 'Upload';
+        const dirCap = this.dir === 'download' ? 'Download' : 'Upload';
         this.wrapEl.title =
-          this.mode === 'charging' ? dirCap + 'ing… ' + this.pct + '%' :
-          this.mode === 'error'    ? dirCap + ' failed — click to retry' :
-          this.mode === 'offline'  ? 'Offline — will retry when online' :
-          'Cloud synced · last ' + dirCap.toLowerCase() + ' ' + this.pct + '%';
+          this.mode === 'active'  ? dirCap + 'ing… ' + this.pct + '%' :
+          this.mode === 'error'   ? dirCap + ' failed — click to retry' :
+          this.mode === 'offline' ? 'Offline — will retry when online' :
+          'Cloud synced · ' + dirCap.toLowerCase() + ' ' + this.pct + '%';
       }
     },
 
@@ -492,29 +569,31 @@ function createBatteryIndicator(opts){
       this.render();
     },
 
+    // Start from current pct (for upload, resume)
     start(){
       if(this.simulate) return;
       let p = Math.max(5, Math.min(this.pct, 90));
       if(this.pct >= 90) p = 5;
-      this.set(p, 'charging');
+      this.set(p, 'active');
       const self = this;
       this.simulate = setInterval(() => {
         if(p < 92){
           p += Math.random() * 6 + 1.5;
-          self.set(Math.min(p, 92), 'charging');
+          self.set(Math.min(p, 92), 'active');
         }
       }, 380);
     },
 
+    // Start from 0 (for download, fresh pull)
     startFromZero(){
       if(this.simulate) return;
       let p = 0;
-      this.set(p, 'charging');
+      this.set(p, 'active');
       const self = this;
       this.simulate = setInterval(() => {
         if(p < 92){
           p += Math.random() * 6 + 1.5;
-          self.set(Math.min(p, 92), 'charging');
+          self.set(Math.min(p, 92), 'active');
         }
       }, 380);
     },
@@ -549,55 +628,56 @@ function createBatteryIndicator(opts){
   };
 }
 
-const UPLOAD_BATTERY = createBatteryIndicator({
-  dir:'upload',
-  fillId:'uploadFill', pctId:'uploadPct', labelId:'uploadLabel', wrapId:'uploadBattery'
+const UPLOAD_INDICATOR = createCloudIndicator({
+  dir: 'upload',
+  wrapId: 'uploadIndicator',
+  pctId: 'uploadPct',
+  labelId: 'uploadLabel',
+  clipRectId: 'uploadClipRect'
 });
 
-const DOWNLOAD_BATTERY = createBatteryIndicator({
-  dir:'download',
-  fillId:'downloadFill', pctId:'downloadPct', labelId:'downloadLabel', wrapId:'downloadBattery'
+const DOWNLOAD_INDICATOR = createCloudIndicator({
+  dir: 'download',
+  wrapId: 'downloadIndicator',
+  pctId: 'downloadPct',
+  labelId: 'downloadLabel',
+  clipRectId: 'downloadClipRect'
 });
 
-/* Backward-compatible facade — previously used as a single BATTERY object. */
+/* Backward-compat facade: still expose old names so rest of code works */
+const UPLOAD_BATTERY   = UPLOAD_INDICATOR;
+const DOWNLOAD_BATTERY = DOWNLOAD_INDICATOR;
+
 const BATTERY = {
-  get upload(){ return UPLOAD_BATTERY; },
-  get download(){ return DOWNLOAD_BATTERY; },
-
-  render(){ UPLOAD_BATTERY.render(); DOWNLOAD_BATTERY.render(); },
-
-  // Upload-direction API (used by SYNC)
-  startCharging(){ UPLOAD_BATTERY.start(); },
-  // Download-direction API (used by cloudPull)
-  startDownload(){ DOWNLOAD_BATTERY.startFromZero(); },
-
-  stopSim(){ UPLOAD_BATTERY.stop(); DOWNLOAD_BATTERY.stop(); },
-
-  // These affect the "current" direction only when passed; by default both.
+  get upload(){ return UPLOAD_INDICATOR; },
+  get download(){ return DOWNLOAD_INDICATOR; },
+  render(){ UPLOAD_INDICATOR.render(); DOWNLOAD_INDICATOR.render(); },
+  startCharging(){ UPLOAD_INDICATOR.start(); },
+  startDownload(){ DOWNLOAD_INDICATOR.startFromZero(); },
+  stopSim(){ UPLOAD_INDICATOR.stop(); DOWNLOAD_INDICATOR.stop(); },
   done(direction){
-    if(direction === 'download')      DOWNLOAD_BATTERY.done();
-    else if(direction === 'upload')   UPLOAD_BATTERY.done();
-    else { UPLOAD_BATTERY.done(); DOWNLOAD_BATTERY.done(); }
+    if(direction === 'download')      DOWNLOAD_INDICATOR.done();
+    else if(direction === 'upload')   UPLOAD_INDICATOR.done();
+    else { UPLOAD_INDICATOR.done(); DOWNLOAD_INDICATOR.done(); }
   },
   error(direction){
-    if(direction === 'download')      DOWNLOAD_BATTERY.error();
-    else if(direction === 'upload')   UPLOAD_BATTERY.error();
-    else { UPLOAD_BATTERY.error(); DOWNLOAD_BATTERY.error(); }
+    if(direction === 'download')      DOWNLOAD_INDICATOR.error();
+    else if(direction === 'upload')   UPLOAD_INDICATOR.error();
+    else { UPLOAD_INDICATOR.error(); DOWNLOAD_INDICATOR.error(); }
   },
   offline(direction){
-    if(direction === 'download')      DOWNLOAD_BATTERY.offline();
-    else if(direction === 'upload')   UPLOAD_BATTERY.offline();
-    else { UPLOAD_BATTERY.offline(); DOWNLOAD_BATTERY.offline(); }
+    if(direction === 'download')      DOWNLOAD_INDICATOR.offline();
+    else if(direction === 'upload')   UPLOAD_INDICATOR.offline();
+    else { UPLOAD_INDICATOR.offline(); DOWNLOAD_INDICATOR.offline(); }
   },
   idle(direction){
-    if(direction === 'download')      DOWNLOAD_BATTERY.idle();
-    else if(direction === 'upload')   UPLOAD_BATTERY.idle();
-    else { UPLOAD_BATTERY.idle(); DOWNLOAD_BATTERY.idle(); }
+    if(direction === 'download')      DOWNLOAD_INDICATOR.idle();
+    else if(direction === 'upload')   UPLOAD_INDICATOR.idle();
+    else { UPLOAD_INDICATOR.idle(); DOWNLOAD_INDICATOR.idle(); }
   },
-
   set(pct, mode, direction){
-    if(direction === 'download')      DOWNLOAD_BATTERY.set(pct, mode);
-    else                              UPLOAD_BATTERY.set(pct, mode);
+    if(direction === 'download')      DOWNLOAD_INDICATOR.set(pct, mode);
+    else                              UPLOAD_INDICATOR.set(pct, mode);
   }
 };
 window.BATTERY = BATTERY;
@@ -611,682 +691,286 @@ let LANG = localStorage.getItem('aps_lang') || 'ms';
 
 const I18N = {
   ms: {
-    'app.name':'Academic Profile',
-    'app.tagline':'Sistem Profil Akademik',
-
-    'nav.group.main':'Utama',
-    'nav.group.academic':'Akademik',
-    'nav.group.career':'Kerjaya',
-    'nav.group.tools':'Alat & Sistem',
-    'nav.group.analytics':'Analitik',
-    'nav.group.system':'Sistem',
-
-    'nav.dashboard':'Dashboard',
-    'nav.profile':'Profil Saya',
-    'nav.expertise':'Kepakaran & Penyelidikan',
-    'nav.qualifications':'Kelayakan Akademik',
-    'nav.teaching':'Pengajaran',
-    'nav.projects':'Projek Penyelidikan',
-    'nav.grants':'Geran Penyelidikan',
-    'nav.publications':'Penerbitan',
-    'nav.conferences':'Persidangan',
-    'nav.books':'Buku & Bab',
-    'nav.awards':'Anugerah & Pengiktirafan',
-    'nav.media':'Majalah / Media',
-    'nav.adminExp':'Pentadbiran',
-    'nav.supervision':'Penyeliaan',
-    'nav.consultancy':'Perundingan',
-    'nav.memberships':'Keahlian Profesional',
-    'nav.community':'Penglibatan Komuniti',
-    'nav.innovation':'Inovasi / Produk',
-    'nav.ip':'Harta Intelek',
-    'nav.cloudSync':'Segerak Resume Cloud',
-    'nav.cv':'CV Saya',
-    'nav.public':'Profil Akademik Awam',
-    'nav.search':'Carian Fakulti',
-    'nav.analytics':'Analitik Fakulti',
-    'nav.kpi':'Papan Pemuka KPI',
-    'nav.quality':'Kualiti Data',
-    'nav.notifications':'Notifikasi',
-    'nav.admin':'Panel Admin',
-    'nav.audit':'Jejak Audit',
-
-    'title.dashboard':'Dashboard',
-    'sub.dashboard':'Ringkasan profil akademik anda',
-    'title.profile':'Profil Saya',
-    'sub.profile':'Maklumat peribadi, pengecam akademik & biografi',
-    'title.expertise':'Kepakaran & Minat Penyelidikan',
-    'sub.expertise':'Kepakaran, minat penyelidikan, kata kunci & SDG',
-    'title.cloudSync':'Segerak Resume Cloud',
-    'sub.cloudSync':'Auto-sync ke Google Sheets setiap kali data berubah',
-    'title.cv':'CV Saya',
-    'sub.cv':'Jana CV akademik daripada satu sumber data',
-    'title.public':'Profil Akademik Awam',
-    'sub.public':'Profil awam yang boleh dikongsi',
-    'title.search':'Carian Fakulti',
-    'sub.search':'Cari kepakaran merentas semua rekod',
-    'title.analytics':'Analitik Fakulti',
-    'sub.analytics':'Statistik penerbitan, penyelidikan & akademik',
-    'title.kpi':'Papan Pemuka KPI',
-    'sub.kpi':'Petunjuk prestasi utama fakulti',
-    'title.quality':'Kualiti Data',
-    'sub.quality':'Semakan data tidak lengkap & pertindihan',
-    'title.notifications':'Notifikasi',
-    'sub.notifications':'Makluman sistem & peringatan',
-    'title.admin':'Panel Admin',
-    'sub.admin':'Pengurusan pengguna, sistem & data',
-    'title.audit':'Jejak Audit',
-    'sub.audit':'Sejarah perubahan data',
-    'sub.records':'Pengurusan rekod',
-
-    'sync.idle':'Cloud sedia',
-    'sync.pending':'Menunggu sync…',
-    'sync.busy':'Menyegerak…',
-    'sync.ok':'☁️ Auto-synced',
-    'sync.error':'⚠️ Sync gagal',
-    'sync.offline':'📴 Offline',
-    'sync.retry':'⟳ Cuba semula…',
-
+    'app.name':'Academic Profile', 'app.tagline':'Sistem Profil Akademik',
+    'nav.group.main':'Utama', 'nav.group.academic':'Akademik', 'nav.group.career':'Kerjaya',
+    'nav.group.tools':'Alat & Sistem', 'nav.group.analytics':'Analitik', 'nav.group.system':'Sistem',
+    'nav.dashboard':'Dashboard', 'nav.profile':'Profil Saya', 'nav.expertise':'Kepakaran & Penyelidikan',
+    'nav.qualifications':'Kelayakan Akademik', 'nav.teaching':'Pengajaran', 'nav.projects':'Projek Penyelidikan',
+    'nav.grants':'Geran Penyelidikan', 'nav.publications':'Penerbitan', 'nav.conferences':'Persidangan',
+    'nav.books':'Buku & Bab', 'nav.awards':'Anugerah & Pengiktirafan', 'nav.media':'Majalah / Media',
+    'nav.adminExp':'Pentadbiran', 'nav.supervision':'Penyeliaan', 'nav.consultancy':'Perundingan',
+    'nav.memberships':'Keahlian Profesional', 'nav.community':'Penglibatan Komuniti',
+    'nav.innovation':'Inovasi / Produk', 'nav.ip':'Harta Intelek', 'nav.cloudSync':'Segerak Resume Cloud',
+    'nav.cv':'CV Saya', 'nav.public':'Profil Akademik Awam', 'nav.search':'Carian Fakulti',
+    'nav.analytics':'Analitik Fakulti', 'nav.kpi':'Papan Pemuka KPI', 'nav.quality':'Kualiti Data',
+    'nav.notifications':'Notifikasi', 'nav.admin':'Panel Admin', 'nav.audit':'Jejak Audit',
+    'title.dashboard':'Dashboard','sub.dashboard':'Ringkasan profil akademik anda',
+    'title.profile':'Profil Saya','sub.profile':'Maklumat peribadi, pengecam akademik & biografi',
+    'title.expertise':'Kepakaran & Minat Penyelidikan','sub.expertise':'Kepakaran, minat penyelidikan, kata kunci & SDG',
+    'title.cloudSync':'Segerak Resume Cloud','sub.cloudSync':'Auto-sync ke Google Sheets setiap kali data berubah',
+    'title.cv':'CV Saya','sub.cv':'Jana CV akademik daripada satu sumber data',
+    'title.public':'Profil Akademik Awam','sub.public':'Profil awam yang boleh dikongsi',
+    'title.search':'Carian Fakulti','sub.search':'Cari kepakaran merentas semua rekod',
+    'title.analytics':'Analitik Fakulti','sub.analytics':'Statistik penerbitan, penyelidikan & akademik',
+    'title.kpi':'Papan Pemuka KPI','sub.kpi':'Petunjuk prestasi utama fakulti',
+    'title.quality':'Kualiti Data','sub.quality':'Semakan data tidak lengkap & pertindihan',
+    'title.notifications':'Notifikasi','sub.notifications':'Makluman sistem & peringatan',
+    'title.admin':'Panel Admin','sub.admin':'Pengurusan pengguna, sistem & data',
+    'title.audit':'Jejak Audit','sub.audit':'Sejarah perubahan data','sub.records':'Pengurusan rekod',
+    'sync.idle':'Cloud sedia','sync.pending':'Menunggu sync…','sync.busy':'Menyegerak…',
+    'sync.ok':'☁️ Auto-synced','sync.error':'⚠️ Sync gagal','sync.offline':'📴 Offline','sync.retry':'⟳ Cuba semula…',
     'role.label':'Peranan anda',
-
-    'btn.save':'💾 Simpan',
-    'btn.cancel':'Batal',
-    'btn.add':'＋ Tambah',
-    'btn.addManual':'＋ Tambah Manual',
-    'btn.edit':'✏️',
-    'btn.delete':'🗑',
-    'btn.print':'🖨 Cetak / Simpan PDF',
-    'btn.download':'⬇ Muat Turun',
-    'btn.search':'🔎 Cari',
-    'btn.forceSync':'⚡ Force Sync Now',
-    'btn.pullCloud':'⬇ Tarik dari Cloud',
-    'btn.testConn':'🔌 Test Sambungan',
-    'btn.generateCV':'📄 JANA CV',
-    'btn.share':'🔗 Kongsi Profil',
-    'btn.viewCV':'📄 Lihat CV',
-    'btn.updateResume':'☁️ Update Resume',
-    'btn.logoutOnly':'Log Out Sahaja',
-    'btn.stay':'❌ Kekal di Halaman',
-    'btn.updateLogout':'☁️ Update Resume & Log Out',
-    'btn.updateExit':'☁️ Update Resume & Keluar',
-    'btn.tryAgain':'☁️ Cuba Lagi',
-    'btn.saveProfile':'💾 Simpan Profil (auto-sync ☁️)',
-    'btn.saveExpertise':'💾 Simpan (auto-sync ☁️)',
-    'btn.aiBio':'✨ AI Jana Biografi',
-    'btn.exportJSON':'⬇ Export JSON',
-    'btn.openQuality':'Buka Kualiti Data →',
-    'btn.close':'✕',
-    'btn.markAllRead':'Tanda semua dibaca',
-    'btn.clear':'Clear',
-
-    'dash.profileStatus':'Status Profil',
-    'dash.complete':'Complete',
-    'dash.role':'Peranan',
-    'dash.totalGrant':'Jumlah Geran',
-    'dash.synced':'☁️ Auto-synced',
-    'dash.notSynced':'☁️ Belum sync',
-    'dash.addInfo':'＋ Tambah Maklumat',
-    'dash.cloudSync':'☁️ Segerak Cloud',
-    'dash.genCV':'📄 Jana CV',
-    'dash.editProfile':'✏️ Edit Profil',
+    'btn.save':'💾 Simpan','btn.cancel':'Batal','btn.add':'＋ Tambah','btn.addManual':'＋ Tambah Manual',
+    'btn.edit':'✏️','btn.delete':'🗑','btn.print':'🖨 Cetak / Simpan PDF','btn.download':'⬇ Muat Turun',
+    'btn.search':'🔎 Cari','btn.forceSync':'⚡ Force Sync Now','btn.pullCloud':'⬇ Tarik dari Cloud',
+    'btn.testConn':'🔌 Test Sambungan','btn.generateCV':'📄 JANA CV','btn.share':'🔗 Kongsi Profil',
+    'btn.viewCV':'📄 Lihat CV','btn.updateResume':'☁️ Update Resume','btn.logoutOnly':'Log Out Sahaja',
+    'btn.stay':'❌ Kekal di Halaman','btn.updateLogout':'☁️ Update Resume & Log Out',
+    'btn.updateExit':'☁️ Update Resume & Keluar','btn.tryAgain':'☁️ Cuba Lagi',
+    'btn.saveProfile':'💾 Simpan Profil (auto-sync ☁️)','btn.saveExpertise':'💾 Simpan (auto-sync ☁️)',
+    'btn.aiBio':'✨ AI Jana Biografi','btn.exportJSON':'⬇ Export JSON','btn.openQuality':'Buka Kualiti Data →',
+    'btn.close':'✕','btn.markAllRead':'Tanda semua dibaca','btn.clear':'Clear',
+    'dash.profileStatus':'Status Profil','dash.complete':'Complete','dash.role':'Peranan','dash.totalGrant':'Jumlah Geran',
+    'dash.synced':'☁️ Auto-synced','dash.notSynced':'☁️ Belum sync','dash.addInfo':'＋ Tambah Maklumat',
+    'dash.cloudSync':'☁️ Segerak Cloud','dash.genCV':'📄 Jana CV','dash.editProfile':'✏️ Edit Profil',
     'dash.autoSync.title':'Auto Cloud Sync — Aktif ✅',
     'dash.autoSync.desc':'Setiap <b>edit / tambah / padam</b> akan <b>auto-push</b> ke Google Sheets. Bila <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b>, atau <b>refresh</b> — sistem akan minta anda update resume dahulu.',
-    'dash.forceSync':'⚡ Force Sync Now',
-    'dash.syncPanel':'⚙️ Panel Sync',
-    'dash.stats':'📊 Statistik Peribadi',
-    'dash.reminders':'🔔 Peringatan & Tugasan',
-    'dash.pubByYear':'📈 Penerbitan Mengikut Tahun',
-    'dash.recentActivity':'🕘 Aktiviti Terkini (Audit)',
-    'dash.noIssues':'Tiada isu data. Profil anda lengkap! 🎉',
-    'dash.noActivity':'Tiada aktiviti lagi.',
-    'dash.incompleteProfile':'👤 Maklumat profil belum lengkap',
-    'dash.missingDOI':'publication belum mempunyai DOI.',
-    'dash.missingYear':'rekod tiada tahun.',
-    'dash.dupRecords':'rekod berkemungkinan duplicate.',
-    'dash.noOrcid':'ORCID belum diisi.',
-
-    'coll.records':'rekod',
-    'coll.autoSyncOn':'Auto-sync aktif ☁️',
-    'coll.searchPlaceholder':'🔎 Cari dalam',
-    'coll.noRecords':'Tiada rekod',
-    'coll.lagi':'lagi.',
-    'coll.add':'Tambah',
-    'coll.addManually':'＋ Tambah Manual',
-    'coll.autoCalc':'Auto kiraan:',
-    'coll.totalGrantObtained':'Jumlah Geran Diperoleh',
-
-    'form.dataAutoSync':'Data akan <b>auto-sync</b> ke Cloud selepas Save.',
-    'form.choose':'— pilih —',
-    'form.add':'Add',
-    'form.edit':'Edit',
-
-    'profile.signedInAs':'Signed in as',
-    'profile.personalInfo':'👤 A. Maklumat Peribadi',
+    'dash.forceSync':'⚡ Force Sync Now','dash.syncPanel':'⚙️ Panel Sync','dash.stats':'📊 Statistik Peribadi',
+    'dash.reminders':'🔔 Peringatan & Tugasan','dash.pubByYear':'📈 Penerbitan Mengikut Tahun',
+    'dash.recentActivity':'🕘 Aktiviti Terkini (Audit)','dash.noIssues':'Tiada isu data. Profil anda lengkap! 🎉',
+    'dash.noActivity':'Tiada aktiviti lagi.','dash.incompleteProfile':'👤 Maklumat profil belum lengkap',
+    'dash.missingDOI':'publication belum mempunyai DOI.','dash.missingYear':'rekod tiada tahun.',
+    'dash.dupRecords':'rekod berkemungkinan duplicate.','dash.noOrcid':'ORCID belum diisi.',
+    'coll.records':'rekod','coll.autoSyncOn':'Auto-sync aktif ☁️','coll.searchPlaceholder':'🔎 Cari dalam',
+    'coll.noRecords':'Tiada rekod','coll.lagi':'lagi.','coll.add':'Tambah','coll.addManually':'＋ Tambah Manual',
+    'coll.autoCalc':'Auto kiraan:','coll.totalGrantObtained':'Jumlah Geran Diperoleh',
+    'form.dataAutoSync':'Data akan <b>auto-sync</b> ke Cloud selepas Save.','form.choose':'— pilih —',
+    'form.add':'Add','form.edit':'Edit',
+    'profile.signedInAs':'Signed in as','profile.personalInfo':'👤 A. Maklumat Peribadi',
     'profile.lockedHint':'🔒 Field bertanda kunci diambil automatik dari <b>akaun login</b> anda (source of truth). Untuk tukar, kemas kini dalam sistem HR / auth.',
-    'profile.academicId':'🆔 B. Pengecam Akademik',
-    'profile.biography':'✍️ C. Biografi',
+    'profile.academicId':'🆔 B. Pengecam Akademik','profile.biography':'✍️ C. Biografi',
     'profile.autoSaveHint':'💡 <b>Auto-save aktif:</b> setiap kali anda taip, data disimpan lokal + auto-push ke Cloud.',
     'profile.logout':'🚪 Log Keluar',
-
-    'exp.expertise':'🔬 Kepakaran',
-    'exp.expertiseHint':'Senarai kepakaran (pisah dengan koma)',
-    'exp.interest':'🎯 Minat Penyelidikan',
-    'exp.interestHint':'Minat penyelidikan (pisah dengan koma)',
-    'exp.keywords':'🏷️ Kata Kunci',
-    'exp.keywordsHint':'Kata kunci (pisah dengan koma)',
-    'exp.sdg':'🌱 Penjajaran SDG',
-    'exp.sdgHint':'SDG (pisah dengan koma)',
-
-    'cv.options':'📄 Pilihan CV',
-    'cv.type':'Jenis CV',
-    'cv.order':'Susunan',
-    'cv.newest':'Terbaru → Terlama',
-    'cv.oldest':'Terlama → Terbaru',
-    'cv.pickSection':'Pilih Section',
-
-    'cloud.autoTitle':'Auto Cloud Sync — Google Sheets',
-    'cloud.endpoint':'Endpoint:',
-    'cloud.lastAuto':'Terakhir auto-sync:',
-    'cloud.never':'Belum pernah sync',
-    'cloud.lastPull':'Terakhir tarik:',
+    'exp.expertise':'🔬 Kepakaran','exp.expertiseHint':'Senarai kepakaran (pisah dengan koma)',
+    'exp.interest':'🎯 Minat Penyelidikan','exp.interestHint':'Minat penyelidikan (pisah dengan koma)',
+    'exp.keywords':'🏷️ Kata Kunci','exp.keywordsHint':'Kata kunci (pisah dengan koma)',
+    'exp.sdg':'🌱 Penjajaran SDG','exp.sdgHint':'SDG (pisah dengan koma)',
+    'cv.options':'📄 Pilihan CV','cv.type':'Jenis CV','cv.order':'Susunan','cv.newest':'Terbaru → Terlama',
+    'cv.oldest':'Terlama → Terbaru','cv.pickSection':'Pilih Section',
+    'cloud.autoTitle':'Auto Cloud Sync — Google Sheets','cloud.endpoint':'Endpoint:',
+    'cloud.lastAuto':'Terakhir auto-sync:','cloud.never':'Belum pernah sync','cloud.lastPull':'Terakhir tarik:',
     'cloud.exitGuardTitle':'Auto-sync + Exit Guard Aktif',
     'cloud.exitGuardDesc':'Setiap <b>edit / tambah / padam</b> akan auto-push ke Google Sheets.<br>Bila anda <b>Log Out</b>, tekan <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b> — sistem akan minta anda tekan <b>Update Resume</b> dahulu.',
-    'cloud.dataSent':'📦 Data Yang Dihantar (Auto)',
-    'cloud.settings':'⚙️ Tetapan Sync',
+    'cloud.dataSent':'📦 Data Yang Dihantar (Auto)','cloud.settings':'⚙️ Tetapan Sync',
     'cloud.autoSyncLabel':'<b>Auto-sync aktif</b> — setiap edit / tambah / padam akan auto-push ke Google Sheets',
     'cloud.exitGuardHint':'<b>✅ Exit Guard Aktif:</b> Bila anda tekan <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b>, sistem akan minta anda tekan <b>Update Resume</b> dahulu sebelum keluar.',
     'cloud.deployHint':'<b>Penting:</b> Apps Script mesti di-deploy <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.',
-    'cloud.syncLog':'🪵 Log Sync',
-    'cloud.profile':'Profil',
-    'cloud.viewCV':'📄 Lihat CV',
-    'cloud.ready':'Auto-sync engine sedia.',
-
-    'search.title':'🔎 Carian Fakulti — Cari Kepakaran',
-    'search.placeholder':'Contoh: Waste Cooking Oil, Polyurethane, Catalysis...',
-    'search.enter':'Masukkan kata kunci untuk mencari.',
-    'search.matches':'padanan',
-    'search.noMatch':'Tiada padanan untuk',
-    'search.expertiseMatch':'🎯 Padanan Kepakaran',
-    'search.viewProfile':'Lihat Profil →',
-
-    'quality.missingDOI':'Missing DOI',
-    'quality.missingYear':'Missing Year',
-    'quality.missingORCID':'Missing ORCID',
-    'quality.duplicates':'Possible Duplicates',
-    'quality.missingData':'🔍 Data Tidak Lengkap',
-    'quality.possibleDup':'⚠️ Kemungkinan Duplicate',
-    'quality.noDOI':'Tiada isu DOI. 👍',
-    'quality.noDup':'Tiada pertindihan dikesan. 👍',
-    'quality.complete':'Lengkapkan',
-    'quality.merge':'Merge (auto-sync)',
-    'quality.keepSeparate':'Kekalkan Berasingan',
-    'quality.orcidMissing':'🆔 ORCID belum diisi pada profil.',
-    'quality.addOrcid':'Tambah ORCID',
-    'quality.noDOIpill':'No DOI',
-    'quality.noYearpill':'No Year',
-    'quality.dupPill':'Possible duplicate publication detected',
-
-    'notif.title':'Notifikasi',
-    'notif.read':'Read',
-    'notif.new':'New',
-
-    'pub.share':'🔗 Kongsi Profil',
-    'pub.viewCV':'📄 Lihat CV',
-    'pub.bio':'👤 Biografi',
-    'pub.expertise':'🔬 Kepakaran',
-    'pub.interest':'🎯 Minat Penyelidikan',
-    'pub.sdg':'🌱 SDG',
-    'pub.recentPubs':'📚 Penerbitan Terkini',
-    'pub.noPubs':'Tiada penerbitan.',
-    'pub.contact':'📞 Hubungan',
-    'pub.links':'🔗 Pautan Akademik',
-    'pub.email':'Email',
-    'pub.phone':'Telefon',
-    'pub.office':'Pejabat',
-
-    'analytics.pubBreakdown':'📚 Pecahan Penerbitan',
-    'analytics.pubGrowth':'📈 Pertumbuhan Penerbitan Mengikut Tahun',
-    'analytics.research':'🔬 Penyelidikan',
-    'analytics.academic':'🎓 Akademik',
-    'analytics.awardsLevel':'🏆 Anugerah Mengikut Tahap',
-    'analytics.supervision':'👨‍🎓 Penyeliaan',
-    'analytics.numProjects':'Bilangan Projek',
-    'analytics.activeProjects':'Projek Aktif',
-    'analytics.completedProjects':'Projek Selesai',
-    'analytics.totalGrant':'Jumlah Geran',
-    'analytics.asPI':'Sebagai PI',
-    'analytics.asCo':'Sebagai Co-Researcher',
-    'analytics.numLecturers':'Bilangan Pensyarah',
-    'analytics.phdQualified':'Berkelayakan PhD',
-    'analytics.masterQualified':'Berkelayakan Master',
-    'analytics.researchActive':'Staf Aktif Penyelidikan',
-    'analytics.profileComplete':'Kelengkapan Profil',
-    'analytics.totalStudents':'Jumlah Pelajar',
-    'analytics.active':'Aktif',
-    'analytics.completed':'Selesai',
-
-    'kpi.yearCompare':'📈 Perbandingan Tahun',
-    'kpi.grantByYear':'📊 Geran Mengikut Tahun',
-    'kpi.notEnoughData':'Data tahun belum mencukupi.',
-    'kpi.noData':'Tiada data.',
-
+    'cloud.syncLog':'🪵 Log Sync','cloud.profile':'Profil','cloud.viewCV':'📄 Lihat CV','cloud.ready':'Auto-sync engine sedia.',
+    'search.title':'🔎 Carian Fakulti — Cari Kepakaran','search.placeholder':'Contoh: Waste Cooking Oil, Polyurethane, Catalysis...',
+    'search.enter':'Masukkan kata kunci untuk mencari.','search.matches':'padanan','search.noMatch':'Tiada padanan untuk',
+    'search.expertiseMatch':'🎯 Padanan Kepakaran','search.viewProfile':'Lihat Profil →',
+    'quality.missingDOI':'Missing DOI','quality.missingYear':'Missing Year','quality.missingORCID':'Missing ORCID',
+    'quality.duplicates':'Possible Duplicates','quality.missingData':'🔍 Data Tidak Lengkap',
+    'quality.possibleDup':'⚠️ Kemungkinan Duplicate','quality.noDOI':'Tiada isu DOI. 👍','quality.noDup':'Tiada pertindihan dikesan. 👍',
+    'quality.complete':'Lengkapkan','quality.merge':'Merge (auto-sync)','quality.keepSeparate':'Kekalkan Berasingan',
+    'quality.orcidMissing':'🆔 ORCID belum diisi pada profil.','quality.addOrcid':'Tambah ORCID',
+    'quality.noDOIpill':'No DOI','quality.noYearpill':'No Year','quality.dupPill':'Possible duplicate publication detected',
+    'notif.title':'Notifikasi','notif.read':'Read','notif.new':'New',
+    'pub.share':'🔗 Kongsi Profil','pub.viewCV':'📄 Lihat CV','pub.bio':'👤 Biografi','pub.expertise':'🔬 Kepakaran',
+    'pub.interest':'🎯 Minat Penyelidikan','pub.sdg':'🌱 SDG','pub.recentPubs':'📚 Penerbitan Terkini',
+    'pub.noPubs':'Tiada penerbitan.','pub.contact':'📞 Hubungan','pub.links':'🔗 Pautan Akademik',
+    'pub.email':'Email','pub.phone':'Telefon','pub.office':'Pejabat',
+    'analytics.pubBreakdown':'📚 Pecahan Penerbitan','analytics.pubGrowth':'📈 Pertumbuhan Penerbitan Mengikut Tahun',
+    'analytics.research':'🔬 Penyelidikan','analytics.academic':'🎓 Akademik','analytics.awardsLevel':'🏆 Anugerah Mengikut Tahap',
+    'analytics.supervision':'👨‍🎓 Penyeliaan','analytics.numProjects':'Bilangan Projek','analytics.activeProjects':'Projek Aktif',
+    'analytics.completedProjects':'Projek Selesai','analytics.totalGrant':'Jumlah Geran','analytics.asPI':'Sebagai PI',
+    'analytics.asCo':'Sebagai Co-Researcher','analytics.numLecturers':'Bilangan Pensyarah','analytics.phdQualified':'Berkelayakan PhD',
+    'analytics.masterQualified':'Berkelayakan Master','analytics.researchActive':'Staf Aktif Penyelidikan',
+    'analytics.profileComplete':'Kelengkapan Profil','analytics.totalStudents':'Jumlah Pelajar',
+    'analytics.active':'Aktif','analytics.completed':'Selesai',
+    'kpi.yearCompare':'📈 Perbandingan Tahun','kpi.grantByYear':'📊 Geran Mengikut Tahun',
+    'kpi.notEnoughData':'Data tahun belum mencukupi.','kpi.noData':'Tiada data.',
     'audit.title':'📝 Jejak Audit — Tadbir Urus Data',
     'audit.desc':'Setiap perubahan direkodkan: siapa, bila, sumber (Manual / Cloud Sync) dan tahap keyakinan.',
-    'audit.noActivity':'Tiada aktiviti direkodkan lagi.',
-    'audit.user':'Pengguna',
-    'audit.activity':'Aktiviti',
-    'audit.source':'Sumber',
-    'audit.confidence':'Confidence',
-    'audit.date':'Tarikh',
-
-    'admin.lecturers':'👥 Pensyarah',
-    'admin.faculty':'🏛️ Fakulti',
-    'admin.department':'🏢 Jabatan',
-    'admin.manageLecturers':'👨‍💼 Urus Pensyarah',
-    'admin.addLecturer':'＋ Tambah Pensyarah',
-    'admin.editLecturer':'✏️ Edit Pensyarah',
-    'admin.disableAcc':'🚫 Nyahaktifkan Akaun',
-    'admin.manageFaculty':'🏛️ Urus Fakulti & Jabatan',
-    'admin.manageFacultyBtn':'Urus Fakulti',
-    'admin.manageDeptBtn':'Urus Jabatan',
-    'admin.manageCatBtn':'Urus Kategori',
-    'admin.dataReports':'📤 Data & Laporan',
-    'admin.exportData':'⬇ Export Data (JSON)',
-    'admin.genReport':'📊 Jana Laporan Fakulti',
-    'admin.rolesAccess':'🔐 Peranan & Akses',
-    'admin.reset':'🗑 Reset Data Saya',
-
+    'audit.noActivity':'Tiada aktiviti direkodkan lagi.','audit.user':'Pengguna','audit.activity':'Aktiviti',
+    'audit.source':'Sumber','audit.confidence':'Confidence','audit.date':'Tarikh',
+    'admin.lecturers':'👥 Pensyarah','admin.faculty':'🏛️ Fakulti','admin.department':'🏢 Jabatan',
+    'admin.manageLecturers':'👨‍💼 Urus Pensyarah','admin.addLecturer':'＋ Tambah Pensyarah',
+    'admin.editLecturer':'✏️ Edit Pensyarah','admin.disableAcc':'🚫 Nyahaktifkan Akaun',
+    'admin.manageFaculty':'🏛️ Urus Fakulti & Jabatan','admin.manageFacultyBtn':'Urus Fakulti',
+    'admin.manageDeptBtn':'Urus Jabatan','admin.manageCatBtn':'Urus Kategori',
+    'admin.dataReports':'📤 Data & Laporan','admin.exportData':'⬇ Export Data (JSON)',
+    'admin.genReport':'📊 Jana Laporan Fakulti','admin.rolesAccess':'🔐 Peranan & Akses','admin.reset':'🗑 Reset Data Saya',
     'logout.confirm.title':'Update Resume Sebelum Log Keluar',
     'logout.confirm.desc':'Anda mempunyai <b>perubahan yang belum disegerakkan</b> ke Google Sheets.',
     'logout.confirm.instruction':'Sila tekan <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini ke cloud sebelum log keluar. Selepas selesai sync, anda akan dilog keluar secara automatik.',
-    'logout.sending':'⏳ Menghantar data ke Google Sheets…',
-    'logout.sent':'✅ Resume berjaya dihantar. Melog keluar…',
+    'logout.sending':'⏳ Menghantar data ke Google Sheets…','logout.sent':'✅ Resume berjaya dihantar. Melog keluar…',
     'logout.failed':'❌ Sync gagal. Sila cuba lagi atau pilih "Log Out Sahaja".',
-    'logout.sendingBtn':'Menghantar ke Cloud…',
-    'logout.retryBtn':'☁️ Cuba Lagi & Log Out',
-    'logout.exitTitle':'Update Resume Terlebih Dahulu',
-    'logout.exitBack':'tekan butang Back (←)',
-    'logout.exitClose':'tutup tab',
-    'logout.exitRefresh':'refresh halaman',
+    'logout.sendingBtn':'Menghantar ke Cloud…','logout.retryBtn':'☁️ Cuba Lagi & Log Out',
+    'logout.exitTitle':'Update Resume Terlebih Dahulu','logout.exitBack':'tekan butang Back (←)',
+    'logout.exitClose':'tutup tab','logout.exitRefresh':'refresh halaman',
     'logout.exitDesc':'Anda cuba <b>{reason}</b> tetapi ada <b>perubahan yang belum disegerakkan</b> ke Google Sheets.',
     'logout.exitInstruction':'Sila tekan butang <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini. Selepas sync berjaya, anda akan dibenarkan keluar.',
     'logout.exitSent':'✅ Resume berjaya dihantar. Anda boleh keluar sekarang.',
     'logout.exitDone':'✅ Update selesai — anda boleh tekan Back / tutup tab / refresh sekarang.',
     'logout.sendingShort':'Menghantar…',
-
-    'toast.roleChanged':'Peranan ditukar:',
-    'toast.noPermRole':'🔒 Anda tiada kebenaran menukar peranan',
-    'toast.saved':'Disimpan ✔ — sync…',
-    'toast.profileSaved':'Profil disimpan ✔ — sync…',
-    'toast.recordSaved':'Rekod disimpan ✔ — sync…',
-    'toast.recordDeleted':'Rekod dipadam — sync…',
-    'toast.aiBio':'✨ Biografi dijana — sync…',
-    'toast.merged':'Rekod digabungkan ✔ — sync…',
-    'toast.dataReset':'Data direset — sync…',
-    'toast.allRead':'Semua notifikasi ditanda dibaca',
-    'toast.exported':'Data dieksport ✔',
-    'toast.deleted':'Rekod dipadam',
-    'toast.online':'🌐 Online — sync semula',
-    'toast.offline':'📴 Offline',
-    'toast.syncing':'☁️ Force sync…',
-    'toast.synced':'☁️ Resume disegerakkan ✔',
-    'toast.syncFailed':'Sync gagal — semak log',
-    'toast.pullFailed':'Tarik gagal',
-    'toast.pullSuccess':'⬇ Data Cloud dimuatkan ✔',
-    'toast.testOK':'Sambungan OK ✔',
-    'toast.testFail':'Sambungan gagal ✖',
-    'toast.copied':'Pautan disalin ✔',
-    'toast.cvDownloaded':'CV dimuat turun',
-    'toast.langChanged':'Bahasa ditukar:',
-
+    'toast.roleChanged':'Peranan ditukar:','toast.noPermRole':'🔒 Anda tiada kebenaran menukar peranan',
+    'toast.saved':'Disimpan ✔ — sync…','toast.profileSaved':'Profil disimpan ✔ — sync…',
+    'toast.recordSaved':'Rekod disimpan ✔ — sync…','toast.recordDeleted':'Rekod dipadam — sync…',
+    'toast.aiBio':'✨ Biografi dijana — sync…','toast.merged':'Rekod digabungkan ✔ — sync…',
+    'toast.dataReset':'Data direset — sync…','toast.allRead':'Semua notifikasi ditanda dibaca',
+    'toast.exported':'Data dieksport ✔','toast.deleted':'Rekod dipadam','toast.online':'🌐 Online — sync semula',
+    'toast.offline':'📴 Offline','toast.syncing':'☁️ Force sync…','toast.synced':'☁️ Resume disegerakkan ✔',
+    'toast.syncFailed':'Sync gagal — semak log','toast.pullFailed':'Tarik gagal','toast.pullSuccess':'⬇ Data Cloud dimuatkan ✔',
+    'toast.testOK':'Sambungan OK ✔','toast.testFail':'Sambungan gagal ✖','toast.copied':'Pautan disalin ✔',
+    'toast.cvDownloaded':'CV dimuat turun','toast.langChanged':'Bahasa ditukar:',
     'confirm.deleteRecord':'Padam rekod ini? Sistem akan auto-sync perubahan ke Cloud.',
     'confirm.replaceProfile':'Ganti profil dengan data Cloud?',
     'confirm.reset':'Reset data profil ANDA kepada keadaan asal? (Hanya data anda sahaja)',
-    'confirm.demoAddLecturer':'Demo: tambah pensyarah baharu',
-    'confirm.demoDisable':'Demo: akaun dinyahaktifkan',
-    'confirm.demoManageFaculty':'Demo: urus fakulti',
-    'confirm.demoManageDept':'Demo: urus jabatan',
-    'confirm.demoManageCat':'Demo: urus kategori',
-    'confirm.keepSeparate':'Rekod dikekalkan berasingan'
+    'confirm.demoAddLecturer':'Demo: tambah pensyarah baharu','confirm.demoDisable':'Demo: akaun dinyahaktifkan',
+    'confirm.demoManageFaculty':'Demo: urus fakulti','confirm.demoManageDept':'Demo: urus jabatan',
+    'confirm.demoManageCat':'Demo: urus kategori','confirm.keepSeparate':'Rekod dikekalkan berasingan'
   },
   en: {
-    'app.name':'Academic Profile',
-    'app.tagline':'Academic Profile System',
-
-    'nav.group.main':'Main',
-    'nav.group.academic':'Academic',
-    'nav.group.career':'Career',
-    'nav.group.tools':'Tools & System',
-    'nav.group.analytics':'Analytics',
-    'nav.group.system':'System',
-
-    'nav.dashboard':'Dashboard',
-    'nav.profile':'My Profile',
-    'nav.expertise':'Expertise & Research',
-    'nav.qualifications':'Academic Qualification',
-    'nav.teaching':'Teaching',
-    'nav.projects':'Research Project',
-    'nav.grants':'Research Grants',
-    'nav.publications':'Publications',
-    'nav.conferences':'Conference',
-    'nav.books':'Book & Chapter',
-    'nav.awards':'Awards & Recognition',
-    'nav.media':'Magazine / Media',
-    'nav.adminExp':'Administrative',
-    'nav.supervision':'Supervision',
-    'nav.consultancy':'Consultancy',
-    'nav.memberships':'Professional Membership',
-    'nav.community':'Community Engagement',
-    'nav.innovation':'Innovation / Product',
-    'nav.ip':'Intellectual Property',
-    'nav.cloudSync':'Cloud Resume Sync',
-    'nav.cv':'My CV',
-    'nav.public':'Public Academic Profile',
-    'nav.search':'Faculty Search',
-    'nav.analytics':'Faculty Analytics',
-    'nav.kpi':'KPI Dashboard',
-    'nav.quality':'Data Quality',
-    'nav.notifications':'Notifications',
-    'nav.admin':'Admin Panel',
-    'nav.audit':'Audit Trail',
-
-    'title.dashboard':'Dashboard',
-    'sub.dashboard':'Overview of your academic profile',
-    'title.profile':'My Profile',
-    'sub.profile':'Personal information, academic identifiers & biography',
-    'title.expertise':'Expertise & Research Interest',
-    'sub.expertise':'Expertise, research interest, keywords & SDG',
-    'title.cloudSync':'Cloud Resume Sync',
-    'sub.cloudSync':'Auto-sync to Google Sheets on every data change',
-    'title.cv':'My CV',
-    'sub.cv':'Generate academic CV from a single source of data',
-    'title.public':'Public Academic Profile',
-    'sub.public':'Shareable public profile',
-    'title.search':'Faculty Search',
-    'sub.search':'Search expertise across all records',
-    'title.analytics':'Faculty Analytics',
-    'sub.analytics':'Publication, research & academic statistics',
-    'title.kpi':'KPI Dashboard',
-    'sub.kpi':'Faculty key performance indicators',
-    'title.quality':'Data Quality',
-    'sub.quality':'Incomplete data & duplicate checks',
-    'title.notifications':'Notifications',
-    'sub.notifications':'System alerts & reminders',
-    'title.admin':'Admin Panel',
-    'sub.admin':'User, system & data management',
-    'title.audit':'Audit Trail',
-    'sub.audit':'Data change history',
-    'sub.records':'Record management',
-
-    'sync.idle':'Cloud idle',
-    'sync.pending':'Sync pending…',
-    'sync.busy':'Syncing…',
-    'sync.ok':'☁️ Auto-synced',
-    'sync.error':'⚠️ Sync failed',
-    'sync.offline':'📴 Offline',
-    'sync.retry':'⟳ Retrying…',
-
+    'app.name':'Academic Profile','app.tagline':'Academic Profile System',
+    'nav.group.main':'Main','nav.group.academic':'Academic','nav.group.career':'Career',
+    'nav.group.tools':'Tools & System','nav.group.analytics':'Analytics','nav.group.system':'System',
+    'nav.dashboard':'Dashboard','nav.profile':'My Profile','nav.expertise':'Expertise & Research',
+    'nav.qualifications':'Academic Qualification','nav.teaching':'Teaching','nav.projects':'Research Project',
+    'nav.grants':'Research Grants','nav.publications':'Publications','nav.conferences':'Conference',
+    'nav.books':'Book & Chapter','nav.awards':'Awards & Recognition','nav.media':'Magazine / Media',
+    'nav.adminExp':'Administrative','nav.supervision':'Supervision','nav.consultancy':'Consultancy',
+    'nav.memberships':'Professional Membership','nav.community':'Community Engagement',
+    'nav.innovation':'Innovation / Product','nav.ip':'Intellectual Property','nav.cloudSync':'Cloud Resume Sync',
+    'nav.cv':'My CV','nav.public':'Public Academic Profile','nav.search':'Faculty Search',
+    'nav.analytics':'Faculty Analytics','nav.kpi':'KPI Dashboard','nav.quality':'Data Quality',
+    'nav.notifications':'Notifications','nav.admin':'Admin Panel','nav.audit':'Audit Trail',
+    'title.dashboard':'Dashboard','sub.dashboard':'Overview of your academic profile',
+    'title.profile':'My Profile','sub.profile':'Personal information, academic identifiers & biography',
+    'title.expertise':'Expertise & Research Interest','sub.expertise':'Expertise, research interest, keywords & SDG',
+    'title.cloudSync':'Cloud Resume Sync','sub.cloudSync':'Auto-sync to Google Sheets on every data change',
+    'title.cv':'My CV','sub.cv':'Generate academic CV from a single source of data',
+    'title.public':'Public Academic Profile','sub.public':'Shareable public profile',
+    'title.search':'Faculty Search','sub.search':'Search expertise across all records',
+    'title.analytics':'Faculty Analytics','sub.analytics':'Publication, research & academic statistics',
+    'title.kpi':'KPI Dashboard','sub.kpi':'Faculty key performance indicators',
+    'title.quality':'Data Quality','sub.quality':'Incomplete data & duplicate checks',
+    'title.notifications':'Notifications','sub.notifications':'System alerts & reminders',
+    'title.admin':'Admin Panel','sub.admin':'User, system & data management',
+    'title.audit':'Audit Trail','sub.audit':'Data change history','sub.records':'Record management',
+    'sync.idle':'Cloud idle','sync.pending':'Sync pending…','sync.busy':'Syncing…','sync.ok':'☁️ Auto-synced',
+    'sync.error':'⚠️ Sync failed','sync.offline':'📴 Offline','sync.retry':'⟳ Retrying…',
     'role.label':'Your role',
-
-    'btn.save':'💾 Save',
-    'btn.cancel':'Cancel',
-    'btn.add':'＋ Add',
-    'btn.addManual':'＋ Add Manually',
-    'btn.edit':'✏️',
-    'btn.delete':'🗑',
-    'btn.print':'🖨 Print / Save as PDF',
-    'btn.download':'⬇ Download',
-    'btn.search':'🔎 Search',
-    'btn.forceSync':'⚡ Force Sync Now',
-    'btn.pullCloud':'⬇ Pull from Cloud',
-    'btn.testConn':'🔌 Test Connection',
-    'btn.generateCV':'📄 GENERATE CV',
-    'btn.share':'🔗 Share Profile',
-    'btn.viewCV':'📄 View CV',
-    'btn.updateResume':'☁️ Update Resume',
-    'btn.logoutOnly':'Log Out Only',
-    'btn.stay':'❌ Stay on Page',
-    'btn.updateLogout':'☁️ Update Resume & Log Out',
-    'btn.updateExit':'☁️ Update Resume & Exit',
-    'btn.tryAgain':'☁️ Try Again',
-    'btn.saveProfile':'💾 Save Profile (auto-sync ☁️)',
-    'btn.saveExpertise':'💾 Save (auto-sync ☁️)',
-    'btn.aiBio':'✨ AI Generate Biography',
-    'btn.exportJSON':'⬇ Export JSON',
-    'btn.openQuality':'Open Data Quality →',
-    'btn.close':'✕',
-    'btn.markAllRead':'Mark all as read',
-    'btn.clear':'Clear',
-
-    'dash.profileStatus':'Profile Status',
-    'dash.complete':'Complete',
-    'dash.role':'Role',
-    'dash.totalGrant':'Total Grant',
-    'dash.synced':'☁️ Auto-synced',
-    'dash.notSynced':'☁️ Not synced',
-    'dash.addInfo':'＋ Add Information',
-    'dash.cloudSync':'☁️ Cloud Sync',
-    'dash.genCV':'📄 Generate CV',
-    'dash.editProfile':'✏️ Edit Profile',
+    'btn.save':'💾 Save','btn.cancel':'Cancel','btn.add':'＋ Add','btn.addManual':'＋ Add Manually',
+    'btn.edit':'✏️','btn.delete':'🗑','btn.print':'🖨 Print / Save as PDF','btn.download':'⬇ Download',
+    'btn.search':'🔎 Search','btn.forceSync':'⚡ Force Sync Now','btn.pullCloud':'⬇ Pull from Cloud',
+    'btn.testConn':'🔌 Test Connection','btn.generateCV':'📄 GENERATE CV','btn.share':'🔗 Share Profile',
+    'btn.viewCV':'📄 View CV','btn.updateResume':'☁️ Update Resume','btn.logoutOnly':'Log Out Only',
+    'btn.stay':'❌ Stay on Page','btn.updateLogout':'☁️ Update Resume & Log Out',
+    'btn.updateExit':'☁️ Update Resume & Exit','btn.tryAgain':'☁️ Try Again',
+    'btn.saveProfile':'💾 Save Profile (auto-sync ☁️)','btn.saveExpertise':'💾 Save (auto-sync ☁️)',
+    'btn.aiBio':'✨ AI Generate Biography','btn.exportJSON':'⬇ Export JSON','btn.openQuality':'Open Data Quality →',
+    'btn.close':'✕','btn.markAllRead':'Mark all as read','btn.clear':'Clear',
+    'dash.profileStatus':'Profile Status','dash.complete':'Complete','dash.role':'Role','dash.totalGrant':'Total Grant',
+    'dash.synced':'☁️ Auto-synced','dash.notSynced':'☁️ Not synced','dash.addInfo':'＋ Add Information',
+    'dash.cloudSync':'☁️ Cloud Sync','dash.genCV':'📄 Generate CV','dash.editProfile':'✏️ Edit Profile',
     'dash.autoSync.title':'Auto Cloud Sync — Active ✅',
     'dash.autoSync.desc':'Every <b>edit / add / delete</b> will <b>auto-push</b> to Google Sheets. When you <b>Log Out</b>, press <b>Back</b>, <b>close tab</b>, or <b>refresh</b> — the system will ask you to update resume first.',
-    'dash.forceSync':'⚡ Force Sync Now',
-    'dash.syncPanel':'⚙️ Sync Panel',
-    'dash.stats':'📊 Personal Statistics',
-    'dash.reminders':'🔔 Reminders & Tasks',
-    'dash.pubByYear':'📈 Publications by Year',
-    'dash.recentActivity':'🕘 Recent Activity (Audit)',
-    'dash.noIssues':'No data issues. Your profile is complete! 🎉',
-    'dash.noActivity':'No activity yet.',
-    'dash.incompleteProfile':'👤 Profile information incomplete',
-    'dash.missingDOI':'publication(s) missing DOI.',
-    'dash.missingYear':'record(s) missing year.',
-    'dash.dupRecords':'possible duplicate record(s).',
-    'dash.noOrcid':'ORCID not filled in.',
-
-    'coll.records':'records',
-    'coll.autoSyncOn':'Auto-sync active ☁️',
-    'coll.searchPlaceholder':'🔎 Search in',
-    'coll.noRecords':'No records',
-    'coll.lagi':'yet.',
-    'coll.add':'Add',
-    'coll.addManually':'＋ Add Manually',
-    'coll.autoCalc':'Auto calculation:',
-    'coll.totalGrantObtained':'Total Grant Obtained',
-
-    'form.dataAutoSync':'Data will <b>auto-sync</b> to Cloud after Save.',
-    'form.choose':'— select —',
-    'form.add':'Add',
-    'form.edit':'Edit',
-
-    'profile.signedInAs':'Signed in as',
-    'profile.personalInfo':'👤 A. Personal Information',
+    'dash.forceSync':'⚡ Force Sync Now','dash.syncPanel':'⚙️ Sync Panel','dash.stats':'📊 Personal Statistics',
+    'dash.reminders':'🔔 Reminders & Tasks','dash.pubByYear':'📈 Publications by Year',
+    'dash.recentActivity':'🕘 Recent Activity (Audit)','dash.noIssues':'No data issues. Your profile is complete! 🎉',
+    'dash.noActivity':'No activity yet.','dash.incompleteProfile':'👤 Profile information incomplete',
+    'dash.missingDOI':'publication(s) missing DOI.','dash.missingYear':'record(s) missing year.',
+    'dash.dupRecords':'possible duplicate record(s).','dash.noOrcid':'ORCID not filled in.',
+    'coll.records':'records','coll.autoSyncOn':'Auto-sync active ☁️','coll.searchPlaceholder':'🔎 Search in',
+    'coll.noRecords':'No records','coll.lagi':'yet.','coll.add':'Add','coll.addManually':'＋ Add Manually',
+    'coll.autoCalc':'Auto calculation:','coll.totalGrantObtained':'Total Grant Obtained',
+    'form.dataAutoSync':'Data will <b>auto-sync</b> to Cloud after Save.','form.choose':'— select —',
+    'form.add':'Add','form.edit':'Edit',
+    'profile.signedInAs':'Signed in as','profile.personalInfo':'👤 A. Personal Information',
     'profile.lockedHint':'🔒 Fields marked with a lock are automatically taken from your <b>login account</b> (source of truth). To change, update in the HR / auth system.',
-    'profile.academicId':'🆔 B. Academic Identifier',
-    'profile.biography':'✍️ C. Biography',
+    'profile.academicId':'🆔 B. Academic Identifier','profile.biography':'✍️ C. Biography',
     'profile.autoSaveHint':'💡 <b>Auto-save active:</b> every time you type, data is saved locally + auto-pushed to Cloud.',
     'profile.logout':'🚪 Log Out',
-
-    'exp.expertise':'🔬 Expertise',
-    'exp.expertiseHint':'List of expertise (comma separated)',
-    'exp.interest':'🎯 Research Interest',
-    'exp.interestHint':'Research interest (comma separated)',
-    'exp.keywords':'🏷️ Keywords',
-    'exp.keywordsHint':'Keywords (comma separated)',
-    'exp.sdg':'🌱 SDG Alignment',
-    'exp.sdgHint':'SDG (comma separated)',
-
-    'cv.options':'📄 CV Options',
-    'cv.type':'CV Type',
-    'cv.order':'Order',
-    'cv.newest':'Newest → Oldest',
-    'cv.oldest':'Oldest → Newest',
-    'cv.pickSection':'Pick Section',
-
-    'cloud.autoTitle':'Auto Cloud Sync — Google Sheets',
-    'cloud.endpoint':'Endpoint:',
-    'cloud.lastAuto':'Last auto-sync:',
-    'cloud.never':'Never synced',
-    'cloud.lastPull':'Last pull:',
+    'exp.expertise':'🔬 Expertise','exp.expertiseHint':'List of expertise (comma separated)',
+    'exp.interest':'🎯 Research Interest','exp.interestHint':'Research interest (comma separated)',
+    'exp.keywords':'🏷️ Keywords','exp.keywordsHint':'Keywords (comma separated)',
+    'exp.sdg':'🌱 SDG Alignment','exp.sdgHint':'SDG (comma separated)',
+    'cv.options':'📄 CV Options','cv.type':'CV Type','cv.order':'Order','cv.newest':'Newest → Oldest',
+    'cv.oldest':'Oldest → Newest','cv.pickSection':'Pick Section',
+    'cloud.autoTitle':'Auto Cloud Sync — Google Sheets','cloud.endpoint':'Endpoint:',
+    'cloud.lastAuto':'Last auto-sync:','cloud.never':'Never synced','cloud.lastPull':'Last pull:',
     'cloud.exitGuardTitle':'Auto-sync + Exit Guard Active',
     'cloud.exitGuardDesc':'Every <b>edit / add / delete</b> auto-pushes to Google Sheets.<br>When you <b>Log Out</b>, press <b>Back</b>, <b>close tab</b> or <b>refresh</b> — the system will ask you to press <b>Update Resume</b> first.',
-    'cloud.dataSent':'📦 Data Being Sent (Auto)',
-    'cloud.settings':'⚙️ Sync Settings',
+    'cloud.dataSent':'📦 Data Being Sent (Auto)','cloud.settings':'⚙️ Sync Settings',
     'cloud.autoSyncLabel':'<b>Auto-sync active</b> — every edit / add / delete auto-pushes to Google Sheets',
     'cloud.exitGuardHint':'<b>✅ Exit Guard Active:</b> When you press <b>Log Out</b>, <b>Back</b>, <b>close tab</b> or <b>refresh</b>, the system will ask you to press <b>Update Resume</b> first before exiting.',
     'cloud.deployHint':'<b>Important:</b> Apps Script must be deployed <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.',
-    'cloud.syncLog':'🪵 Sync Log',
-    'cloud.profile':'Profile',
-    'cloud.viewCV':'📄 View CV',
-    'cloud.ready':'Auto-sync engine ready.',
-
-    'search.title':'🔎 Faculty Search — Find Expertise',
-    'search.placeholder':'Example: Waste Cooking Oil, Polyurethane, Catalysis...',
-    'search.enter':'Enter a keyword to search.',
-    'search.matches':'matches',
-    'search.noMatch':'No matches for',
-    'search.expertiseMatch':'🎯 Expertise Matches',
-    'search.viewProfile':'View Profile →',
-
-    'quality.missingDOI':'Missing DOI',
-    'quality.missingYear':'Missing Year',
-    'quality.missingORCID':'Missing ORCID',
-    'quality.duplicates':'Possible Duplicates',
-    'quality.missingData':'🔍 Missing Data',
-    'quality.possibleDup':'⚠️ Possible Duplicates',
-    'quality.noDOI':'No DOI issues. 👍',
-    'quality.noDup':'No duplicates detected. 👍',
-    'quality.complete':'Complete',
-    'quality.merge':'Merge (auto-sync)',
-    'quality.keepSeparate':'Keep Separate',
-    'quality.orcidMissing':'🆔 ORCID not filled in on profile.',
-    'quality.addOrcid':'Add ORCID',
-    'quality.noDOIpill':'No DOI',
-    'quality.noYearpill':'No Year',
-    'quality.dupPill':'Possible duplicate publication detected',
-
-    'notif.title':'Notifications',
-    'notif.read':'Read',
-    'notif.new':'New',
-
-    'pub.share':'🔗 Share Profile',
-    'pub.viewCV':'📄 View CV',
-    'pub.bio':'👤 Biography',
-    'pub.expertise':'🔬 Expertise',
-    'pub.interest':'🎯 Research Interest',
-    'pub.sdg':'🌱 SDG',
-    'pub.recentPubs':'📚 Recent Publications',
-    'pub.noPubs':'No publications.',
-    'pub.contact':'📞 Contact',
-    'pub.links':'🔗 Academic Links',
-    'pub.email':'Email',
-    'pub.phone':'Phone',
-    'pub.office':'Office',
-
-    'analytics.pubBreakdown':'📚 Publication Breakdown',
-    'analytics.pubGrowth':'📈 Publication Growth by Year',
-    'analytics.research':'🔬 Research',
-    'analytics.academic':'🎓 Academic',
-    'analytics.awardsLevel':'🏆 Awards by Level',
-    'analytics.supervision':'👨‍🎓 Supervision',
-    'analytics.numProjects':'Number of Projects',
-    'analytics.activeProjects':'Active Projects',
-    'analytics.completedProjects':'Completed Projects',
-    'analytics.totalGrant':'Total Grant',
-    'analytics.asPI':'As PI',
-    'analytics.asCo':'As Co-Researcher',
-    'analytics.numLecturers':'Number of Lecturers',
-    'analytics.phdQualified':'PhD Qualified',
-    'analytics.masterQualified':'Master Qualified',
-    'analytics.researchActive':'Research Active Staff',
-    'analytics.profileComplete':'Profile Completeness',
-    'analytics.totalStudents':'Total Students',
-    'analytics.active':'Active',
-    'analytics.completed':'Completed',
-
-    'kpi.yearCompare':'📈 Year Comparison',
-    'kpi.grantByYear':'📊 Grant by Year',
-    'kpi.notEnoughData':'Not enough yearly data.',
-    'kpi.noData':'No data.',
-
+    'cloud.syncLog':'🪵 Sync Log','cloud.profile':'Profile','cloud.viewCV':'📄 View CV','cloud.ready':'Auto-sync engine ready.',
+    'search.title':'🔎 Faculty Search — Find Expertise','search.placeholder':'Example: Waste Cooking Oil, Polyurethane, Catalysis...',
+    'search.enter':'Enter a keyword to search.','search.matches':'matches','search.noMatch':'No matches for',
+    'search.expertiseMatch':'🎯 Expertise Matches','search.viewProfile':'View Profile →',
+    'quality.missingDOI':'Missing DOI','quality.missingYear':'Missing Year','quality.missingORCID':'Missing ORCID',
+    'quality.duplicates':'Possible Duplicates','quality.missingData':'🔍 Missing Data',
+    'quality.possibleDup':'⚠️ Possible Duplicates','quality.noDOI':'No DOI issues. 👍','quality.noDup':'No duplicates detected. 👍',
+    'quality.complete':'Complete','quality.merge':'Merge (auto-sync)','quality.keepSeparate':'Keep Separate',
+    'quality.orcidMissing':'🆔 ORCID not filled in on profile.','quality.addOrcid':'Add ORCID',
+    'quality.noDOIpill':'No DOI','quality.noYearpill':'No Year','quality.dupPill':'Possible duplicate publication detected',
+    'notif.title':'Notifications','notif.read':'Read','notif.new':'New',
+    'pub.share':'🔗 Share Profile','pub.viewCV':'📄 View CV','pub.bio':'👤 Biography','pub.expertise':'🔬 Expertise',
+    'pub.interest':'🎯 Research Interest','pub.sdg':'🌱 SDG','pub.recentPubs':'📚 Recent Publications',
+    'pub.noPubs':'No publications.','pub.contact':'📞 Contact','pub.links':'🔗 Academic Links',
+    'pub.email':'Email','pub.phone':'Phone','pub.office':'Office',
+    'analytics.pubBreakdown':'📚 Publication Breakdown','analytics.pubGrowth':'📈 Publication Growth by Year',
+    'analytics.research':'🔬 Research','analytics.academic':'🎓 Academic','analytics.awardsLevel':'🏆 Awards by Level',
+    'analytics.supervision':'👨‍🎓 Supervision','analytics.numProjects':'Number of Projects','analytics.activeProjects':'Active Projects',
+    'analytics.completedProjects':'Completed Projects','analytics.totalGrant':'Total Grant','analytics.asPI':'As PI',
+    'analytics.asCo':'As Co-Researcher','analytics.numLecturers':'Number of Lecturers','analytics.phdQualified':'PhD Qualified',
+    'analytics.masterQualified':'Master Qualified','analytics.researchActive':'Research Active Staff',
+    'analytics.profileComplete':'Profile Completeness','analytics.totalStudents':'Total Students',
+    'analytics.active':'Active','analytics.completed':'Completed',
+    'kpi.yearCompare':'📈 Year Comparison','kpi.grantByYear':'📊 Grant by Year',
+    'kpi.notEnoughData':'Not enough yearly data.','kpi.noData':'No data.',
     'audit.title':'📝 Audit Trail — Data Governance',
     'audit.desc':'Every change is recorded: who, when, source (Manual / Cloud Sync) and confidence level.',
-    'audit.noActivity':'No activity recorded yet.',
-    'audit.user':'User',
-    'audit.activity':'Activity',
-    'audit.source':'Source',
-    'audit.confidence':'Confidence',
-    'audit.date':'Date',
-
-    'admin.lecturers':'👥 Lecturers',
-    'admin.faculty':'🏛️ Faculty',
-    'admin.department':'🏢 Department',
-    'admin.manageLecturers':'👨‍💼 Manage Lecturers',
-    'admin.addLecturer':'＋ Add Lecturer',
-    'admin.editLecturer':'✏️ Edit Lecturer',
-    'admin.disableAcc':'🚫 Disable Account',
-    'admin.manageFaculty':'🏛️ Manage Faculty & Department',
-    'admin.manageFacultyBtn':'Manage Faculty',
-    'admin.manageDeptBtn':'Manage Department',
-    'admin.manageCatBtn':'Manage Categories',
-    'admin.dataReports':'📤 Data & Reports',
-    'admin.exportData':'⬇ Export Data (JSON)',
-    'admin.genReport':'📊 Generate Faculty Report',
-    'admin.rolesAccess':'🔐 Roles & Access',
-    'admin.reset':'🗑 Reset My Data',
-
+    'audit.noActivity':'No activity recorded yet.','audit.user':'User','audit.activity':'Activity',
+    'audit.source':'Source','audit.confidence':'Confidence','audit.date':'Date',
+    'admin.lecturers':'👥 Lecturers','admin.faculty':'🏛️ Faculty','admin.department':'🏢 Department',
+    'admin.manageLecturers':'👨‍💼 Manage Lecturers','admin.addLecturer':'＋ Add Lecturer',
+    'admin.editLecturer':'✏️ Edit Lecturer','admin.disableAcc':'🚫 Disable Account',
+    'admin.manageFaculty':'🏛️ Manage Faculty & Department','admin.manageFacultyBtn':'Manage Faculty',
+    'admin.manageDeptBtn':'Manage Department','admin.manageCatBtn':'Manage Categories',
+    'admin.dataReports':'📤 Data & Reports','admin.exportData':'⬇ Export Data (JSON)',
+    'admin.genReport':'📊 Generate Faculty Report','admin.rolesAccess':'🔐 Roles & Access','admin.reset':'🗑 Reset My Data',
     'logout.confirm.title':'Update Resume Before Logging Out',
     'logout.confirm.desc':'You have <b>unsynced changes</b> to Google Sheets.',
     'logout.confirm.instruction':'Please press <b>☁️ Update Resume</b> below to save all latest changes to the cloud before logging out. After sync completes, you will be logged out automatically.',
-    'logout.sending':'⏳ Sending data to Google Sheets…',
-    'logout.sent':'✅ Resume sent successfully. Logging out…',
+    'logout.sending':'⏳ Sending data to Google Sheets…','logout.sent':'✅ Resume sent successfully. Logging out…',
     'logout.failed':'❌ Sync failed. Please try again or choose "Log Out Only".',
-    'logout.sendingBtn':'Sending to Cloud…',
-    'logout.retryBtn':'☁️ Try Again & Log Out',
-    'logout.exitTitle':'Update Resume First',
-    'logout.exitBack':'press Back button (←)',
-    'logout.exitClose':'close tab',
-    'logout.exitRefresh':'refresh page',
+    'logout.sendingBtn':'Sending to Cloud…','logout.retryBtn':'☁️ Try Again & Log Out',
+    'logout.exitTitle':'Update Resume First','logout.exitBack':'press Back button (←)',
+    'logout.exitClose':'close tab','logout.exitRefresh':'refresh page',
     'logout.exitDesc':'You tried to <b>{reason}</b> but there are <b>unsynced changes</b> to Google Sheets.',
     'logout.exitInstruction':'Please press the <b>☁️ Update Resume</b> button below to save all latest changes. After sync succeeds, you will be allowed to exit.',
     'logout.exitSent':'✅ Resume sent successfully. You can exit now.',
     'logout.exitDone':'✅ Update complete — you can now press Back / close tab / refresh.',
     'logout.sendingShort':'Sending…',
-
-    'toast.roleChanged':'Role changed:',
-    'toast.noPermRole':'🔒 You do not have permission to change roles',
-    'toast.saved':'Saved ✔ — syncing…',
-    'toast.profileSaved':'Profile saved ✔ — syncing…',
-    'toast.recordSaved':'Record saved ✔ — syncing…',
-    'toast.recordDeleted':'Record deleted — syncing…',
-    'toast.aiBio':'✨ Biography generated — syncing…',
-    'toast.merged':'Records merged ✔ — syncing…',
-    'toast.dataReset':'Data reset — syncing…',
-    'toast.allRead':'All notifications marked as read',
-    'toast.exported':'Data exported ✔',
-    'toast.deleted':'Record deleted',
-    'toast.online':'🌐 Online — re-syncing',
-    'toast.offline':'📴 Offline',
-    'toast.syncing':'☁️ Force sync…',
-    'toast.synced':'☁️ Resume synced ✔',
-    'toast.syncFailed':'Sync failed — check log',
-    'toast.pullFailed':'Pull failed',
-    'toast.pullSuccess':'⬇ Cloud data loaded ✔',
-    'toast.testOK':'Connection OK ✔',
-    'toast.testFail':'Connection failed ✖',
-    'toast.copied':'Link copied ✔',
-    'toast.cvDownloaded':'CV downloaded',
-    'toast.langChanged':'Language changed:',
-
+    'toast.roleChanged':'Role changed:','toast.noPermRole':'🔒 You do not have permission to change roles',
+    'toast.saved':'Saved ✔ — syncing…','toast.profileSaved':'Profile saved ✔ — syncing…',
+    'toast.recordSaved':'Record saved ✔ — syncing…','toast.recordDeleted':'Record deleted — syncing…',
+    'toast.aiBio':'✨ Biography generated — syncing…','toast.merged':'Records merged ✔ — syncing…',
+    'toast.dataReset':'Data reset — syncing…','toast.allRead':'All notifications marked as read',
+    'toast.exported':'Data exported ✔','toast.deleted':'Record deleted','toast.online':'🌐 Online — re-syncing',
+    'toast.offline':'📴 Offline','toast.syncing':'☁️ Force sync…','toast.synced':'☁️ Resume synced ✔',
+    'toast.syncFailed':'Sync failed — check log','toast.pullFailed':'Pull failed','toast.pullSuccess':'⬇ Cloud data loaded ✔',
+    'toast.testOK':'Connection OK ✔','toast.testFail':'Connection failed ✖','toast.copied':'Link copied ✔',
+    'toast.cvDownloaded':'CV downloaded','toast.langChanged':'Language changed:',
     'confirm.deleteRecord':'Delete this record? The system will auto-sync the change to Cloud.',
     'confirm.replaceProfile':'Replace profile with Cloud data?',
     'confirm.reset':'Reset YOUR profile data to original state? (Your data only)',
-    'confirm.demoAddLecturer':'Demo: add new lecturer',
-    'confirm.demoDisable':'Demo: account disabled',
-    'confirm.demoManageFaculty':'Demo: manage faculty',
-    'confirm.demoManageDept':'Demo: manage department',
-    'confirm.demoManageCat':'Demo: manage categories',
-    'confirm.keepSeparate':'Records kept separate'
+    'confirm.demoAddLecturer':'Demo: add new lecturer','confirm.demoDisable':'Demo: account disabled',
+    'confirm.demoManageFaculty':'Demo: manage faculty','confirm.demoManageDept':'Demo: manage department',
+    'confirm.demoManageCat':'Demo: manage categories','confirm.keepSeparate':'Records kept separate'
   }
 };
 
@@ -1319,18 +1003,11 @@ const SCHEMA = {
     title:r=>`${r.qualification||''}${r.field?' — '+r.field:''}`,
     fields:[
       {k:'qualification',l:'Qualification',type:'select',opts:['PhD','Master','Bachelor','Diploma','Professional Qualification'],req:true},
-      {k:'field',l:'Field of Study'},
-      {k:'university',l:'University'},
-      {k:'faculty',l:'Faculty'},
-      {k:'country',l:'Country'},
-      {k:'startYear',l:'Start Year',type:'number'},
-      {k:'gradYear',l:'Graduation Year',type:'number'},
-      {k:'grade',l:'Grade / CGPA'},
-      {k:'supervisor',l:'Supervisor'},
-      {k:'specialisation',l:'Specialisation'},
+      {k:'field',l:'Field of Study'},{k:'university',l:'University'},{k:'faculty',l:'Faculty'},
+      {k:'country',l:'Country'},{k:'startYear',l:'Start Year',type:'number'},{k:'gradYear',l:'Graduation Year',type:'number'},
+      {k:'grade',l:'Grade / CGPA'},{k:'supervisor',l:'Supervisor'},{k:'specialisation',l:'Specialisation'},
       {k:'thesis',l:'Thesis Title',type:'textarea',full:true}
     ]},
-
   teaching:{ label:'Teaching', icon:'👨‍🏫', singular:'Course', dateKey:'academicYear', cols:['courseCode','programme','role'],
     title:r=>`${r.courseCode?r.courseCode+' — ':''}${r.courseName||''}`,
     fields:[
@@ -1344,236 +1021,159 @@ const SCHEMA = {
       {k:'mode',l:'Teaching Mode',type:'select',opts:['Face to Face','Online','Hybrid','Blended Learning']},
       {k:'innovation',l:'Teaching Innovation',type:'select',opts:['MOOC','OER','e-Learning','Digital Learning','Teaching Module','Teaching Material','Innovative Teaching','None']}
     ]},
-
   projects:{ label:'Research Project', icon:'🔬', singular:'Project', dateKey:'startDate', cols:['grantType','role','status'],
     title:r=>r.title,
     fields:[
-      {k:'title',l:'Project Title',req:true,full:true},
-      {k:'acronym',l:'Project Acronym'},
-      {k:'grantType',l:'Grant Type'},
-      {k:'grantNumber',l:'Grant Number'},
-      {k:'fundingAgency',l:'Funding Agency'},
+      {k:'title',l:'Project Title',req:true,full:true},{k:'acronym',l:'Project Acronym'},
+      {k:'grantType',l:'Grant Type'},{k:'grantNumber',l:'Grant Number'},{k:'fundingAgency',l:'Funding Agency'},
       {k:'totalFunding',l:'Total Funding (RM)',type:'number'},
-      {k:'startDate',l:'Start Date',type:'date'},
-      {k:'endDate',l:'End Date',type:'date'},
+      {k:'startDate',l:'Start Date',type:'date'},{k:'endDate',l:'End Date',type:'date'},
       {k:'status',l:'Project Status',type:'select',opts:['Active','Completed','Pending','Terminated']},
       {k:'role',l:'Role',type:'select',opts:['Principal Investigator','Co-Researcher','Research Member']},
-      {k:'coResearchers',l:'Co-Researchers',full:true},
-      {k:'researchArea',l:'Research Area'},
-      {k:'keywords',l:'Keywords'},
-      {k:'sdg',l:'SDG'},
-      {k:'output',l:'Output',type:'textarea',full:true},
-      {k:'publication',l:'Publication Generated'},
-      {k:'patent',l:'Patent Generated'},
-      {k:'innovation',l:'Innovation Generated'}
+      {k:'coResearchers',l:'Co-Researchers',full:true},{k:'researchArea',l:'Research Area'},
+      {k:'keywords',l:'Keywords'},{k:'sdg',l:'SDG'},
+      {k:'output',l:'Output',type:'textarea',full:true},{k:'publication',l:'Publication Generated'},
+      {k:'patent',l:'Patent Generated'},{k:'innovation',l:'Innovation Generated'}
     ]},
-
   grants:{ label:'Research Grants', icon:'💰', singular:'Grant', dateKey:'year', cols:['fundingAgency','amount','status'],
     title:r=>r.grantName||r.projectTitle,
     fields:[
-      {k:'grantName',l:'Grant Name',req:true},
-      {k:'grantNumber',l:'Grant Number'},
-      {k:'fundingAgency',l:'Funding Agency'},
-      {k:'grantScheme',l:'Grant Scheme'},
-      {k:'amount',l:'Amount (RM)',type:'number'},
-      {k:'pi',l:'Principal Investigator'},
-      {k:'coPi',l:'Co-PI',full:true},
-      {k:'startDate',l:'Start Date',type:'date'},
-      {k:'endDate',l:'End Date',type:'date'},
+      {k:'grantName',l:'Grant Name',req:true},{k:'grantNumber',l:'Grant Number'},{k:'fundingAgency',l:'Funding Agency'},
+      {k:'grantScheme',l:'Grant Scheme'},{k:'amount',l:'Amount (RM)',type:'number'},
+      {k:'pi',l:'Principal Investigator'},{k:'coPi',l:'Co-PI',full:true},
+      {k:'startDate',l:'Start Date',type:'date'},{k:'endDate',l:'End Date',type:'date'},
       {k:'status',l:'Status',type:'select',opts:['Active','Completed','Pending']},
-      {k:'projectTitle',l:'Project Title',full:true},
-      {k:'faculty',l:'Faculty'},
-      {k:'year',l:'Year',type:'number'},
-      {k:'output',l:'Output',type:'textarea',full:true}
+      {k:'projectTitle',l:'Project Title',full:true},{k:'faculty',l:'Faculty'},
+      {k:'year',l:'Year',type:'number'},{k:'output',l:'Output',type:'textarea',full:true}
     ]},
-
   publications:{ label:'Publications', icon:'📚', singular:'Publication', dateKey:'year', cols:['journal','year','quartile'],
     title:r=>r.title,
     fields:[
       {k:'type',l:'Publication Type',type:'select',opts:['Journal Article','Review','Conference Paper','Proceedings','Book','Book Chapter','Magazine','Others']},
-      {k:'title',l:'Title',req:true,full:true},
-      {k:'authors',l:'Authors',full:true},
-      {k:'corresponding',l:'Corresponding Author'},
-      {k:'affiliation',l:'Affiliation'},
-      {k:'journal',l:'Journal Name'},
-      {k:'publisher',l:'Publisher'},
-      {k:'year',l:'Year',type:'number'},
-      {k:'volume',l:'Volume'},{k:'issue',l:'Issue'},{k:'pages',l:'Pages'},
+      {k:'title',l:'Title',req:true,full:true},{k:'authors',l:'Authors',full:true},
+      {k:'corresponding',l:'Corresponding Author'},{k:'affiliation',l:'Affiliation'},
+      {k:'journal',l:'Journal Name'},{k:'publisher',l:'Publisher'},
+      {k:'year',l:'Year',type:'number'},{k:'volume',l:'Volume'},{k:'issue',l:'Issue'},{k:'pages',l:'Pages'},
       {k:'doi',l:'DOI'},{k:'issn',l:'ISSN'},{k:'eissn',l:'eISSN'},{k:'isbn',l:'ISBN'},
-      {k:'abstract',l:'Abstract',type:'textarea',full:true},
-      {k:'keywords',l:'Keywords',full:true},
+      {k:'abstract',l:'Abstract',type:'textarea',full:true},{k:'keywords',l:'Keywords',full:true},
       {k:'indexing',l:'Indexing',type:'select',opts:['Scopus','Web of Science','MyCite','ERA','None']},
       {k:'quartile',l:'Quartile',type:'select',opts:['Q1','Q2','Q3','Q4','None']},
-      {k:'citation',l:'Citation',type:'number'},
-      {k:'url',l:'URL',full:true}
+      {k:'citation',l:'Citation',type:'number'},{k:'url',l:'URL',full:true}
     ]},
-
   conferences:{ label:'Conference', icon:'🎤', singular:'Conference Paper', dateKey:'year', cols:['conferenceName','year','presentationType'],
     title:r=>r.paperTitle,
     fields:[
-      {k:'paperTitle',l:'Paper Title',req:true,full:true},
-      {k:'authors',l:'Authors',full:true},
-      {k:'conferenceName',l:'Conference Name'},
-      {k:'acronym',l:'Conference Acronym'},
-      {k:'organizer',l:'Organizer'},
-      {k:'date',l:'Date',type:'date'},
-      {k:'location',l:'Location'},
-      {k:'country',l:'Country'},
+      {k:'paperTitle',l:'Paper Title',req:true,full:true},{k:'authors',l:'Authors',full:true},
+      {k:'conferenceName',l:'Conference Name'},{k:'acronym',l:'Conference Acronym'},
+      {k:'organizer',l:'Organizer'},{k:'date',l:'Date',type:'date'},
+      {k:'location',l:'Location'},{k:'country',l:'Country'},
       {k:'presentationType',l:'Presentation Type',type:'select',opts:['Oral','Poster']},
-      {k:'proceedings',l:'Proceedings'},
-      {k:'isbn',l:'ISBN'},{k:'doi',l:'DOI'},
-      {k:'year',l:'Year',type:'number'},
-      {k:'award',l:'Award / Recognition'}
+      {k:'proceedings',l:'Proceedings'},{k:'isbn',l:'ISBN'},{k:'doi',l:'DOI'},
+      {k:'year',l:'Year',type:'number'},{k:'award',l:'Award / Recognition'}
     ]},
-
   books:{ label:'Book & Book Chapter', icon:'📖', singular:'Book', dateKey:'year', cols:['publisher','year','type'],
     title:r=>r.title,
     fields:[
       {k:'type',l:'Type',type:'select',opts:['Book','Book Chapter']},
-      {k:'title',l:'Title',req:true,full:true},
-      {k:'bookTitle',l:'Book Title (for chapter)'},
-      {k:'authors',l:'Author(s)',full:true},
-      {k:'editors',l:'Editor(s)'},
-      {k:'publisher',l:'Publisher'},
-      {k:'isbn',l:'ISBN'},{k:'doi',l:'DOI'},
-      {k:'pages',l:'Pages'},
-      {k:'year',l:'Year',type:'number'},
-      {k:'edition',l:'Edition'},
-      {k:'country',l:'Country'}
+      {k:'title',l:'Title',req:true,full:true},{k:'bookTitle',l:'Book Title (for chapter)'},
+      {k:'authors',l:'Author(s)',full:true},{k:'editors',l:'Editor(s)'},
+      {k:'publisher',l:'Publisher'},{k:'isbn',l:'ISBN'},{k:'doi',l:'DOI'},
+      {k:'pages',l:'Pages'},{k:'year',l:'Year',type:'number'},
+      {k:'edition',l:'Edition'},{k:'country',l:'Country'}
     ]},
-
   awards:{ label:'Awards & Recognition', icon:'🏆', singular:'Award', dateKey:'year', cols:['organisation','level','year'],
     title:r=>r.awardTitle,
     fields:[
-      {k:'awardTitle',l:'Award Title',req:true,full:true},
-      {k:'category',l:'Award Category'},
+      {k:'awardTitle',l:'Award Title',req:true,full:true},{k:'category',l:'Award Category'},
       {k:'organisation',l:'Awarding Organisation'},
       {k:'level',l:'Level',type:'select',opts:['International','National','University','Faculty','Professional']},
-      {k:'date',l:'Date',type:'date'},
-      {k:'year',l:'Year',type:'number'},
-      {k:'position',l:'Position / Rank'},
-      {k:'role',l:'Role'},
+      {k:'date',l:'Date',type:'date'},{k:'year',l:'Year',type:'number'},
+      {k:'position',l:'Position / Rank'},{k:'role',l:'Role'},
       {k:'description',l:'Description',type:'textarea',full:true}
     ]},
-
   media:{ label:'Magazine / Media', icon:'📰', singular:'Media', dateKey:'date', cols:['outlet','type','date'],
     title:r=>r.articleTitle,
     fields:[
-      {k:'articleTitle',l:'Article Title',req:true,full:true},
-      {k:'author',l:'Author'},
-      {k:'outlet',l:'Magazine / Newspaper'},
-      {k:'publisher',l:'Publisher'},
-      {k:'date',l:'Date',type:'date'},
-      {k:'volume',l:'Volume'},{k:'issue',l:'Issue'},{k:'pages',l:'Pages'},
+      {k:'articleTitle',l:'Article Title',req:true,full:true},{k:'author',l:'Author'},
+      {k:'outlet',l:'Magazine / Newspaper'},{k:'publisher',l:'Publisher'},
+      {k:'date',l:'Date',type:'date'},{k:'volume',l:'Volume'},{k:'issue',l:'Issue'},{k:'pages',l:'Pages'},
       {k:'url',l:'URL',full:true},
       {k:'type',l:'Type',type:'select',opts:['Magazine','Newspaper','Online Media','Interview','Expert Commentary']}
     ]},
-
   adminExp:{ label:'Administrative Experience', icon:'💼', singular:'Appointment', dateKey:'startDate', cols:['organisation','startDate','endDate'],
     title:r=>r.position,
     fields:[
-      {k:'position',l:'Position',req:true},
-      {k:'organisation',l:'Organisation'},
-      {k:'faculty',l:'Faculty / Department'},
-      {k:'startDate',l:'Start Date',type:'date'},
-      {k:'endDate',l:'End Date',type:'date'},
+      {k:'position',l:'Position',req:true},{k:'organisation',l:'Organisation'},
+      {k:'faculty',l:'Faculty / Department'},{k:'startDate',l:'Start Date',type:'date'},{k:'endDate',l:'End Date',type:'date'},
       {k:'appointmentType',l:'Appointment Type',type:'select',opts:['Permanent','Contract','Acting','Secondment','Ad-hoc']},
       {k:'refNumber',l:'Reference Number'},
       {k:'description',l:'Description',type:'textarea',full:true},
       {k:'responsibilities',l:'Responsibilities',type:'textarea',full:true}
     ]},
-
   supervision:{ label:'Supervision', icon:'👨‍🎓', singular:'Student', dateKey:'startDate', cols:['programme','level','status'],
     title:r=>r.studentName,
     fields:[
-      {k:'studentName',l:'Student Name',req:true},
-      {k:'studentId',l:'Student ID'},
+      {k:'studentName',l:'Student Name',req:true},{k:'studentId',l:'Student ID'},
       {k:'programme',l:'Programme'},
       {k:'level',l:'Level',type:'select',opts:['Diploma','Degree','Master','PhD']},
       {k:'projectTitle',l:'Project Title',full:true},
       {k:'role',l:'Role',type:'select',opts:['Main Supervisor','Co-Supervisor','Panel']},
-      {k:'startDate',l:'Start Date',type:'date'},
-      {k:'endDate',l:'End Date',type:'date'},
+      {k:'startDate',l:'Start Date',type:'date'},{k:'endDate',l:'End Date',type:'date'},
       {k:'status',l:'Status',type:'select',opts:['Active','Completed','Withdrawn']},
       {k:'graduationYear',l:'Graduation Year',type:'number'}
     ]},
-
   consultancy:{ label:'Consultancy', icon:'🏢', singular:'Consultancy', dateKey:'startDate', cols:['client','value','status'],
     title:r=>r.title,
     fields:[
-      {k:'title',l:'Consultancy Title',req:true,full:true},
-      {k:'client',l:'Client'},
-      {k:'organisation',l:'Organisation'},
-      {k:'role',l:'Role'},
-      {k:'startDate',l:'Start Date',type:'date'},
-      {k:'endDate',l:'End Date',type:'date'},
+      {k:'title',l:'Consultancy Title',req:true,full:true},{k:'client',l:'Client'},
+      {k:'organisation',l:'Organisation'},{k:'role',l:'Role'},
+      {k:'startDate',l:'Start Date',type:'date'},{k:'endDate',l:'End Date',type:'date'},
       {k:'value',l:'Consultancy Value (RM)',type:'number'},
       {k:'status',l:'Status',type:'select',opts:['Active','Completed','Pending']},
-      {k:'description',l:'Description',type:'textarea',full:true},
-      {k:'output',l:'Output',type:'textarea',full:true}
+      {k:'description',l:'Description',type:'textarea',full:true},{k:'output',l:'Output',type:'textarea',full:true}
     ]},
-
   memberships:{ label:'Professional Membership', icon:'👔', singular:'Membership', dateKey:'startYear', cols:['organisation','membershipType','status'],
     title:r=>r.organisation,
     fields:[
-      {k:'organisation',l:'Organisation',req:true},
-      {k:'membershipType',l:'Membership Type'},
-      {k:'membershipNumber',l:'Membership Number'},
-      {k:'position',l:'Position'},
-      {k:'startYear',l:'Start Year',type:'number'},
-      {k:'endYear',l:'End Year',type:'number'},
+      {k:'organisation',l:'Organisation',req:true},{k:'membershipType',l:'Membership Type'},
+      {k:'membershipNumber',l:'Membership Number'},{k:'position',l:'Position'},
+      {k:'startYear',l:'Start Year',type:'number'},{k:'endYear',l:'End Year',type:'number'},
       {k:'status',l:'Status',type:'select',opts:['Active','Expired','Lifetime']}
     ]},
-
   community:{ label:'Community Engagement', icon:'🌍', singular:'Programme', dateKey:'date', cols:['organisation','date','sdg'],
     title:r=>r.programmeName,
     fields:[
-      {k:'programmeName',l:'Programme Name',req:true,full:true},
-      {k:'organisation',l:'Organisation'},
-      {k:'date',l:'Date',type:'date'},
-      {k:'location',l:'Location'},
-      {k:'targetGroup',l:'Target Group'},
-      {k:'role',l:'Role'},
-      {k:'participants',l:'Number of Participants',type:'number'},
-      {k:'sdg',l:'SDG'},
-      {k:'description',l:'Description',type:'textarea',full:true},
-      {k:'output',l:'Output'},
-      {k:'impact',l:'Impact',type:'textarea',full:true}
+      {k:'programmeName',l:'Programme Name',req:true,full:true},{k:'organisation',l:'Organisation'},
+      {k:'date',l:'Date',type:'date'},{k:'location',l:'Location'},{k:'targetGroup',l:'Target Group'},
+      {k:'role',l:'Role'},{k:'participants',l:'Number of Participants',type:'number'},
+      {k:'sdg',l:'SDG'},{k:'description',l:'Description',type:'textarea',full:true},
+      {k:'output',l:'Output'},{k:'impact',l:'Impact',type:'textarea',full:true}
     ]},
-
   innovation:{ label:'Innovation / Product', icon:'💡', singular:'Innovation', dateKey:'year', cols:['category','year','commercialisation'],
     title:r=>r.title,
     fields:[
-      {k:'title',l:'Innovation Title',req:true,full:true},
-      {k:'category',l:'Innovation Category'},
-      {k:'inventors',l:'Inventor(s)',full:true},
-      {k:'year',l:'Year',type:'number'},
+      {k:'title',l:'Innovation Title',req:true,full:true},{k:'category',l:'Innovation Category'},
+      {k:'inventors',l:'Inventor(s)',full:true},{k:'year',l:'Year',type:'number'},
       {k:'description',l:'Description',type:'textarea',full:true},
       {k:'patent',l:'Patent'},{k:'copyright',l:'Copyright'},{k:'trademark',l:'Trademark'},
-      {k:'competition',l:'Innovation Competition'},
-      {k:'award',l:'Award'},
+      {k:'competition',l:'Innovation Competition'},{k:'award',l:'Award'},
       {k:'commercialisation',l:'Commercialisation Status',type:'select',opts:['Not Commercialised','Pre-Commercial','Licensed','Commercialised']},
       {k:'industryPartner',l:'Industry Partner'},
       {k:'trl',l:'Technology Readiness Level (TRL)',type:'select',opts:['TRL 1','TRL 2','TRL 3','TRL 4','TRL 5','TRL 6','TRL 7','TRL 8','TRL 9']}
     ]},
-
   ip:{ label:'Intellectual Property', icon:'📜', singular:'IP Record', dateKey:'filingDate', cols:['ipType','registrationNumber','status'],
     title:r=>r.title,
     fields:[
       {k:'ipType',l:'IP Type',type:'select',opts:['Patent','Copyright','Industrial Design','Trademark','Utility Innovation']},
-      {k:'title',l:'Title',req:true,full:true},
-      {k:'registrationNumber',l:'Registration Number'},
-      {k:'applicant',l:'Applicant'},
-      {k:'inventors',l:'Inventor(s)',full:true},
-      {k:'filingDate',l:'Filing Date',type:'date'},
-      {k:'registrationDate',l:'Registration Date',type:'date'},
-      {k:'status',l:'Status',type:'select',opts:['Filed','Pending','Granted','Expired']},
-      {k:'country',l:'Country'}
+      {k:'title',l:'Title',req:true,full:true},{k:'registrationNumber',l:'Registration Number'},
+      {k:'applicant',l:'Applicant'},{k:'inventors',l:'Inventor(s)',full:true},
+      {k:'filingDate',l:'Filing Date',type:'date'},{k:'registrationDate',l:'Registration Date',type:'date'},
+      {k:'status',l:'Status',type:'select',opts:['Filed','Pending','Granted','Expired']},{k:'country',l:'Country'}
     ]}
 };
 
 /* =========================================================
-   SEED
+   SEED / PERSISTENCE
    ========================================================= */
 function seed(){
   const d = authDerivedProfile();
@@ -1597,9 +1197,6 @@ function seed(){
   };
 }
 
-/* =========================================================
-   PERSISTENCE
-   ========================================================= */
 const LS_KEY = 'academic_profile_system_v2_' + (CURRENT_USER.id || 'anon');
 let DB;
 
@@ -1619,7 +1216,6 @@ function load(){
 }
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
 DB = load() || seed();
-
 DB.role = CURRENT_APP_ROLE;
 
 (function hydrateProfile(){
@@ -1640,69 +1236,57 @@ DB.role = CURRENT_APP_ROLE;
    ========================================================= */
 const NAV = [
   {group:'nav.group.main'},
-  {id:'dashboard',      label:'nav.dashboard',      icon:'🏠'},
-  {id:'profile',        label:'nav.profile',        icon:'👤'},
-  {id:'expertise',      label:'nav.expertise',      icon:'🔬'},
-  {id:'qualifications', label:'nav.qualifications', icon:'🎓', coll:true},
+  {id:'dashboard',label:'nav.dashboard',icon:'🏠'},
+  {id:'profile',label:'nav.profile',icon:'👤'},
+  {id:'expertise',label:'nav.expertise',icon:'🔬'},
+  {id:'qualifications',label:'nav.qualifications',icon:'🎓',coll:true},
   {group:'nav.group.academic'},
-  {id:'teaching',       label:'nav.teaching',       icon:'👨‍🏫', coll:true},
-  {id:'projects',       label:'nav.projects',       icon:'🔬', coll:true},
-  {id:'grants',         label:'nav.grants',         icon:'💰', coll:true},
-  {id:'publications',   label:'nav.publications',   icon:'📚', coll:true},
-  {id:'conferences',    label:'nav.conferences',    icon:'🎤', coll:true},
-  {id:'books',          label:'nav.books',          icon:'📖', coll:true},
-  {id:'awards',         label:'nav.awards',         icon:'🏆', coll:true},
-  {id:'media',          label:'nav.media',          icon:'📰', coll:true},
+  {id:'teaching',label:'nav.teaching',icon:'👨‍🏫',coll:true},
+  {id:'projects',label:'nav.projects',icon:'🔬',coll:true},
+  {id:'grants',label:'nav.grants',icon:'💰',coll:true},
+  {id:'publications',label:'nav.publications',icon:'📚',coll:true},
+  {id:'conferences',label:'nav.conferences',icon:'🎤',coll:true},
+  {id:'books',label:'nav.books',icon:'📖',coll:true},
+  {id:'awards',label:'nav.awards',icon:'🏆',coll:true},
+  {id:'media',label:'nav.media',icon:'📰',coll:true},
   {group:'nav.group.career'},
-  {id:'adminExp',       label:'nav.adminExp',       icon:'💼', coll:true},
-  {id:'supervision',    label:'nav.supervision',    icon:'👨‍🎓', coll:true},
-  {id:'consultancy',    label:'nav.consultancy',    icon:'🏢', coll:true},
-  {id:'memberships',    label:'nav.memberships',    icon:'👔', coll:true},
-  {id:'community',      label:'nav.community',      icon:'🌍', coll:true},
-  {id:'innovation',     label:'nav.innovation',     icon:'💡', coll:true},
-  {id:'ip',             label:'nav.ip',             icon:'📜', coll:true},
+  {id:'adminExp',label:'nav.adminExp',icon:'💼',coll:true},
+  {id:'supervision',label:'nav.supervision',icon:'👨‍🎓',coll:true},
+  {id:'consultancy',label:'nav.consultancy',icon:'🏢',coll:true},
+  {id:'memberships',label:'nav.memberships',icon:'👔',coll:true},
+  {id:'community',label:'nav.community',icon:'🌍',coll:true},
+  {id:'innovation',label:'nav.innovation',icon:'💡',coll:true},
+  {id:'ip',label:'nav.ip',icon:'📜',coll:true},
   {group:'nav.group.tools'},
-  {id:'cloudSync',      label:'nav.cloudSync',      icon:'☁️'},
-  {id:'cv',             label:'nav.cv',             icon:'📄'},
-  {id:'public',         label:'nav.public',         icon:'🌐'},
+  {id:'cloudSync',label:'nav.cloudSync',icon:'☁️'},
+  {id:'cv',label:'nav.cv',icon:'📄'},
+  {id:'public',label:'nav.public',icon:'🌐'},
   {group:'nav.group.analytics'},
-  {id:'search',         label:'nav.search',         icon:'🔎'},
-  {id:'analytics',      label:'nav.analytics',      icon:'📊', roles:['Head','Admin']},
-  {id:'kpi',            label:'nav.kpi',            icon:'📈', roles:['Head','Admin']},
-  {id:'quality',        label:'nav.quality',        icon:'⚠️'},
+  {id:'search',label:'nav.search',icon:'🔎'},
+  {id:'analytics',label:'nav.analytics',icon:'📊',roles:['Head','Admin']},
+  {id:'kpi',label:'nav.kpi',icon:'📈',roles:['Head','Admin']},
+  {id:'quality',label:'nav.quality',icon:'⚠️'},
   {group:'nav.group.system'},
-  {id:'notifications',  label:'nav.notifications',  icon:'🔔'},
-  {id:'admin',          label:'nav.admin',          icon:'👨‍💼', roles:['Admin']},
-  {id:'audit',          label:'nav.audit',          icon:'📝'}
+  {id:'notifications',label:'nav.notifications',icon:'🔔'},
+  {id:'admin',label:'nav.admin',icon:'👨‍💼',roles:['Admin']},
+  {id:'audit',label:'nav.audit',icon:'📝'}
 ];
 
 const TITLES = {
-  dashboard:['title.dashboard','sub.dashboard'],
-  profile:['title.profile','sub.profile'],
-  expertise:['title.expertise','sub.expertise'],
-  cloudSync:['title.cloudSync','sub.cloudSync'],
-  cv:['title.cv','sub.cv'],
-  public:['title.public','sub.public'],
-  search:['title.search','sub.search'],
-  analytics:['title.analytics','sub.analytics'],
-  kpi:['title.kpi','sub.kpi'],
-  quality:['title.quality','sub.quality'],
-  notifications:['title.notifications','sub.notifications'],
-  admin:['title.admin','sub.admin'],
-  audit:['title.audit','sub.audit']
+  dashboard:['title.dashboard','sub.dashboard'],profile:['title.profile','sub.profile'],
+  expertise:['title.expertise','sub.expertise'],cloudSync:['title.cloudSync','sub.cloudSync'],
+  cv:['title.cv','sub.cv'],public:['title.public','sub.public'],search:['title.search','sub.search'],
+  analytics:['title.analytics','sub.analytics'],kpi:['title.kpi','sub.kpi'],quality:['title.quality','sub.quality'],
+  notifications:['title.notifications','sub.notifications'],admin:['title.admin','sub.admin'],audit:['title.audit','sub.audit']
 };
 
 let state = { view:'dashboard', q:'' };
 
 function setRole(r){
   if(CURRENT_APP_ROLE !== 'Admin' && r !== CURRENT_APP_ROLE){
-    toast(L('toast.noPermRole'));
-    render();
-    return;
+    toast(L('toast.noPermRole')); render(); return;
   }
-  DB.role = r;
-  save();
-  render();
+  DB.role = r; save(); render();
   toast(L('toast.roleChanged') + ' ' + r);
 }
 window.setRole = setRole;
@@ -1711,13 +1295,7 @@ function canSee(item){
   if(!item.roles) return true;
   return item.roles.includes(DB.role);
 }
-
-function go(view, q){
-  state.view = view;
-  state.q = q || '';
-  window.scrollTo(0,0);
-  render();
-}
+function go(view, q){ state.view = view; state.q = q || ''; window.scrollTo(0,0); render(); }
 window.go = go;
 
 /* =========================================================
@@ -1809,60 +1387,42 @@ function findDuplicates(){
   });
   return Object.values(map).filter(a=>a.length>1);
 }
-
 function qualityIssues(){
   const pubs = DB.publications||[];
   const missingDOI = pubs.filter(p=>!p.doi).length;
   const missingYear = pubs.filter(p=>!p.year).length;
   const noOrcid = DB.profile.orcid ? 0 : 1;
   const dup = findDuplicates().length;
-  const incomplete = 100 - profileCompleteness() > 0 ? 1 : 0;
-  return { missingDOI, missingYear, noOrcid, dup, incomplete, total: missingDOI + missingYear + noOrcid + dup };
+  return { missingDOI, missingYear, noOrcid, dup, total: missingDOI + missingYear + noOrcid + dup };
 }
-
 function notifications(){
   const q = qualityIssues();
   const list = [];
   const isMs = LANG === 'ms';
-
-  if(q.missingDOI) list.push({
-    id:'n-doi', icon:'🔍',
+  if(q.missingDOI) list.push({id:'n-doi',icon:'🔍',tone:'amber',
     title: isMs ? `${q.missingDOI} penerbitan tiada DOI` : `${q.missingDOI} publication(s) missing DOI`,
-    desc: isMs ? 'Lengkapkan DOI untuk pengindeksan yang lebih baik.' : 'Complete DOI for better indexing.',
-    tone:'amber'});
-  if(q.noOrcid) list.push({
-    id:'n-orcid', icon:'🆔',
+    desc: isMs ? 'Lengkapkan DOI untuk pengindeksan yang lebih baik.' : 'Complete DOI for better indexing.'});
+  if(q.noOrcid) list.push({id:'n-orcid',icon:'🆔',tone:'amber',
     title: isMs ? 'Profil tiada ORCID' : 'Profile missing ORCID',
-    desc: isMs ? 'Tambah ORCID untuk penyegerakan penulis.' : 'Add ORCID for author synchronisation.',
-    tone:'amber'});
-  if(q.dup) list.push({
-    id:'n-dup', icon:'⚠️',
+    desc: isMs ? 'Tambah ORCID untuk penyegerakan penulis.' : 'Add ORCID for author synchronisation.'});
+  if(q.dup) list.push({id:'n-dup',icon:'⚠️',tone:'red',
     title: isMs ? 'Kemungkinan penerbitan bertindih' : 'Possible duplicate publication detected',
-    desc: isMs ? 'Sistem mengesan rekod yang mungkin bertindih.' : 'The system detected records that may overlap.',
-    tone:'red'});
+    desc: isMs ? 'Sistem mengesan rekod yang mungkin bertindih.' : 'The system detected records that may overlap.'});
   const pc = profileCompleteness();
-  if(pc < 100) list.push({
-    id:'n-prof', icon:'👤',
+  if(pc < 100) list.push({id:'n-prof',icon:'👤',tone:'sky',
     title: isMs ? `Profil anda ${pc}% lengkap` : `Your profile is ${pc}% complete`,
-    desc: isMs ? 'Lengkapkan maklumat untuk CV yang lebih baik.' : 'Complete the information for a better CV.',
-    tone:'sky'});
-  list.push({
-    id:'n-cv', icon:'📄',
+    desc: isMs ? 'Lengkapkan maklumat untuk CV yang lebih baik.' : 'Complete the information for a better CV.'});
+  list.push({id:'n-cv',icon:'📄',tone:'green',
     title: isMs ? 'Templat CV sedia' : 'CV template ready',
-    desc: isMs ? 'CV akademik anda boleh dijana pada bila-bila masa.' : 'Your academic CV can be generated anytime.',
-    tone:'green'});
-  if(DB.cloud && DB.cloud.lastPush) list.push({
-    id:'n-cloud', icon:'☁️',
+    desc: isMs ? 'CV akademik anda boleh dijana pada bila-bila masa.' : 'Your academic CV can be generated anytime.'});
+  if(DB.cloud && DB.cloud.lastPush) list.push({id:'n-cloud',icon:'☁️',tone:'green',
     title: isMs ? 'Auto cloud sync aktif' : 'Auto cloud sync active',
-    desc: (isMs?'Kali terakhir hantar: ':'Last push: ') + fmtDateTime(DB.cloud.lastPush),
-    tone:'green'});
+    desc: (isMs?'Kali terakhir hantar: ':'Last push: ') + fmtDateTime(DB.cloud.lastPush)});
   return list;
 }
-
 function log(action, target, source, extra){
   DB.audit.unshift({
-    id: uid(),
-    who: DB.profile.name || CURRENT_USER.name,
+    id: uid(), who: DB.profile.name || CURRENT_USER.name,
     action, target, source: source || 'Manual Entry',
     date: new Date().toISOString(),
     confidence: extra && extra.confidence ? extra.confidence : null,
@@ -1872,7 +1432,7 @@ function log(action, target, source, extra){
 }
 
 /* =========================================================
-   VIEW: DASHBOARD
+   VIEWS
    ========================================================= */
 const VIEWS = {};
 
@@ -1984,9 +1544,6 @@ function barChart(map){
     </div>`).join('');
 }
 
-/* =========================================================
-   VIEW: PROFILE
-   ========================================================= */
 VIEWS.profile = function(){
   const p = DB.profile;
   const f = (k,l,type,locked) => `<label class="fld"><span>${l}${locked?' 🔒':''}</span>
@@ -2079,15 +1636,11 @@ function aiBiography(){
   p.shortBio = `${p.title||''} ${p.name||''} is a ${p.position||'lecturer'} at the ${p.faculty||'faculty'}, ${p.campus||''}. ` +
     `His/her research focuses on ${interests.slice(0,3).join(', ')||'sustainable engineering'}, with expertise in ${expertise.slice(0,3).join(', ')||'chemical engineering'}. ` +
     `To date, he/she has secured ${money(total)} in research funding and published ${(DB.publications||[]).length} indexed publications.`;
-
   p.longBio = p.shortBio + `\n\nRecent works include: ${topPubs.join('; ')||'—'}. ` +
     `He/she is actively involved in supervision, community engagement and technology commercialisation, aligning research to the United Nations Sustainable Development Goals.`;
-
   p.academicProfile = `Academic career began with a ${(DB.qualifications||[])[0]?.qualification||'higher degree'} in ${(DB.qualifications||[])[0]?.field||'the field'} from ${(DB.qualifications||[])[0]?.university||'the university'}. ` +
     `Currently serving as ${p.position||'lecturer'} and actively teaching at undergraduate and postgraduate levels.`;
-
   p.researchProfile = `Research interests: ${interests.join(', ')||'—'}. Keywords: ${p.keywords||'—'}. SDG alignment: ${p.sdg||'—'}.`;
-
   log('Generated Biography','My Profile','Auto Generator',{confidence:94, verified:false});
   save(); render(); toast(L('toast.aiBio'));
   clearTimeout(SYNC.timer);
@@ -2095,9 +1648,6 @@ function aiBiography(){
 }
 window.aiBiography = aiBiography;
 
-/* =========================================================
-   VIEW: EXPERTISE
-   ========================================================= */
 VIEWS.expertise = function(){
   const p = DB.profile;
   const chips = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>`<span class="pill">${esc(x)}</span>`).join(' ');
@@ -2140,9 +1690,6 @@ function saveExpertise(){
 }
 window.saveExpertise = saveExpertise;
 
-/* =========================================================
-   GENERIC COLLECTION VIEW
-   ========================================================= */
 function viewCollection(key){
   const sch = SCHEMA[key];
   const labelText = L('nav.'+key, sch.label);
@@ -2151,7 +1698,6 @@ function viewCollection(key){
   let list = [...rows];
   if(q) list = list.filter(r => JSON.stringify(r).toLowerCase().includes(q));
   list.sort((a,b)=> String(b[sch.dateKey]||'').localeCompare(String(a[sch.dateKey]||'')));
-
   const cols = sch.cols || [];
 
   $('#view').innerHTML = `
@@ -2223,9 +1769,6 @@ function delRec(key, id){
 }
 window.delRec = delRec;
 
-/* =========================================================
-   MODAL FORM
-   ========================================================= */
 function openForm(key, id){
   const sch = SCHEMA[key];
   const rec = id ? DB[key].find(r=>r.id===id) : {};
@@ -2261,7 +1804,6 @@ function openForm(key, id){
   </div>`;
 }
 window.openForm = openForm;
-
 function closeModal(){ $('#modalRoot').innerHTML = ''; }
 window.closeModal = closeModal;
 
@@ -2270,7 +1812,6 @@ function submitForm(e, key, id){
   const form = e.target;
   const data = { id: id || uid() };
   new FormData(form).forEach((v,k)=>{ data[k] = typeof v === 'string' ? v.trim() : v; });
-
   if(id){
     const i = DB[key].findIndex(r=>r.id===id);
     DB[key][i] = data;
@@ -2314,7 +1855,6 @@ const SYNC = {
     SYNC.setStatus('busy');
     const ok = await cloudPush({ silent:true, reason });
     SYNC.inflight = false;
-
     if(ok){
       SYNC.retries = 0; SYNC.queue = 0; SYNC.dirty = false;
       SYNC.setStatus('ok');
@@ -2341,14 +1881,13 @@ const SYNC = {
       dot.className = 'sync-dot ' + (map[s]||'off');
       lbl.textContent = L('sync.'+s, s);
     }
-
-    // === BATTERY HOOK — UPLOAD battery only (download is handled in cloudPull) ===
+    // === UPLOAD cloud indicator animation ===
     try{
-      if(s === 'busy' || s === 'pending' || s === 'retry')      UPLOAD_BATTERY.start();
-      else if(s === 'ok')                                       UPLOAD_BATTERY.done();
-      else if(s === 'error')                                    UPLOAD_BATTERY.error();
-      else if(s === 'offline')                                  UPLOAD_BATTERY.offline();
-      else if(s === 'idle')                                     UPLOAD_BATTERY.idle();
+      if(s === 'busy' || s === 'pending' || s === 'retry')      UPLOAD_INDICATOR.start();
+      else if(s === 'ok')                                       UPLOAD_INDICATOR.done();
+      else if(s === 'error')                                    UPLOAD_INDICATOR.error();
+      else if(s === 'offline')                                  UPLOAD_INDICATOR.offline();
+      else if(s === 'idle')                                     UPLOAD_INDICATOR.idle();
     }catch(e){}
   },
 
@@ -2356,39 +1895,29 @@ const SYNC = {
     try{
       if(!DB.cloud.autoSync || !navigator.onLine) return;
       if(!SYNC.dirty && !SYNC.timer && SYNC.queue===0) return;
-
       const full = buildCloudPayload();
       let body = JSON.stringify(full);
-
       if(body.length > 60000){
         const minimal = {
-          action:'updateResume',
-          timestamp:new Date().toISOString(),
+          action:'updateResume', timestamp:new Date().toISOString(),
           source:'Academic Profile System (beacon-minimal)',
-          key: DB.cloud.key || '',
-          sheet: DB.cloud.sheet || 'Resume',
+          key: DB.cloud.key || '', sheet: DB.cloud.sheet || 'Resume',
           auth:{ userId:CURRENT_USER.id, name:CURRENT_USER.name, email:CURRENT_USER.email, role:CURRENT_ROLE },
           profile: DB.profile,
           summary:{ publications:(DB.publications||[]).length, completeness: profileCompleteness() },
-          data:{
-            publications: DB.publications||[], grants: DB.grants||[],
-            projects: DB.projects||[], awards: DB.awards||[],
-            conferences: DB.conferences||[], supervision: DB.supervision||[]
-          }
+          data:{ publications: DB.publications||[], grants: DB.grants||[], projects: DB.projects||[],
+                 awards: DB.awards||[], conferences: DB.conferences||[], supervision: DB.supervision||[] }
         };
         body = JSON.stringify(minimal);
       }
-
       fetch(CLOUD_URL, {
         method:'POST', keepalive:true,
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body, redirect:'follow'
       }).catch(()=>{});
-
       if(navigator.sendBeacon){
         try{ navigator.sendBeacon(CLOUD_URL, new Blob([body], {type:'text/plain;charset=utf-8'})); }catch(e){}
       }
-
       SYNC.dirty = false;
     }catch(e){}
   }
@@ -2422,7 +1951,7 @@ document.addEventListener('visibilitychange', ()=>{
     SYNC.flush('visibility-hidden');
   }
 });
-window.addEventListener('pagehide',     ()=>{ SYNC.flushKeepalive(); });
+window.addEventListener('pagehide', ()=>{ SYNC.flushKeepalive(); });
 window.addEventListener('online',  ()=>{ toast(L('toast.online')); SYNC.flush('online'); });
 window.addEventListener('offline', ()=>{ SYNC.setStatus('offline'); toast(L('toast.offline')); });
 
@@ -2434,7 +1963,7 @@ setInterval(()=>{
 }, 3*60*1000);
 
 /* =========================================================
-   LOGOUT MODAL
+   LOGOUT / EXIT GUARD
    ========================================================= */
 let _logoutBypass = false;
 let _allowExit = false;
@@ -2446,13 +1975,11 @@ function hasUnsavedCloudChanges(){
 
 function doLogout(){
   if(!hasUnsavedCloudChanges()){
-    _logoutBypass = true;
-    _allowExit = true;
+    _logoutBypass = true; _allowExit = true;
     try { FMSAuth.clearSession(); } catch(e){}
     window.location.href = 'login.html';
     return;
   }
-
   $('#logoutRoot').innerHTML = `
   <div class="modal-bg" onclick="if(event.target===this)closeLogoutModal()">
     <div class="modal" style="max-width:560px">
@@ -2475,7 +2002,6 @@ function doLogout(){
   </div>`;
 }
 window.doLogout = doLogout;
-
 function closeLogoutModal(){ $('#logoutRoot').innerHTML = ''; }
 window.closeLogoutModal = closeLogoutModal;
 
@@ -2484,12 +2010,9 @@ async function syncAndLogout(){
   const prog = document.getElementById('logoutProgress');
   if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${esc(L('logout.sendingBtn'))}`; }
   if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = L('logout.sending'); }
-
   try{
-    clearTimeout(SYNC.timer);
-    SYNC.queue = 0;
+    clearTimeout(SYNC.timer); SYNC.queue = 0;
     const ok = await cloudPush({ silent:true, reason:'logout' });
-
     if(ok){
       if(prog){ prog.className='logout-progress done'; prog.innerHTML = L('logout.sent'); }
       SYNC.dirty = false;
@@ -2506,25 +2029,19 @@ async function syncAndLogout(){
 window.syncAndLogout = syncAndLogout;
 
 function forceLogout(){
-  _logoutBypass = true;
-  _allowExit = true;
+  _logoutBypass = true; _allowExit = true;
   closeLogoutModal();
   try { FMSAuth.clearSession(); } catch(e){}
   window.location.href = 'login.html';
 }
 window.forceLogout = forceLogout;
 
-/* =========================================================
-   EXIT GUARD
-   ========================================================= */
 function showExitGuardModal(reason){
   if(_exitGuardShown) return;
   _exitGuardShown = true;
-
   const reasonText = reason === 'back'  ? L('logout.exitBack')
                    : reason === 'close' ? L('logout.exitClose')
                    : L('logout.exitRefresh');
-
   $('#logoutRoot').innerHTML = `
   <div class="modal-bg" onclick="event.stopPropagation()">
     <div class="modal" style="max-width:560px">
@@ -2544,11 +2061,7 @@ function showExitGuardModal(reason){
     </div>
   </div>`;
 }
-
-function cancelExitGuard(){
-  _exitGuardShown = false;
-  $('#logoutRoot').innerHTML = '';
-}
+function cancelExitGuard(){ _exitGuardShown = false; $('#logoutRoot').innerHTML = ''; }
 window.cancelExitGuard = cancelExitGuard;
 
 async function syncThenExit(){
@@ -2556,19 +2069,14 @@ async function syncThenExit(){
   const prog = document.getElementById('exitGuardProgress');
   if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${esc(L('logout.sendingShort'))}`; }
   if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = L('logout.sending'); }
-
   try{
-    clearTimeout(SYNC.timer);
-    SYNC.queue = 0;
+    clearTimeout(SYNC.timer); SYNC.queue = 0;
     const ok = await cloudPush({ silent:true, reason:'exit-guard' });
-
     if(ok){
-      SYNC.dirty = false;
-      SYNC.setStatus('ok');
+      SYNC.dirty = false; SYNC.setStatus('ok');
       if(prog){ prog.className='logout-progress done'; prog.innerHTML = L('logout.exitSent'); }
       setTimeout(() => {
-        _exitGuardShown = false;
-        _allowExit = true;
+        _exitGuardShown = false; _allowExit = true;
         $('#logoutRoot').innerHTML = '';
         toast(L('logout.exitDone'));
       }, 1200);
@@ -2599,7 +2107,6 @@ window.syncThenExit = syncThenExit;
 
 window.addEventListener('beforeunload', (e) => {
   if(_allowExit || _logoutBypass) return;
-
   if(hasUnsavedCloudChanges()){
     SYNC.flushKeepalive();
     e.preventDefault();
@@ -2612,7 +2119,7 @@ window.addEventListener('beforeunload', (e) => {
 });
 
 /* =========================================================
-   VIEW: Cloud Sync Panel
+   VIEW: CLOUD SYNC PANEL
    ========================================================= */
 VIEWS.cloudSync = function(){
   const c = DB.cloud;
@@ -2728,12 +2235,9 @@ function buildCloudPayload(){
     auth: { userId: CURRENT_USER.id, name: CURRENT_USER.name, email: CURRENT_USER.email, role: CURRENT_ROLE },
     profile: DB.profile,
     summary: {
-      publications: (DB.publications||[]).length,
-      grants: (DB.grants||[]).length,
-      totalGrants: totalGrants(),
-      projects: (DB.projects||[]).length,
-      awards: (DB.awards||[]).length,
-      completeness: profileCompleteness()
+      publications: (DB.publications||[]).length, grants: (DB.grants||[]).length,
+      totalGrants: totalGrants(), projects: (DB.projects||[]).length,
+      awards: (DB.awards||[]).length, completeness: profileCompleteness()
     },
     cvHtml: (function(){
       try {
@@ -2811,13 +2315,10 @@ async function cloudPush(opts){
   const silent = !!opts.silent;
   if(!silent) setBusy('btnPush', true, 'Uploading…');
   syncLog(`⬆ Push${opts.reason?' ('+opts.reason+')':''}…`,'in');
-
   const payload = buildCloudPayload();
   syncLog(`📦 Payload: ${(JSON.stringify(payload).length/1024).toFixed(1)} KB`,'t');
-
   try{
     const r = await cloudPost(payload);
-
     if(r.ok){
       DB.cloud.lastPush = new Date().toISOString();
       log('Cloud Sync — Pushed', DB.profile.name||'Profile', 'Cloud Sync', { confidence:100, verified:true });
@@ -2854,10 +2355,7 @@ window.quickCloudPush = quickCloudPush;
 async function cloudPull(){
   setBusy('btnPull', true, 'Pulling…');
   syncLog('⬇ Pulling…','in');
-
-  // === Start DOWNLOAD battery animation ===
-  DOWNLOAD_BATTERY.startFromZero();
-
+  DOWNLOAD_INDICATOR.startFromZero();
   try{
     const url = CLOUD_URL + '?action=getResume&userId=' + encodeURIComponent(CURRENT_USER.id) +
                 '&key=' + encodeURIComponent(DB.cloud.key||'') + '&t=' + Date.now();
@@ -2867,10 +2365,9 @@ async function cloudPull(){
     if(!json){
       syncLog(`⚠️ Not JSON: ${esc(text.slice(0,200))}`,'er');
       toast(L('toast.pullFailed'));
-      DOWNLOAD_BATTERY.error();
+      DOWNLOAD_INDICATOR.error();
       return;
     }
-
     const incoming = json.data || json.profile || json;
     if(incoming.profile && confirm(L('confirm.replaceProfile'))){
       const d = authDerivedProfile();
@@ -2880,19 +2377,16 @@ async function cloudPull(){
       DB.profile.position = d.position || DB.profile.position;
     }
     Object.keys(SCHEMA).forEach(k=>{ if(Array.isArray(incoming[k])) DB[k] = incoming[k]; });
-
     DB.cloud.lastPull = new Date().toISOString();
     log('Cloud Sync — Pulled', DB.profile.name||'Profile', 'Cloud Sync');
     save(); render();
     syncLog('✅ Data pulled.','ok');
     toast(L('toast.pullSuccess'));
-
-    // === Complete DOWNLOAD battery animation ===
-    DOWNLOAD_BATTERY.done();
+    DOWNLOAD_INDICATOR.done();
   }catch(err){
     syncLog(`❌ ${esc(err.message)}`,'er');
     toast(L('toast.pullFailed'));
-    DOWNLOAD_BATTERY.error();
+    DOWNLOAD_INDICATOR.error();
   }finally{ setBusy('btnPull', false); }
 }
 window.cloudPull = cloudPull;
@@ -2966,16 +2460,12 @@ function generateCV(){
     </div>
   </div>`;
 
-  if(chosen.includes('profile')){
-    h += `<h2>Profile</h2><p>${esc(p.shortBio||p.longBio||'—')}</p>`;
-  }
-  if(chosen.includes('expertise')){
-    h += `<h2>Expertise &amp; Research Interest</h2>
+  if(chosen.includes('profile')) h += `<h2>Profile</h2><p>${esc(p.shortBio||p.longBio||'—')}</p>`;
+  if(chosen.includes('expertise')) h += `<h2>Expertise &amp; Research Interest</h2>
       <p><b>Expertise:</b> ${esc(p.expertise||'—')}</p>
       <p><b>Research Interest:</b> ${esc(p.researchInterest||'—')}</p>
       <p><b>Keywords:</b> ${esc(p.keywords||'—')}</p>
       <p><b>SDG:</b> ${esc(p.sdg||'—')}</p>`;
-  }
   if(chosen.includes('qualifications')){
     h += `<h2>Academic Qualification</h2>`;
     sortBy('qualifications','gradYear').forEach(q=>{
@@ -3098,9 +2588,6 @@ function downloadCV(){
 }
 window.downloadCV = downloadCV;
 
-/* =========================================================
-   VIEW: PUBLIC PROFILE
-   ========================================================= */
 VIEWS.public = function(){
   const p = DB.profile;
   const slug = (p.name||'user').toLowerCase().replace(/\s+/g,'-');
@@ -3164,9 +2651,6 @@ function copyLink(url){
 }
 window.copyLink = copyLink;
 
-/* =========================================================
-   VIEW: FACULTY SEARCH
-   ========================================================= */
 VIEWS.search = function(){
   $('#view').innerHTML = `
   <div class="card card-pad" style="margin-bottom:16px">
@@ -3189,20 +2673,15 @@ function doSearch(){
   const q = ($('#sq').value||'').trim().toLowerCase();
   state.q = q;
   if(!q){ $('#searchRes').innerHTML = ''; return; }
-
   const p = DB.profile;
   const hit = (txt) => String(txt||'').toLowerCase().includes(q);
   const matches = [];
-
   if(hit(p.expertise)) matches.push(['Expertise', p.expertise]);
   if(hit(p.researchInterest)) matches.push(['Research Interest', p.researchInterest]);
   if(hit(p.keywords)) matches.push(['Keywords', p.keywords]);
-
   const rel = k => (DB[k]||[]).filter(r => JSON.stringify(r).toLowerCase().includes(q));
-
   const pubs = rel('publications'), projs = rel('projects'), grants = rel('grants'),
         teach = rel('teaching'), innov = rel('innovation'), comm = rel('community');
-
   const total = pubs.length + projs.length + grants.length + teach.length + innov.length + comm.length + matches.length;
 
   $('#searchRes').innerHTML = `
@@ -3245,9 +2724,6 @@ function resultBlock(title, arr, tFn, sFn){
   </div>`;
 }
 
-/* =========================================================
-   VIEW: FACULTY ANALYTICS
-   ========================================================= */
 VIEWS.analytics = function(){
   const pubs = DB.publications||[];
   const projs = DB.projects||[];
@@ -3324,9 +2800,6 @@ function statCard(ic, n, l){
   return `<div class="stat" style="cursor:default"><span class="ic">${ic}</span><div class="n">${n}</div><div class="l">${l}</div></div>`;
 }
 
-/* =========================================================
-   VIEW: KPI DASHBOARD
-   ========================================================= */
 VIEWS.kpi = function(){
   const pubs = DB.publications||[];
   const years = Object.keys(pubByYear()).sort();
@@ -3385,9 +2858,6 @@ VIEWS.kpi = function(){
   </div>`;
 };
 
-/* =========================================================
-   VIEW: DATA QUALITY
-   ========================================================= */
 VIEWS.quality = function(){
   const q = qualityIssues();
   const dups = findDuplicates();
@@ -3448,9 +2918,6 @@ function mergeDup(gi){
 }
 window.mergeDup = mergeDup;
 
-/* =========================================================
-   VIEW: NOTIFICATIONS
-   ========================================================= */
 VIEWS.notifications = function(){
   const list = notifications();
   $('#view').innerHTML = `
@@ -3477,9 +2944,6 @@ function markAllRead(){
 }
 window.markAllRead = markAllRead;
 
-/* =========================================================
-   VIEW: ADMIN PANEL
-   ========================================================= */
 VIEWS.admin = function(){
   $('#view').innerHTML = `
   <div class="grid g4" style="margin-bottom:18px">
@@ -3541,18 +3005,12 @@ window.exportData = exportData;
 
 function resetAll(){
   if(!confirm(L('confirm.reset'))) return;
-  DB = seed();
-  save();
-  go('dashboard');
-  toast(L('toast.dataReset'));
+  DB = seed(); save(); go('dashboard'); toast(L('toast.dataReset'));
   clearTimeout(SYNC.timer);
   SYNC.flush('after-reset');
 }
 window.resetAll = resetAll;
 
-/* =========================================================
-   VIEW: AUDIT TRAIL
-   ========================================================= */
 VIEWS.audit = function(){
   $('#view').innerHTML = `
   <div class="card card-pad" style="margin-bottom:16px">
@@ -3587,9 +3045,9 @@ function bootApp(){
   render();
   SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
 
-  // Make sure both batteries are initialized even before first sync
-  UPLOAD_BATTERY.render();
-  DOWNLOAD_BATTERY.render();
+  // Init both cloud indicators
+  UPLOAD_INDICATOR.render();
+  DOWNLOAD_INDICATOR.render();
 
   const hasData = Object.keys(SCHEMA).some(k => (DB[k]||[]).length > 0);
   if(hasData && DB.cloud.autoSync){
