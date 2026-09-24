@@ -292,6 +292,28 @@ const AUTH_TO_APP_ROLE = {
 const CURRENT_APP_ROLE = AUTH_TO_APP_ROLE[CURRENT_ROLE] || 'Lecturer';
 
 /* =========================================================
+   0a. ROLE → DEFAULT POSITION (fix: elak lab_staff jadi "Senior Lecturer")
+   ========================================================= */
+const ROLE_DEFAULT_POSITION = {
+  student:        'Student',
+  academic_staff: 'Lecturer',
+  lab_staff:      'Lab Staff',
+  coordinator:    'Coordinator',
+  admin:          'Administrator'
+};
+
+// Nilai profile yang WAJIB ikut akaun login (source of truth)
+function authDerivedProfile(){
+  return {
+    name:       CURRENT_USER.name  || 'User',
+    email:      CURRENT_USER.email || '',
+    staffId:    CURRENT_USER.id    || '',
+    position:   CURRENT_USER.position || ROLE_DEFAULT_POSITION[CURRENT_ROLE] || 'Lecturer',
+    department: CURRENT_USER.unit  || ''
+  };
+}
+
+/* =========================================================
    0. HELPERS
    ========================================================= */
 const $ = s => document.querySelector(s);
@@ -578,16 +600,17 @@ const SCHEMA = {
 };
 
 /* =========================================================
-   2. SEED DATA
+   2. SEED DATA — guna authDerivedProfile() sebagai asas
    ========================================================= */
 function seed(){
+  const d = authDerivedProfile();
   return {
     role: CURRENT_APP_ROLE,
     profile:{
-      name: CURRENT_USER.name, prefName:'', title:'', staffId: CURRENT_USER.id || 'STAFF-00123',
-      position: CURRENT_USER.position || 'Senior Lecturer', grade:'', faculty:'Faculty of Chemical Engineering',
-      campus:'Kampus Utama', department: CURRENT_USER.unit || 'Jabatan Kejuruteraan Kimia', centre:'',
-      email: CURRENT_USER.email || 'staff@university.edu.my', officeTel:'', mobile:'',
+      name: d.name, prefName:'', title:'', staffId: d.staffId,
+      position: d.position, grade:'', faculty:'',
+      campus:'', department: d.department, centre:'',
+      email: d.email, officeTel:'', mobile:'',
       officeLoc:'', photo:'👨‍🔬',
       orcid:'', scopus:'', wos:'',
       scholar:'', researchgate:'', linkedin:'', website:'',
@@ -627,12 +650,29 @@ DB = load() || seed();
 /* Setiap kali load, role UI diambil dari role auth (elak naik pangkat sendiri) */
 DB.role = CURRENT_APP_ROLE;
 
+/* =========================================================
+   FIX: hydrateProfile() — SELALU sync identity fields dari akaun login
+   (sebelum ini hanya isi kalau kosong, jadi data lama kekal salah)
+   ========================================================= */
 (function hydrateProfile(){
-  if(!DB.profile.name || DB.profile.name === 'User') DB.profile.name = CURRENT_USER.name;
-  if(!DB.profile.email) DB.profile.email = CURRENT_USER.email;
-  if(!DB.profile.staffId) DB.profile.staffId = CURRENT_USER.id;
-  if(!DB.profile.position && CURRENT_USER.position) DB.profile.position = CURRENT_USER.position;
-  if(!DB.profile.department && CURRENT_USER.unit) DB.profile.department = CURRENT_USER.unit;
+  const d = authDerivedProfile();
+
+  // WAJIB ikut akaun — name, staffId, position (based on role)
+  if(d.name)     DB.profile.name     = d.name;
+  if(d.staffId)  DB.profile.staffId  = d.staffId;
+  if(d.position) DB.profile.position = d.position;
+
+  // Optional — hanya timpa kalau auth ada nilai
+  if(d.email)      DB.profile.email      = d.email;
+  if(d.department) DB.profile.department = d.department;
+
+  // faculty/campus/centre: kekalkan user-set (auth.js tak provide)
+  if(!DB.profile.faculty) DB.profile.faculty = '';
+  if(!DB.profile.campus)  DB.profile.campus  = '';
+  if(!DB.profile.centre)  DB.profile.centre  = '';
+
+  // Simpan perubahan
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){}
 })();
 
 /* =========================================================
@@ -697,7 +737,6 @@ const TITLES = {
 let state = { view:'dashboard', q:'' };
 
 function setRole(r){
-  // Hanya Admin boleh tukar peranan (demo); pengguna lain terikat pada role auth
   if(CURRENT_APP_ROLE !== 'Admin' && r !== CURRENT_APP_ROLE){
     toast('🔒 Anda tiada kebenaran menukar peranan');
     render();
@@ -970,8 +1009,8 @@ function barChart(map){
    ========================================================= */
 VIEWS.profile = function(){
   const p = DB.profile;
-  const f = (k,l,type) => `<label class="fld"><span>${l}</span>
-      <input type="${type||'text'}" data-p="${k}" value="${esc(p[k]||'')}"></label>`;
+  const f = (k,l,type,locked) => `<label class="fld"><span>${l}${locked?' 🔒':''}</span>
+      <input type="${type||'text'}" data-p="${k}" value="${esc(p[k]||'')}" ${locked?'readonly style="background:#f8fafc;cursor:not-allowed"':''}></label>`;
   const t = (k,l) => `<label class="fld full"><span>${l}</span>
       <textarea rows="3" data-p="${k}">${esc(p[k]||'')}</textarea></label>`;
 
@@ -989,13 +1028,16 @@ VIEWS.profile = function(){
 
   <div class="card card-pad" style="margin-bottom:16px">
     <div class="section-title">👤 A. Personal Information</div>
+    <div class="hint" style="margin-bottom:14px">
+      🔒 Field bertanda kunci diambil automatik dari <b>akaun login</b> anda (source of truth). Untuk tukar, kemas kini dalam sistem HR / auth.
+    </div>
     <div class="form-grid">
-      ${f('name','Full Name')} ${f('prefName','Preferred Name')}
-      ${f('title','Title')} ${f('staffId','Staff ID')}
-      ${f('position','Position')} ${f('grade','Grade')}
+      ${f('name','Full Name','text',true)} ${f('prefName','Preferred Name')}
+      ${f('title','Title')} ${f('staffId','Staff ID','text',true)}
+      ${f('position','Position','text',true)} ${f('grade','Grade')}
       ${f('faculty','Faculty')} ${f('campus','Campus')}
-      ${f('department','Department')} ${f('centre','Centre / Unit')}
-      ${f('email','Email','email')} ${f('officeTel','Office Telephone')}
+      ${f('department','Department','text',true)} ${f('centre','Centre / Unit')}
+      ${f('email','Email','email',true)} ${f('officeTel','Office Telephone')}
       ${f('mobile','Mobile Telephone')} ${f('officeLoc','Office Location')}
       <label class="fld"><span>Profile Photo (emoji atau URL)</span>
         <input type="text" data-p="photo" value="${esc(p.photo||'')}"></label>
@@ -1031,14 +1073,15 @@ VIEWS.profile = function(){
 };
 
 function saveProfile(){
-  document.querySelectorAll('[data-p]').forEach(el=>{ DB.profile[el.dataset.p] = el.value; });
+  document.querySelectorAll('[data-p]').forEach(el=>{
+    if(el.readOnly) return; // Jangan timpa field yang dikunci dari auth
+    DB.profile[el.dataset.p] = el.value;
+  });
   try {
     const s = FMSAuth.getSession && FMSAuth.getSession();
     if(s && s.user){
       s.user.name = DB.profile.name || s.user.name;
       s.user.email = DB.profile.email || s.user.email;
-      if(DB.profile.position) s.user.position = DB.profile.position;
-      if(DB.profile.department) s.user.unit = DB.profile.department;
       FMSAuth.saveSession(s, s.role || 'academic_staff');
     }
   } catch(e){}
@@ -1277,7 +1320,7 @@ VIEWS.scanner = function(){
     <div class="card card-pad">
       <div class="section-title">🤖 AI Document Scanner</div>
       <div class="hint" style="margin-bottom:14px">
-        <b>“Upload Once, Extract Automatically, Verify Once, Use Everywhere.”</b><br>
+        <b>"Upload Once, Extract Automatically, Verify Once, Use Everywhere."</b><br>
         Dokumen asal <b>tidak disimpan secara kekal</b>.
       </div>
 
@@ -1659,6 +1702,7 @@ window.SYNC = SYNC;
 document.addEventListener('input', (e) => {
   const el = e.target;
   if(!el || !el.dataset) return;
+  if(el.readOnly) return; // skip field yang dikunci dari auth
   let changed = false;
   if(el.dataset.p){ DB.profile[el.dataset.p] = el.value; changed = true; }
   if(el.dataset.e){ DB.profile[el.dataset.e] = el.value; changed = true; }
@@ -1668,6 +1712,7 @@ document.addEventListener('input', (e) => {
 document.addEventListener('change', (e) => {
   const el = e.target;
   if(!el || !el.dataset) return;
+  if(el.readOnly) return;
   if(el.dataset.p || el.dataset.e){
     log('Auto-saved field', el.dataset.p || el.dataset.e, 'Auto-save');
     SYNC.schedule('on-blur');
@@ -2140,8 +2185,13 @@ async function cloudPull(){
     if(!json){ syncLog(`⚠️ Bukan JSON: ${esc(text.slice(0,200))}`,'er'); toast('Tarik gagal'); return; }
 
     const incoming = json.data || json.profile || json;
+    // NOTE: jangan timpa identity fields dari auth walaupun pull dari cloud
     if(incoming.profile && confirm('Ganti profil dengan data Cloud?')){
+      const d = authDerivedProfile();
       DB.profile = { ...DB.profile, ...incoming.profile };
+      DB.profile.name     = d.name     || DB.profile.name;
+      DB.profile.staffId  = d.staffId  || DB.profile.staffId;
+      DB.profile.position = d.position || DB.profile.position;
     }
     Object.keys(SCHEMA).forEach(k=>{ if(Array.isArray(incoming[k])) DB[k] = incoming[k]; });
 
