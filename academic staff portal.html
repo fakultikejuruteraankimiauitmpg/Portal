@@ -158,32 +158,80 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    /* Quick Links — SOLID colours */
-    .quick-link {
-        position: relative; overflow: hidden;
-        border-radius: 14px; color: #fff;
-        transition: all .28s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 8px 20px -10px rgba(0,0,0,.25);
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-        padding: 20px 12px; text-align: center; text-decoration: none;
+    /* ============================================================
+       PORTAL MENU (LIST STYLE - UPDATED)
+    ============================================================ */
+    .portal-menu-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px -10px rgba(0,45,98,.15);
+        border: 1px solid rgba(226,232,240,.8);
+        overflow: hidden;
+        margin-bottom: 24px;
     }
-    .quick-link::before {
-        content: ''; position: absolute;
-        top: -30px; right: -30px;
-        width: 90px; height: 90px; border-radius: 50%;
-        background: rgba(255,255,255,0.14); transition: transform .35s;
+    .portal-menu-header {
+        background: #002D62;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
     }
-    .quick-link:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 34px -14px rgba(0,0,0,.35); }
-    .quick-link:hover::before { transform: scale(1.4); }
-    .quick-link i { font-size: 22px; position: relative; z-index: 1; }
-    .quick-link span {
-        font-size: 10px; font-weight: 800; letter-spacing: .1em;
-        text-transform: uppercase; line-height: 1.25; position: relative; z-index: 1;
-        word-break: break-word;
+    .portal-menu-header::before {
+        content: ''; position: absolute; right: -20px; top: -20px; width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.05);
     }
-    .ql-navy   { background: #002D62; }
-    .ql-purple { background: #9B26B6; }
-    .ql-gold   { background: #FDB913; }
+    .portal-menu-icon {
+        width: 40px; height: 40px; border-radius: 10px; background: #FDB913;
+        display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px;
+        margin-right: 16px;
+        box-shadow: 0 4px 10px rgba(253,185,19,.4);
+    }
+    .portal-menu-title {
+        font-size: 14px; font-weight: 900; color: #fff; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2;
+    }
+    .portal-menu-sub {
+        font-size: 9px; font-weight: 700; color: #FDB913; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px;
+    }
+    .portal-menu-badge {
+        font-size: 9px; font-weight: 800; color: #fff; border: 1px solid #FDB913; border-radius: 9999px;
+        padding: 4px 10px; display: flex; align-items: center; gap: 6px; background: rgba(253,185,19,.15);
+    }
+    .portal-menu-badge i { color: #FDB913; }
+    .portal-menu-body { padding: 20px 24px; }
+    .portal-section-title {
+        font-size: 10px; font-weight: 900; color: #9B26B6; letter-spacing: .15em; text-transform: uppercase;
+        padding-bottom: 8px; border-bottom: 2px solid #FDB913; margin-bottom: 16px; display: inline-block;
+    }
+    
+    /* List item styling */
+    .portal-link-item {
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        padding: 14px 8px; 
+        background: transparent; 
+        color: #002D62; 
+        font-size: 13px; 
+        font-weight: 700; 
+        text-decoration: none;
+        border-bottom: 1px solid #E2E8F0;
+        transition: all .2s ease;
+        width: 100%;
+    }
+    .portal-link-item:last-child {
+        border-bottom: none;
+    }
+    .portal-link-item:hover {
+        color: #9B26B6;
+        padding-left: 16px; /* subtle shift on hover */
+    }
+    .portal-link-item i { 
+        color: #9B26B6; 
+        font-size: 14px; 
+        width: 20px; 
+        text-align: center; 
+    }
 
     /* Activity Trail */
     .activity-timeline { position: relative; }
@@ -795,18 +843,35 @@
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="card p-6 mb-6 anim-up rounded-3xl">
-        <div class="mb-5 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <span class="section-label" data-i18n="quick_links_label">Quick Menu</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="quick_links_title">Staff Quick Links</h3>
+    <!-- ============================================================
+         NEW PORTAL MENU CARD (LIST STYLE - UPDATED)
+    ============================================================ -->
+    <div class="portal-menu-card anim-up">
+        <div class="portal-menu-header">
+            <div class="flex items-center">
+                <div class="portal-menu-icon"><i class="fas fa-th-large"></i></div>
+                <div>
+                    <div class="portal-menu-title">Portal Menu</div>
+                    <div class="portal-menu-sub">Quick Access To All Systems</div>
+                </div>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="quick_links_hint">Opens in new tab</span>
+            <div class="portal-menu-badge">
+                <i class="fas fa-check-circle"></i> UPDATED 2026
+            </div>
         </div>
-
-        <div id="quickLinksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- rendered by JS -->
+        <div class="portal-menu-body">
+            <div class="portal-section-title">Administration</div>
+            <!-- Removed grid, using flex-col for list layout. Removed Notifications. -->
+            <div class="flex flex-col">
+                <a href="resume_portal.html" class="portal-link-item">
+                    <i class="fas fa-file-alt"></i>
+                    Resume
+                </a>
+                <a href="#" class="portal-link-item">
+                    <i class="fas fa-user-cog"></i>
+                    Account Settings
+                </a>
+            </div>
         </div>
     </div>
 
@@ -1418,26 +1483,13 @@
     let charts = { pub: null, inv: null, grt: null, trend: null };
     let activities = [];
 
-    /* Static quick links (read-only) — 3 SOLID colours only */
-    const QUICK_LINKS = [
-        { href: 'https://elearning.uitm.edu.my',  icon: 'fa-graduation-cap',       color: 'ql-navy',   labelKey: 'link_elearning' },
-        { href: 'https://istudent.uitm.edu.my',   icon: 'fa-users',                color: 'ql-purple', labelKey: 'link_istudent' },
-        { href: 'https://library.uitm.edu.my',    icon: 'fa-book-open',            color: 'ql-gold',   labelKey: 'link_library' },
-        { href: 'https://research.uitm.edu.my',   icon: 'fa-flask-vial',           color: 'ql-navy',   labelKey: 'link_research' },
-        { href: 'https://ir.uitm.edu.my',         icon: 'fa-file-lines',           color: 'ql-purple', labelKey: 'link_publications' },
-        { href: 'https://hr.uitm.edu.my',         icon: 'fa-user-tie',             color: 'ql-gold',   labelKey: 'link_hr' },
-        { href: 'https://finance.uitm.edu.my',    icon: 'fa-file-invoice-dollar',  color: 'ql-navy',   labelKey: 'link_finance' },
-        { href: 'https://helpdesk.uitm.edu.my',   icon: 'fa-headset',              color: 'ql-purple', labelKey: 'link_helpdesk' }
-    ];
-
     /* Activity type meta — SOLID colours */
     const ACTIVITY_TYPES = {
-        login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
-        link_click:      { icon: 'fa-arrow-up-right-from-square', bg: '#002D62', en: 'Opened quick link',      ms: 'Buka pautan pantas' },
-        profile_update:  { icon: 'fa-user-pen',                   bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
-        password_change: { icon: 'fa-key',                        bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
-        settings_open:   { icon: 'fa-gear',                       bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
-        activity_clear:  { icon: 'fa-broom',                      bg: '#002D62', en: 'Cleared activity trail', ms: 'Kosongkan jejak aktiviti' }
+        login:           { icon: 'fa-right-to-bracket', bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
+        profile_update:  { icon: 'fa-user-pen',         bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
+        password_change: { icon: 'fa-key',              bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
+        settings_open:   { icon: 'fa-gear',             bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
+        activity_clear:  { icon: 'fa-broom',            bg: '#002D62', en: 'Cleared activity trail', ms: 'Kosongkan jejak aktiviti' }
     };
 
     /* =========================================================
@@ -1460,10 +1512,6 @@
             ann_2: "Research grant submission deadline extended",
             ann_3: "Semester 2 course registration now open",
             ann_days: "days ago", ann_week: "week ago",
-            quick_links_label: "Quick Menu", quick_links_title: "Staff Quick Links", quick_links_hint: "Opens in new tab",
-            link_elearning: "E-Learning", link_istudent: "iStudent", link_library: "Library",
-            link_research: "Research Portal", link_publications: "Publications",
-            link_hr: "HR System", link_finance: "Finance", link_helpdesk: "IT Helpdesk",
             news_tag: "Latest Updates", news_title: "Newsroom & Events", btn_archive: "View Archive",
             news_1_title: "FKK Researchers Secure RM500k Grant for Green Hydrogen.",
             news_2_title: "Dean's List Ceremony: Celebrating Academic Excellence.",
@@ -1543,10 +1591,6 @@
             ann_2: "Tarikh akhir penghantaran geran penyelidikan dilanjutkan",
             ann_3: "Pendaftaran kursus Semester 2 kini dibuka",
             ann_days: "hari lalu", ann_week: "minggu lalu",
-            quick_links_label: "Menu Pantas", quick_links_title: "Pautan Pantas Staf", quick_links_hint: "Buka dalam tab baharu",
-            link_elearning: "E-Pembelajaran", link_istudent: "iStudent", link_library: "Perpustakaan",
-            link_research: "Portal Penyelidikan", link_publications: "Penerbitan",
-            link_hr: "Sistem HR", link_finance: "Kewangan", link_helpdesk: "Helpdesk IT",
             news_tag: "Terkini", news_title: "Berita & Acara", btn_archive: "Lihat Arkib",
             news_1_title: "Penyelidik FKK Raih Geran RM500k untuk Hidrogen Hijau.",
             news_2_title: "Majlis Anugerah Dekan: Meraikan Kecemerlangan Akademik.",
@@ -1660,7 +1704,6 @@
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (staff) fillStaff(staff);
-        renderQuickLinks();
         renderActivities();
         updateStrength();
     };
@@ -1688,35 +1731,6 @@
         }
         const sAvatar = document.getElementById('settingsAvatar');
         if (sAvatar) sAvatar.textContent = initials;
-    }
-
-    /* =========================================================
-       QUICK LINKS — read-only render
-    ========================================================== */
-    function renderQuickLinks() {
-        const grid = document.getElementById('quickLinksGrid');
-        if (!grid) return;
-
-        grid.innerHTML = QUICK_LINKS.map(link => {
-            const label = i18n[currentLang][link.labelKey] || link.labelKey;
-            return `
-                <a href="${escapeHtml(link.href)}" target="_blank" rel="noopener"
-                   class="quick-link ${link.color}"
-                   data-label-key="${escapeHtml(link.labelKey)}"
-                   data-href="${escapeHtml(link.href)}">
-                    <i class="fas ${escapeHtml(link.icon)}"></i>
-                    <span>${escapeHtml(label)}</span>
-                </a>`;
-        }).join('');
-
-        grid.querySelectorAll('.quick-link').forEach(a => {
-            a.addEventListener('click', () => {
-                const labelKey = a.dataset.labelKey;
-                const href = a.dataset.href;
-                const label = i18n[currentLang][labelKey] || labelKey;
-                logActivity('link_click', label, href);
-            });
-        });
     }
 
     /* =========================================================
