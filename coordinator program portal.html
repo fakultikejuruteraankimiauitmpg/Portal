@@ -158,6 +158,81 @@
         background-size: 26px 26px; opacity: .35;
     }
 
+    /* ============================================================
+       PORTAL MENU (LIST STYLE)
+    ============================================================ */
+    .portal-menu-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px -10px rgba(0,45,98,.15);
+        border: 1px solid rgba(226,232,240,.8);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+    .portal-menu-header {
+        background: #002D62;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+    .portal-menu-header::before {
+        content: ''; position: absolute; right: -20px; top: -20px; width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.05);
+    }
+    .portal-menu-icon {
+        width: 40px; height: 40px; border-radius: 10px; background: #FDB913;
+        display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px;
+        margin-right: 16px;
+        box-shadow: 0 4px 10px rgba(253,185,19,.4);
+    }
+    .portal-menu-title {
+        font-size: 14px; font-weight: 900; color: #fff; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2;
+    }
+    .portal-menu-sub {
+        font-size: 9px; font-weight: 700; color: #FDB913; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px;
+    }
+    .portal-menu-badge {
+        font-size: 9px; font-weight: 800; color: #fff; border: 1px solid #FDB913; border-radius: 9999px;
+        padding: 4px 10px; display: flex; align-items: center; gap: 6px; background: rgba(253,185,19,.15);
+    }
+    .portal-menu-badge i { color: #FDB913; }
+    .portal-menu-body { padding: 20px 24px; }
+    .portal-section-title {
+        font-size: 10px; font-weight: 900; color: #9B26B6; letter-spacing: .15em; text-transform: uppercase;
+        padding-bottom: 8px; border-bottom: 2px solid #FDB913; margin-bottom: 16px; display: inline-block;
+    }
+    
+    /* List item styling */
+    .portal-link-item {
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        padding: 14px 8px; 
+        background: transparent; 
+        color: #002D62; 
+        font-size: 13px; 
+        font-weight: 700; 
+        text-decoration: none;
+        border-bottom: 1px solid #E2E8F0;
+        transition: all .2s ease;
+        width: 100%;
+    }
+    .portal-link-item:last-child {
+        border-bottom: none;
+    }
+    .portal-link-item:hover {
+        color: #9B26B6;
+        padding-left: 16px;
+    }
+    .portal-link-item i { 
+        color: #9B26B6; 
+        font-size: 14px; 
+        width: 20px; 
+        text-align: center; 
+    }
+
     /* Activity Trail */
     .activity-timeline { position: relative; }
     .activity-timeline::before {
@@ -868,50 +943,31 @@
     </div>
 
     <!-- ============================================================
-         PORTAL MENU
+         PORTAL MENU (LIST STYLE - UPDATED)
     ============================================================ -->
-    <div class="bg-white rounded-3xl shadow-[0_18px_40px_-20px_rgba(0,45,98,0.25)] border border-slate-200 overflow-hidden mb-6 anim-up">
-        <!-- Header -->
-        <div class="bg-[#002D62] p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
-            <div class="flex items-center gap-4 relative z-10">
-                <div class="w-12 h-12 rounded-xl bg-[#FDB913] flex items-center justify-center text-white shadow-lg">
-                    <i class="fas fa-th-large text-lg"></i>
-                </div>
+    <div class="portal-menu-card anim-up">
+        <div class="portal-menu-header">
+            <div class="flex items-center">
+                <div class="portal-menu-icon"><i class="fas fa-th-large"></i></div>
                 <div>
-                    <h3 class="text-white font-black text-lg tracking-wide uppercase leading-tight" data-i18n="portal_menu_title">Portal Menu</h3>
-                    <p class="text-white/70 text-[10px] font-bold tracking-[0.2em] uppercase mt-0.5" data-i18n="portal_menu_sub">Quick Access To All Systems</p>
+                    <div class="portal-menu-title" data-i18n="portal_menu_title">Portal Menu</div>
+                    <div class="portal-menu-sub" data-i18n="portal_menu_sub">Quick Access To All Systems</div>
                 </div>
             </div>
-            <div class="relative z-10">
-                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#FDB913] text-[#FDB913] text-[10px] font-black uppercase tracking-widest bg-[#002D62]/50 backdrop-blur-sm">
-                    <span class="w-2 h-2 rounded-full bg-[#FDB913] animate-pulse"></span>
-                    <span data-i18n="portal_menu_updated">Updated 2026</span>
-                </span>
+            <div class="portal-menu-badge">
+                <i class="fas fa-check-circle"></i> <span data-i18n="portal_menu_updated">UPDATED 2026</span>
             </div>
-            <!-- Decorative circles -->
-            <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-white/5 pointer-events-none"></div>
-            <div class="absolute -right-5 -bottom-10 w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
         </div>
-
-        <!-- Body -->
-        <div class="p-6">
-            <div class="mb-4">
-                <span class="text-[#9B26B6] font-black text-[10px] tracking-[0.2em] uppercase border-b-2 border-[#9B26B6] pb-1" data-i18n="portal_admin_label">Administration</span>
-            </div>
-            <div class="space-y-1">
-                <!-- Resume (Now using <a> tag for reliable navigation) -->
-                <a href="resume_portal.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 group">
-                    <div class="w-8 text-center text-[#9B26B6]">
-                        <i class="fas fa-file-alt text-lg group-hover:scale-110 transition-transform"></i>
-                    </div>
-                    <span class="text-[#002D62] font-bold text-sm" data-i18n="portal_resume">Resume</span>
+        <div class="portal-menu-body">
+            <div class="portal-section-title" data-i18n="portal_admin_label">Administration</div>
+            <div class="flex flex-col">
+                <a href="resume_portal.html" class="portal-link-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span data-i18n="portal_resume">Resume</span>
                 </a>
-                <!-- Account Settings (Now using <a> tag with onclick to prevent default) -->
-                <a href="#" onclick="document.getElementById('settingsBtn').click(); return false;" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer group">
-                    <div class="w-8 text-center text-[#9B26B6]">
-                        <i class="fas fa-users-cog text-lg group-hover:scale-110 transition-transform"></i>
-                    </div>
-                    <span class="text-[#002D62] font-bold text-sm" data-i18n="portal_settings">Account Settings</span>
+                <a href="#" onclick="document.getElementById('settingsBtn').click(); return false;" class="portal-link-item">
+                    <i class="fas fa-user-cog"></i>
+                    <span data-i18n="portal_settings">Account Settings</span>
                 </a>
             </div>
         </div>
@@ -1663,7 +1719,7 @@
             stu_leave: "On Leave", stu_graduating: "Graduating 2026",
             stu_capacity: "Enrolment Capacity",
             portal_menu_title: "Portal Menu", portal_menu_sub: "Quick Access To All Systems",
-            portal_menu_updated: "Updated 2026", portal_admin_label: "Administration",
+            portal_menu_updated: "UPDATED 2026", portal_admin_label: "Administration",
             portal_resume: "Resume", portal_settings: "Account Settings",
             news_tag: "Latest Updates", news_title: "Newsroom & Events", btn_archive: "View Archive",
             news_1_title: "FKK Researchers Secure RM500k Grant for Green Hydrogen.",
@@ -1768,7 +1824,7 @@
             stu_leave: "Bercuti", stu_graduating: "Bergraduat 2026",
             stu_capacity: "Kapasiti Enrolmen",
             portal_menu_title: "Menu Portal", portal_menu_sub: "Akses Pantas Ke Semua Sistem",
-            portal_menu_updated: "Dikemas kini 2026", portal_admin_label: "Pentadbiran",
+            portal_menu_updated: "DIKEMAS KINI 2026", portal_admin_label: "Pentadbiran",
             portal_resume: "Resume", portal_settings: "Tetapan Akaun",
             news_tag: "Terkini", news_title: "Berita & Acara", btn_archive: "Lihat Arkib",
             news_1_title: "Penyelidik FKK Raih Geran RM500k untuk Hidrogen Hijau.",
