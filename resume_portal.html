@@ -55,7 +55,7 @@ a{color:var(--brand);text-decoration:none}
 .sync-status .sync-dot.busy{background:#f59e0b;animation:pulse 1s infinite}
 @media(max-width:640px){.sync-status span:last-child{display:none}}
 
-/* ============ BATTERY UPLOAD INDICATOR ============ */
+/* ============ BATTERY UPLOAD / DOWNLOAD INDICATOR ============ */
 .upload-battery{
   display:flex;align-items:center;gap:8px;padding:6px 10px;
   background:#fff;border:1px solid var(--line);border-radius:10px;
@@ -63,15 +63,26 @@ a{color:var(--brand);text-decoration:none}
   user-select:none;
 }
 .upload-battery:hover{border-color:#c7d2fe;background:#f8faff}
+.upload-battery.is-download:hover{border-color:#7dd3fc;background:#f0f9ff}
+.upload-battery.is-upload:hover{border-color:#86efac;background:#f0fdf4}
 .battery-shell{
   position:relative;width:42px;height:18px;
   border:2px solid #475569;border-radius:4px;padding:2px;
   background:#f8fafc;flex-shrink:0;
+  transition:border-color .25s;
 }
 .battery-shell::after{
   content:'';position:absolute;right:-5px;top:5px;width:3px;height:8px;
   background:#475569;border-radius:0 2px 2px 0;
+  transition:background .25s;
 }
+/* Upload direction: green theme */
+.battery-shell.uploading{border-color:#10b981}
+.battery-shell.uploading::after{background:#10b981}
+/* Download direction: blue theme */
+.battery-shell.downloading{border-color:#0ea5e9}
+.battery-shell.downloading::after{background:#0ea5e9}
+
 .battery-fill{
   height:100%;width:100%;
   background:linear-gradient(90deg,#10b981,#34d399);
@@ -79,7 +90,11 @@ a{color:var(--brand);text-decoration:none}
   display:block;
 }
 .battery-fill.charging{
-  background:linear-gradient(90deg,#f59e0b,#fbbf24);
+  background:linear-gradient(90deg,#10b981,#34d399);
+  animation:batteryPulse 1s ease-in-out infinite;
+}
+.battery-fill.downloading{
+  background:linear-gradient(90deg,#0ea5e9,#38bdf8);
   animation:batteryPulse 1s ease-in-out infinite;
 }
 .battery-fill.error{background:linear-gradient(90deg,#ef4444,#f87171)}
@@ -95,6 +110,11 @@ a{color:var(--brand);text-decoration:none}
   font-size:10px;color:var(--muted);text-transform:uppercase;
   letter-spacing:.6px;font-weight:800;
 }
+.upload-battery.is-upload .battery-label{color:#059669}
+.upload-battery.is-download .battery-label{color:#0284c7}
+.upload-battery.is-error .battery-label{color:#dc2626}
+.upload-battery.is-offline .battery-label{color:#64748b}
+
 @media(max-width:820px){.battery-label{display:none}}
 @media(max-width:640px){.battery-shell{width:32px;height:14px}.battery-shell::after{top:3px;height:6px}}
 @keyframes batteryPulse{0%,100%{opacity:1}50%{opacity:.55}}
@@ -245,8 +265,8 @@ tbody tr:hover{background:#fafbff}
       </div>
       <div class="tb-right">
 
-        <!-- === BATTERY UPLOAD INDICATOR === -->
-        <div class="upload-battery" id="uploadBattery" onclick="go('cloudSync')" title="Upload progress">
+        <!-- === BATTERY UPLOAD / DOWNLOAD INDICATOR === -->
+        <div class="upload-battery" id="uploadBattery" onclick="go('cloudSync')" title="Transfer progress">
           <div class="battery-shell">
             <div class="battery-fill" id="batteryFill"></div>
           </div>
@@ -365,11 +385,12 @@ function toast(msg){
 }
 
 /* =========================================================
-   BATTERY UPLOAD INDICATOR
+   BATTERY UPLOAD / DOWNLOAD INDICATOR
    ========================================================= */
 const BATTERY = {
   pct: 100,
   mode: 'ok',           // 'ok' | 'charging' | 'error' | 'offline'
+  direction: 'upload',  // 'upload' | 'download'
   simulate: null,
 
   render(){
@@ -377,61 +398,103 @@ const BATTERY = {
     const pctEl = document.getElementById('batteryPct');
     const lblEl = document.getElementById('batteryLabel');
     const wrap  = document.getElementById('uploadBattery');
+    const shell = document.querySelector('.battery-shell');
     if(!fill || !pctEl) return;
 
-    // clamp
     BATTERY.pct = Math.max(0, Math.min(100, Math.round(BATTERY.pct)));
 
     fill.style.width = BATTERY.pct + '%';
     pctEl.textContent = BATTERY.pct + '%';
 
-    // class reset
+    // reset classes
     fill.className = 'battery-fill';
+    if(shell) shell.className = 'battery-shell';
+    if(wrap){
+      wrap.classList.remove('is-upload','is-download','is-error','is-offline');
+    }
 
-    if(BATTERY.mode === 'charging')      fill.classList.add('charging');
-    else if(BATTERY.mode === 'error')    fill.classList.add('error');
-    else if(BATTERY.mode === 'offline')  fill.classList.add('offline');
+    const isDownload = BATTERY.direction === 'download';
+
+    if(BATTERY.mode === 'charging'){
+      if(isDownload){
+        fill.classList.add('downloading');
+        if(shell) shell.classList.add('downloading');
+        if(wrap) wrap.classList.add('is-download');
+      } else {
+        fill.classList.add('charging');
+        if(shell) shell.classList.add('uploading');
+        if(wrap) wrap.classList.add('is-upload');
+      }
+    }
+    else if(BATTERY.mode === 'error'){
+      fill.classList.add('error');
+      if(wrap) wrap.classList.add('is-error');
+    }
+    else if(BATTERY.mode === 'offline'){
+      fill.classList.add('offline');
+      if(wrap) wrap.classList.add('is-offline');
+    }
     else {
       // color by percentage when idle/ok
       if(BATTERY.pct >= 80)      fill.classList.add('high');
       else if(BATTERY.pct >= 40) fill.classList.add('mid');
       else                       fill.classList.add('low');
+      if(wrap) wrap.classList.add(isDownload ? 'is-download' : 'is-upload');
     }
 
     if(lblEl){
       lblEl.textContent =
-        BATTERY.mode === 'charging' ? 'UPLOADING' :
+        BATTERY.mode === 'charging' ? (isDownload ? 'DOWNLOADING' : 'UPLOADING') :
         BATTERY.mode === 'error'    ? 'FAILED'    :
-        BATTERY.mode === 'offline'  ? 'OFFLINE'   : 'UPLOAD';
+        BATTERY.mode === 'offline'  ? 'OFFLINE'   :
+        (isDownload ? 'DOWNLOAD' : 'UPLOAD');
     }
 
     if(wrap){
+      const dirCap = isDownload ? 'Download' : 'Upload';
       wrap.title =
-        BATTERY.mode === 'charging' ? 'Uploading… ' + BATTERY.pct + '%' :
-        BATTERY.mode === 'error'    ? 'Upload failed — click to retry' :
+        BATTERY.mode === 'charging' ? dirCap + 'ing… ' + BATTERY.pct + '%' :
+        BATTERY.mode === 'error'    ? dirCap + ' failed — click to retry' :
         BATTERY.mode === 'offline'  ? 'Offline — will retry when online' :
-        'Cloud synced · ' + BATTERY.pct + '%';
+        'Cloud synced · last ' + dirCap.toLowerCase() + ' ' + BATTERY.pct + '%';
     }
   },
 
-  set(pct, mode){
+  set(pct, mode, direction){
     BATTERY.pct = pct;
     if(mode) BATTERY.mode = mode;
+    if(direction) BATTERY.direction = direction;
     BATTERY.render();
   },
 
   startCharging(){
-    // Idempotent: don't restart if already charging
+    // Upload simulation
     if(BATTERY.simulate) return;
+    BATTERY.direction = 'upload';
 
-    // Start from 5% (or from current if < 90%)
     let p = Math.max(5, Math.min(BATTERY.pct, 90));
     if(BATTERY.pct >= 90) p = 5;
-    BATTERY.set(p, 'charging');
+    BATTERY.set(p, 'charging', 'upload');
 
     BATTERY.simulate = setInterval(() => {
       if(p < 92){
-        p += Math.random() * 6 + 1.5;   // random step
+        p += Math.random() * 6 + 1.5;
+        BATTERY.set(Math.min(p, 92), 'charging');
+      }
+    }, 380);
+  },
+
+  startDownload(){
+    // Download simulation — start from 0 and fill up
+    if(BATTERY.simulate) return;
+    BATTERY.direction = 'download';
+
+    let p = 0;
+    BATTERY.set(p, 'charging', 'download');
+
+    BATTERY.simulate = setInterval(() => {
+      if(p < 92){
+        p += Math.random() * 6 + 1.5;
         BATTERY.set(Math.min(p, 92), 'charging');
       }
     }, 380);
@@ -2205,7 +2268,7 @@ const SYNC = {
       lbl.textContent = L('sync.'+s, s);
     }
 
-    // === BATTERY HOOK ===
+    // === BATTERY HOOK (upload only; download handled separately) ===
     try{
       if(s === 'busy' || s === 'pending' || s === 'retry')      BATTERY.startCharging();
       else if(s === 'ok')                                       BATTERY.done();
@@ -2717,13 +2780,22 @@ window.quickCloudPush = quickCloudPush;
 async function cloudPull(){
   setBusy('btnPull', true, 'Pulling…');
   syncLog('⬇ Pulling…','in');
+
+  // === Start battery DOWNLOAD animation ===
+  BATTERY.startDownload();
+
   try{
     const url = CLOUD_URL + '?action=getResume&userId=' + encodeURIComponent(CURRENT_USER.id) +
                 '&key=' + encodeURIComponent(DB.cloud.key||'') + '&t=' + Date.now();
     const res = await fetch(url, { method:'GET', redirect:'follow' });
     const text = await res.text();
     let json = null; try { json = JSON.parse(text); } catch(e){}
-    if(!json){ syncLog(`⚠️ Not JSON: ${esc(text.slice(0,200))}`,'er'); toast(L('toast.pullFailed')); return; }
+    if(!json){
+      syncLog(`⚠️ Not JSON: ${esc(text.slice(0,200))}`,'er');
+      toast(L('toast.pullFailed'));
+      BATTERY.error();
+      return;
+    }
 
     const incoming = json.data || json.profile || json;
     if(incoming.profile && confirm(L('confirm.replaceProfile'))){
@@ -2740,9 +2812,13 @@ async function cloudPull(){
     save(); render();
     syncLog('✅ Data pulled.','ok');
     toast(L('toast.pullSuccess'));
+
+    // === Complete battery DOWNLOAD animation ===
+    BATTERY.done();
   }catch(err){
     syncLog(`❌ ${esc(err.message)}`,'er');
     toast(L('toast.pullFailed'));
+    BATTERY.error();
   }finally{ setBusy('btnPull', false); }
 }
 window.cloudPull = cloudPull;
