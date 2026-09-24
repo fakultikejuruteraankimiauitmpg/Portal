@@ -568,6 +568,49 @@
   }
   .filter-btn.active .fcount{background:#FDB913;color:#002D62}
 
+  /* ===== MODE TOGGLE (BARU) ===== */
+  .mode-toggle{
+    display:inline-flex;
+    gap:4px;
+    background:#F1F5F9;
+    border-radius:999px;
+    padding:4px;
+    margin-bottom:20px;
+    border:1px solid #E2E8F0;
+  }
+  .mode-btn{
+    padding:9px 22px;
+    border-radius:999px;
+    font-size:.68rem;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    font-family:inherit;
+    border:none;
+    background:transparent;
+    color:#64748B;
+    transition:.2s;
+    white-space:nowrap;
+  }
+  .mode-btn:hover{color:var(--navy)}
+  .mode-btn.active{
+    background:#002D62;
+    color:#fff;
+    box-shadow:0 4px 14px -6px rgba(0,45,98,.5);
+  }
+  .mode-btn .mb-count{
+    margin-left:6px;
+    background:rgba(255,255,255,.2);
+    border-radius:999px;
+    padding:1px 7px;
+    font-size:.6rem;
+  }
+  .mode-btn.active .mb-count{
+    background:#FDB913;
+    color:#002D62;
+  }
+
   .app-list{display:flex;flex-direction:column;gap:14px}
 
   .app-card{
@@ -902,6 +945,8 @@
     .app-card-body{padding:14px 16px 16px}
     .app-actions{flex-direction:column}
     .app-actions button{width:100%;justify-content:center}
+    .mode-toggle{width:100%}
+    .mode-btn{flex:1;text-align:center;padding:9px 12px;font-size:.6rem}
   }
 </style>
 </head>
@@ -1029,6 +1074,18 @@
       </div>
     </div>
 
+    <!-- ===== MODE TOGGLE (BARU) ===== -->
+    <div class="mode-toggle" id="appsModeToggle">
+      <button type="button" class="mode-btn active" data-mode="all">
+        <span data-i18n="modeAll">Semua Permohonan</span>
+        <span class="mb-count" id="mbCountAll">0</span>
+      </button>
+      <button type="button" class="mode-btn" data-mode="mine">
+        <span data-i18n="modeMine">Permohonan Saya</span>
+        <span class="mb-count" id="mbCountMine">0</span>
+      </button>
+    </div>
+
     <div class="stats-strip" id="appsStats"></div>
 
     <div class="filter-bar" id="appsFilterBar">
@@ -1070,7 +1127,7 @@
 <script>
 /* ============================================================
    SISTEM PERMOHONAN MAKMAL — PINJAMAN ALAT RADAS (BORANG B)
-   Borang + Senarai Permohonan (status disatukan).
+   Borang + Senarai Permohonan (semua sheet + permohonan saya).
    ============================================================ */
 
 /* ============================================================
@@ -1201,11 +1258,12 @@
   }
 
   /* ---------- Storage keys ---------- */
-  var SUBMIT_KEY   = "ppm-fkk-alat-submitted-v3-" + USER.id;
-  var DRAFT_KEY    = "ppm-fkk-alat-draft-v3-"  + USER.id;
-  var SHARED_KEY   = "ppm-fkk-alat-shared-v3-" + USER.id;
-  var LANG_KEY     = "ppm-fkk-alat-lang";
-  var LOGIN_KEY    = "ppm-fkk-lastlogin-v3-" + USER.id;
+  var SUBMIT_KEY      = "ppm-fkk-alat-submitted-v3-" + USER.id;
+  var ALL_SUBMIT_KEY  = "ppm-fkk-alat-all-submitted-v3";       /* BARU: cache semua permohonan */
+  var DRAFT_KEY       = "ppm-fkk-alat-draft-v3-"  + USER.id;
+  var SHARED_KEY      = "ppm-fkk-alat-shared-v3-" + USER.id;
+  var LANG_KEY        = "ppm-fkk-alat-lang";
+  var LOGIN_KEY       = "ppm-fkk-lastlogin-v3-" + USER.id;
 
   function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
   function lsSet(key, val) { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
@@ -1261,7 +1319,7 @@
   }
 
   /* ============================================================
-     LOCAL CACHE (mirror of remote list)
+     LOCAL CACHE — Permohonan Saya (mirror)
      ============================================================ */
   var REMOTE_LIST = null;
 
@@ -1283,6 +1341,31 @@
     var list = getSubmitted().slice();
     list.unshift(normalizeEntry(entry));
     setSubmitted(list.slice(0, 200));
+  }
+
+  /* ============================================================
+     LOCAL CACHE — SEMUA Permohonan (BARU)
+     ============================================================ */
+  var ALL_REMOTE_LIST = null;
+
+  function getAllSubmitted() {
+    if (ALL_REMOTE_LIST === null) {
+      var cached = safeParse(lsGet(ALL_SUBMIT_KEY), []);
+      if (!Array.isArray(cached)) cached = [];
+      ALL_REMOTE_LIST = cached.map(normalizeEntry).filter(Boolean);
+    }
+    return ALL_REMOTE_LIST;
+  }
+  function setAllSubmitted(list) {
+    if (!Array.isArray(list)) list = [];
+    ALL_REMOTE_LIST = list.map(normalizeEntry).filter(Boolean);
+    lsSet(ALL_SUBMIT_KEY, JSON.stringify(ALL_REMOTE_LIST));
+    return ALL_REMOTE_LIST;
+  }
+  function pushAllSubmitted(entry) {
+    var list = getAllSubmitted().slice();
+    list.unshift(normalizeEntry(entry));
+    setAllSubmitted(list.slice(0, 500));
   }
 
   /* ---------- Draft / shared (local only) ---------- */
@@ -1454,7 +1537,13 @@
       statPending: "Menunggu",
       statApproved: "Diluluskan",
       statRejected: "Ditolak",
-      footer: "© Hak Cipta Terpelihara Fakulti Kejuruteraan Kimia UiTM Pasir Gudang"
+      footer: "© Hak Cipta Terpelihara Fakulti Kejuruteraan Kimia UiTM Pasir Gudang",
+      /* BARU */
+      modeAll: "Semua Permohonan",
+      modeMine: "Permohonan Saya",
+      appsEmptyMine: "Anda belum menghantar sebarang permohonan.",
+      appsEmptyMineDesc: "Permohonan yang anda hantar akan dipaparkan di sini.",
+      toastSyncAllFail: "Ralat memuatkan semua permohonan dari pelayan."
     },
     en: {
       brandSmall: "FACULTY",
@@ -1581,7 +1670,13 @@
       statPending: "Pending",
       statApproved: "Approved",
       statRejected: "Rejected",
-      footer: "© Copyright Reserved Faculty of Chemical Engineering UiTM Pasir Gudang"
+      footer: "© Copyright Reserved Faculty of Chemical Engineering UiTM Pasir Gudang",
+      /* BARU */
+      modeAll: "All Applications",
+      modeMine: "My Applications",
+      appsEmptyMine: "You have not submitted any applications yet.",
+      appsEmptyMineDesc: "Applications you submit will be displayed here.",
+      toastSyncAllFail: "Error loading all applications from server."
     }
   };
 
@@ -1652,7 +1747,7 @@
     return '<span class="status-badge ' + cls + '"><span class="dot"></span>' + esc(lbl) + '</span>';
   }
 
-  /* ---------- List visibility: setiap pengguna lihat permohonan sendiri sahaja ---------- */
+  /* ---------- List visibility ---------- */
   function visibleList() {
     var list = getSubmitted();
     return list.filter(function (e) {
@@ -2283,6 +2378,7 @@
       }
       var entry = normalizeEntry(res.data);
       pushSubmitted(entry);
+      pushAllSubmitted(entry);
       clearDraft();
       showSuccessScreen(entry, rows.length);
       refreshNavCounts();
@@ -2342,7 +2438,7 @@
   }
 
   /* ============================================================
-     SERVER SYNC
+     SERVER SYNC — PERMOHONAN SAYA
      ============================================================ */
   function syncFromServer(opts) {
     opts = opts || {};
@@ -2359,6 +2455,39 @@
         try { console.warn("[SYNC]", err); } catch (e) {}
         if (!opts.silent) toast(t("toastSyncFail"));
         return getSubmitted();
+      });
+  }
+
+  /* ============================================================
+     SERVER SYNC — SEMUA PERMOHONAN (BARU)
+     Cuba `listAll` dahulu, kemudian fallback `list` tanpa userId.
+     ============================================================ */
+  function syncAllFromServer(opts) {
+    opts = opts || {};
+
+    // Cuba action: "listAll"
+    return apiGet({ action: "listAll" })
+      .then(function (res) {
+        if (res && res.status === "success" && Array.isArray(res.data)) {
+          return res.data;
+        }
+        // Fallback: action "list" tanpa userId
+        return apiGet({ action: "list" }).then(function (res2) {
+          if (res2 && res2.status === "success" && Array.isArray(res2.data)) {
+            return res2.data;
+          }
+          throw new Error((res2 && res2.message) || t("toastSyncAllFail"));
+        });
+      })
+      .then(function (data) {
+        setAllSubmitted(data);
+        updateModeCounts();
+        return getAllSubmitted();
+      })
+      .catch(function (err) {
+        try { console.warn("[SYNC ALL]", err); } catch (e) {}
+        if (!opts.silent) toast(t("toastSyncAllFail"));
+        return getAllSubmitted();
       });
   }
 
@@ -2392,6 +2521,8 @@
     }
     var dot = $("#bellDot");
     if (dot) dot.classList.toggle("show", pending > 0);
+
+    updateModeCounts();
   }
 
   /* ============================================================
@@ -2452,9 +2583,28 @@
   }
 
   /* ============================================================
-     APPS VIEW (senarai permohonan + status)
+     APPS VIEW (Senarai Permohonan)
+     currentAppsMode: "all" | "mine"
      ============================================================ */
   var currentAppsFilter = "all";
+  var currentAppsMode   = "all";   /* BARU */
+
+  function getActiveList() {
+    if (currentAppsMode === "mine") {
+      return visibleList();
+    }
+    return getAllSubmitted();
+  }
+
+  function updateModeCounts() {
+    var allCount = getAllSubmitted().length;
+    var mineCount = visibleList().length;
+
+    var elAll = document.getElementById("mbCountAll");
+    var elMine = document.getElementById("mbCountMine");
+    if (elAll) elAll.textContent = allCount;
+    if (elMine) elMine.textContent = mineCount;
+  }
 
   function computeStats(list) {
     var stats = { total: list.length, pending: 0, approved: 0, rejected: 0 };
@@ -2517,13 +2667,16 @@
 
   function appCardHTML(entry) {
     var status = entry.status || "pending";
+    var isMine = entry.authUserId && entry.authUserId === USER.id;
 
     return (
       '<div class="app-card" data-type="' + esc(entry.type) + '" data-ref="' + esc(entry.ref) + '">' +
         '<div class="app-card-head">' +
           '<div class="ac-icon">' + BADGE + '</div>' +
           '<div class="ac-title-wrap">' +
-            '<p class="ac-title">' + esc(typeName()) + '</p>' +
+            '<p class="ac-title">' + esc(typeName()) +
+              (isMine ? ' <span style="color:#FDB913;font-size:.7rem">★ Saya</span>' : '') +
+            '</p>' +
             '<span class="ac-ref">' + esc(entry.ref) + '</span>' +
           '</div>' +
           statusBadgeHTML(status) +
@@ -2548,7 +2701,7 @@
   }
 
   function renderApps() {
-    var list = visibleList();
+    var list = getActiveList();
     var stats = computeStats(list);
     renderStatsStrip("appsStats", stats);
 
@@ -2559,6 +2712,12 @@
     if (fcApproved) fcApproved.textContent = stats.approved;
     if (fcRejected) fcRejected.textContent = stats.rejected;
 
+    /* Mode toggle active state */
+    $$("#appsModeToggle .mode-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.dataset.mode === currentAppsMode);
+    });
+
+    /* Filter bar active state */
     $$("#appsFilterBar .filter-btn").forEach(function (btn) {
       btn.classList.toggle("active", btn.dataset.filter === currentAppsFilter);
     });
@@ -2574,11 +2733,13 @@
     if (!content) return;
 
     if (!list.length) {
+      var title = currentAppsMode === "mine" ? t("appsEmptyMine") : t("appsEmptyTitle");
+      var desc  = currentAppsMode === "mine" ? t("appsEmptyMineDesc") : t("appsEmptyDesc");
       content.innerHTML =
         '<div class="empty-state">' +
           '<div class="ico">📋</div>' +
-          '<h4>' + esc(t("appsEmptyTitle")) + '</h4>' +
-          '<p>' + esc(t("appsEmptyDesc")) + '</p>' +
+          '<h4>' + esc(title) + '</h4>' +
+          '<p>' + esc(desc) + '</p>' +
         '</div>';
       return;
     }
@@ -2620,9 +2781,14 @@
   }
 
   function findEntry(ref) {
-    var list = getSubmitted();
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].ref === ref) return list[i];
+    /* Cari dalam semua cache dahulu, kemudian dalam milik saya */
+    var allList = getAllSubmitted();
+    for (var i = 0; i < allList.length; i++) {
+      if (allList[i].ref === ref) return allList[i];
+    }
+    var mineList = getSubmitted();
+    for (var j = 0; j < mineList.length; j++) {
+      if (mineList[j].ref === ref) return mineList[j];
     }
     return null;
   }
@@ -2727,14 +2893,21 @@
       try {
         renderApps();
         showView("apps");
-        syncFromServer({ silent: true }).then(renderApps);
+        /* Muat SEMUA permohonan & permohonan saya secara selari */
+        Promise.all([
+          syncAllFromServer({ silent: true }),
+          syncFromServer({ silent: true })
+        ]).then(function () {
+          renderApps();
+        });
       } catch (err) { logError(err); }
     },
     logout: doLogout,
     switchLanguage: switchLanguage,
     toast: toast,
     closeModal: closeModal,
-    sync: syncFromServer
+    sync: syncFromServer,
+    syncAll: syncAllFromServer
   };
 
   /* ============================================================
@@ -2828,6 +3001,27 @@
         });
       }
 
+      /* ===== MODE TOGGLE EVENTS (BARU) ===== */
+      var modeToggle = $("#appsModeToggle");
+      if (modeToggle) {
+        modeToggle.addEventListener("click", function (e) {
+          var btn = e.target.closest ? e.target.closest(".mode-btn") : null;
+          if (!btn) return;
+          var mode = btn.dataset.mode || "all";
+          if (mode === currentAppsMode) return;
+          currentAppsMode = mode;
+          currentAppsFilter = "all";   /* reset filter */
+          renderApps();
+          /* Jika tukar ke "all" dan cache kosong, cuba sync */
+          if (mode === "all" && !getAllSubmitted().length) {
+            syncAllFromServer({ silent: true }).then(function () {
+              updateModeCounts();
+              renderApps();
+            });
+          }
+        });
+      }
+
       attachListActions();
 
       applyStaticTranslations();
@@ -2843,8 +3037,9 @@
       renderForm();
       showView("form");
 
-      // Tarik senarai terbaru dari Google Sheet (senyap)
-      syncFromServer({ silent: true });
+      /* Tarik data dari pelayan secara selari */
+      syncAllFromServer({ silent: true });
+      syncFromServer({ silent: true }).then(updateModeCounts);
 
       try {
         console.log("[AUTH] Signed in as", USER.name, "(" + USER.id + ") · role:", AUTH.rawRole, "→ app role:", USER.role);
