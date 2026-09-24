@@ -868,7 +868,7 @@
     </div>
 
     <!-- ============================================================
-         PORTAL MENU (NEWLY ADDED)
+         PORTAL MENU
     ============================================================ -->
     <div class="bg-white rounded-3xl shadow-[0_18px_40px_-20px_rgba(0,45,98,0.25)] border border-slate-200 overflow-hidden mb-6 anim-up">
         <!-- Header -->
@@ -899,20 +899,20 @@
                 <span class="text-[#9B26B6] font-black text-[10px] tracking-[0.2em] uppercase border-b-2 border-[#9B26B6] pb-1" data-i18n="portal_admin_label">Administration</span>
             </div>
             <div class="space-y-1">
-                <!-- Resume -->
-                <div onclick="window.location.href='resume_portal.html'" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 group">
+                <!-- Resume (Now using <a> tag for reliable navigation) -->
+                <a href="resume_portal.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 group">
                     <div class="w-8 text-center text-[#9B26B6]">
                         <i class="fas fa-file-alt text-lg group-hover:scale-110 transition-transform"></i>
                     </div>
                     <span class="text-[#002D62] font-bold text-sm" data-i18n="portal_resume">Resume</span>
-                </div>
-                <!-- Account Settings -->
-                <div onclick="document.getElementById('settingsBtn').click()" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer group">
+                </a>
+                <!-- Account Settings (Now using <a> tag with onclick to prevent default) -->
+                <a href="#" onclick="document.getElementById('settingsBtn').click(); return false;" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer group">
                     <div class="w-8 text-center text-[#9B26B6]">
                         <i class="fas fa-users-cog text-lg group-hover:scale-110 transition-transform"></i>
                     </div>
                     <span class="text-[#002D62] font-bold text-sm" data-i18n="portal_settings">Account Settings</span>
-                </div>
+                </a>
             </div>
         </div>
     </div>
