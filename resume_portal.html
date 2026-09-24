@@ -219,11 +219,11 @@ tbody tr:hover{background:#fafbff}
           <option value="Head">👨‍💼 Head / Coordinator</option>
           <option value="Admin">🔐 Admin</option>
         </select>
-        <div class="sync-status" onclick="go('cloudSync')" title="Cloud Sync Status">
+        <div class="sync-status" onclick="go('cloudSync')" title="Auto Cloud Sync Status">
           <span class="sync-dot off" id="syncDot"></span>
           <span id="syncLabel">Cloud idle</span>
         </div>
-        <button class="icon-btn" onclick="quickCloudPush()" title="Sync ke Cloud">☁️</button>
+        <button class="icon-btn" onclick="quickCloudPush()" title="Force Sync Now">☁️</button>
         <button class="icon-btn" onclick="go('notifications')" title="Notifications">🔔<span class="dot" id="notifDot"></span></button>
         <div class="user-badge" onclick="go('profile')" title="Profil Saya">
           <div class="avatar" id="tbAvatar">AR</div>
@@ -606,7 +606,8 @@ function load(){
     if(!d.audit) d.audit = [];
     if(!d.readNotifs) d.readNotifs = [];
     if(!d.cloud) d.cloud = { lastPush:null, lastPull:null, autoSync:true, sheet:'Resume', key:'' };
-    if(d.cloud.autoSync === undefined) d.cloud.autoSync = true;
+    // Default ON — user boleh matikan melalui checkbox di Cloud Sync panel
+    if(d.cloud.autoSync === undefined || d.cloud.autoSync === null) d.cloud.autoSync = true;
     return d;
   }catch(e){ return null; }
 }
@@ -668,7 +669,7 @@ const TITLES = {
   profile:['My Profile','Maklumat peribadi, pengecam akademik & biografi'],
   expertise:['Expertise & Research Interest','Kepakaran, minat penyelidikan, kata kunci & SDG'],
   scanner:['AI Document Scanner','Upload Once, Extract Automatically, Verify Once, Use Everywhere'],
-  cloudSync:['Cloud Resume Sync','Hantar & tarik data resume anda ke Google Sheets melalui Apps Script'],
+  cloudSync:['Cloud Resume Sync','Auto-sync ke Google Sheets setiap kali data berubah'],
   cv:['My CV','Jana CV akademik daripada satu sumber data'],
   public:['Public Academic Profile','Profil awam yang boleh dikongsi'],
   search:['Faculty Search','Cari kepakaran merentas semua rekod'],
@@ -801,7 +802,7 @@ function notifications(){
   const pc = profileCompleteness();
   if(pc < 100) list.push({id:'n-prof', icon:'👤', title:`Your profile is ${pc}% complete`, desc:'Lengkapkan maklumat untuk CV yang lebih baik.', tone:'sky'});
   list.push({id:'n-cv', icon:'📄', title:'CV template ready', desc:'Academic CV anda boleh dijana pada bila-bila masa.', tone:'green'});
-  if(DB.cloud && DB.cloud.lastPush) list.push({id:'n-cloud', icon:'☁️', title:'Cloud sync aktif', desc:'Kali terakhir hantar: ' + fmtDateTime(DB.cloud.lastPush), tone:'green'});
+  if(DB.cloud && DB.cloud.lastPush) list.push({id:'n-cloud', icon:'☁️', title:'Auto cloud sync aktif', desc:'Kali terakhir hantar: ' + fmtDateTime(DB.cloud.lastPush), tone:'green'});
   return list;
 }
 
@@ -850,28 +851,28 @@ VIEWS.dashboard = function(){
         <span class="pill ${pc>=85?'green':'amber'}">Status Profil: ${pc}% Complete</span>
         <span class="pill sky">Role: ${DB.role}</span>
         <span class="pill gray">Total Grant: ${money(totalGrants())}</span>
-        ${DB.cloud && DB.cloud.lastPush?`<span class="pill green">☁️ Synced ${fmtDateTime(DB.cloud.lastPush)}</span>`:'<span class="pill amber">☁️ Belum sync</span>'}
+        ${DB.cloud && DB.cloud.lastPush?`<span class="pill green">☁️ Auto-synced ${fmtDateTime(DB.cloud.lastPush)}</span>`:'<span class="pill amber">☁️ Belum sync</span>'}
       </div>
     </div>
     <div class="btn-row" style="align-items:flex-start">
       <button class="btn btn-primary" onclick="openForm('publications')">＋ Add Information</button>
       <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
-      <button class="btn btn-ok" onclick="go('cloudSync')">☁️ Update Resume</button>
+      <button class="btn btn-ok" onclick="go('cloudSync')">☁️ Cloud Sync</button>
       <button class="btn" onclick="go('cv')">📄 Generate CV</button>
       <button class="btn" onclick="go('profile')">✏️ Edit Profile</button>
     </div>
   </div>
 
-  <div class="card card-pad" style="margin-bottom:18px;border-left:4px solid var(--brand)">
+  <div class="card card-pad" style="margin-bottom:18px;border-left:4px solid var(--ok)">
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-      <div style="font-size:26px">☁️</div>
+      <div style="font-size:26px">🔄</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800">Cloud Resume Sync (Auto)</div>
-        <div class="muted small">Data akan dihantar secara automatik ke Google Sheets selepas setiap perubahan.</div>
+        <div style="font-weight:800">Auto Cloud Sync — Aktif ✅</div>
+        <div class="muted small">Setiap <b>edit / tambah / padam</b> data akan <b>auto-push</b> ke Google Sheets. Anda <b>tidak perlu</b> tekan butang Update Resume.</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ok" onclick="quickCloudPush()">⬆ Update Resume ke Cloud</button>
-        <button class="btn" onclick="go('cloudSync')">⚙️ Buka Panel Sync</button>
+        <button class="btn" onclick="quickCloudPush()">⚡ Force Sync Now</button>
+        <button class="btn" onclick="go('cloudSync')">⚙️ Panel Sync</button>
       </div>
     </div>
   </div>
@@ -987,9 +988,11 @@ VIEWS.profile = function(){
       ${t('researchProfile','Research Profile')}
     </div>
     <div class="btn-row" style="margin-top:14px">
-      <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile</button>
-      <button class="btn btn-ok" onclick="saveProfileAndSync()">💾☁️ Save & Sync to Cloud</button>
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile (auto-sync ☁️)</button>
       <button class="btn" onclick="aiBiography()">✨ AI Generate Biography</button>
+    </div>
+    <div class="hint ok" style="margin-top:12px">
+      💡 <b>Auto-sync aktif:</b> Selepas Save, data akan dihantar ke Google Sheets secara automatik.
     </div>
   </div>`;
 };
@@ -1007,28 +1010,10 @@ function saveProfile(){
     }
   } catch(e){}
   log('Updated Profile','My Profile','Manual Entry');
-  save(); render(); toast('Profil disimpan ✔');
+  save(); render(); toast('Profil disimpan ✔ — auto-sync…');
   SYNC.schedule('after-profile-save');
 }
 window.saveProfile = saveProfile;
-
-async function saveProfileAndSync(){
-  document.querySelectorAll('[data-p]').forEach(el=>{ DB.profile[el.dataset.p] = el.value; });
-  try {
-    const s = FMSAuth.getSession && FMSAuth.getSession();
-    if(s && s.user){
-      s.user.name = DB.profile.name || s.user.name;
-      s.user.email = DB.profile.email || s.user.email;
-      if(DB.profile.position) s.user.position = DB.profile.position;
-      if(DB.profile.department) s.user.unit = DB.profile.department;
-      FMSAuth.saveSession(s, s.role || 'academic_staff');
-    }
-  } catch(e){}
-  log('Updated Profile','My Profile','Manual Entry');
-  save();
-  await SYNC.flush('manual-save-profile');
-}
-window.saveProfileAndSync = saveProfileAndSync;
 
 function aiBiography(){
   const p = DB.profile;
@@ -1051,7 +1036,7 @@ function aiBiography(){
   p.researchProfile = `Research interests: ${interests.join(', ')||'—'}. Keywords: ${p.keywords||'—'}. SDG alignment: ${p.sdg||'—'}.`;
 
   log('AI Generated Biography','My Profile','AI Generator',{confidence:94, verified:false});
-  save(); render(); toast('✨ Biografi dijana oleh AI — sila semak');
+  save(); render(); toast('✨ Biografi dijana oleh AI — auto-sync…');
   SYNC.schedule('after-ai-bio');
 }
 window.aiBiography = aiBiography;
@@ -1088,25 +1073,17 @@ VIEWS.expertise = function(){
     <div style="margin-top:10px">${chips(p.sdg)}</div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="saveExpertise()">💾 Save</button>
-    <button class="btn btn-ok" onclick="saveExpertiseAndSync()">💾☁️ Save & Sync</button>
+    <button class="btn btn-primary" onclick="saveExpertise()">💾 Save (auto-sync ☁️)</button>
   </div>`;
 };
 
 function saveExpertise(){
   document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
   log('Updated Expertise','Expertise & Research','Manual Entry');
-  save(); render(); toast('Disimpan ✔');
+  save(); render(); toast('Disimpan ✔ — auto-sync…');
   SYNC.schedule('after-expertise');
 }
 window.saveExpertise = saveExpertise;
-async function saveExpertiseAndSync(){
-  document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
-  log('Updated Expertise','Expertise & Research','Manual Entry');
-  save();
-  await SYNC.flush('manual-save-expertise');
-}
-window.saveExpertiseAndSync = saveExpertiseAndSync;
 
 /* =========================================================
    10. GENERIC COLLECTION VIEW
@@ -1127,7 +1104,7 @@ function viewCollection(key){
       <div style="font-size:30px">${sch.icon}</div>
       <div style="flex:1;min-width:200px">
         <div style="font-weight:800;font-size:16px">${sch.label}</div>
-        <div class="muted small">${rows.length} rekod dalam pangkalan data</div>
+        <div class="muted small">${rows.length} rekod dalam pangkalan data · Auto-sync aktif ☁️</div>
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="openForm('${key}')">＋ Add Manually</button>
@@ -1181,11 +1158,11 @@ function cellVal(sch, key, r){
 }
 
 function delRec(key, id){
-  if(!confirm('Padam rekod ini?')) return;
+  if(!confirm('Padam rekod ini? Sistem akan auto-sync perubahan ke Cloud.')) return;
   const rec = DB[key].find(r=>r.id===id);
   DB[key] = DB[key].filter(r=>r.id!==id);
   log('Deleted Record', (SCHEMA[key].title(rec)||key), 'Manual Entry');
-  save(); render(); toast('Rekod dipadam');
+  save(); render(); toast('Rekod dipadam — auto-sync…');
   SYNC.schedule('after-delete');
 }
 window.delRec = delRec;
@@ -1217,7 +1194,7 @@ function openForm(key, id){
         <button type="button" class="btn btn-sm" style="margin-left:auto" onclick="closeModal()">✕</button>
       </div>
       <div class="modal-body">
-        <div class="hint" style="margin-bottom:16px">💡 Anda boleh isi secara manual, atau gunakan <b>🤖 AI Scanner</b> untuk ekstrak maklumat daripada dokumen.</div>
+        <div class="hint" style="margin-bottom:16px">💡 Isi manual atau guna <b>🤖 AI Scanner</b>. Data akan <b>auto-sync</b> ke Cloud selepas Save.</div>
         <div class="form-grid">${body}</div>
       </div>
       <div class="modal-foot">
@@ -1246,7 +1223,7 @@ function submitForm(e, key, id){
     DB[key].push(data);
     log('Added Record', SCHEMA[key].title(data)||key, 'Manual Entry');
   }
-  closeModal(); save(); render(); toast('Rekod disimpan ✔');
+  closeModal(); save(); render(); toast('Rekod disimpan ✔ — auto-sync…');
   SYNC.schedule('after-save');
 }
 window.submitForm = submitForm;
@@ -1263,7 +1240,7 @@ VIEWS.scanner = function(){
       <div class="section-title">🤖 AI Document Scanner</div>
       <div class="hint" style="margin-bottom:14px">
         <b>“Upload Once, Extract Automatically, Verify Once, Use Everywhere.”</b><br>
-        Dokumen asal <b>tidak disimpan secara kekal</b> — sistem hanya menyimpan <i>extracted structured information</i>.
+        Dokumen asal <b>tidak disimpan secara kekal</b> — hanya <i>extracted structured information</i>.
       </div>
 
       <div class="fld" style="margin-bottom:12px">
@@ -1301,7 +1278,7 @@ VIEWS.scanner = function(){
     <div class="card card-pad">
       <div class="section-title">⚙️ Proses AI</div>
       <div id="steps">
-        ${['Upload','AI membaca dokumen','AI mengenal pasti jenis dokumen','AI extract information','Confidence score','Pensyarah verify','Save']
+        ${['Upload','AI membaca dokumen','AI mengenal pasti jenis dokumen','AI extract information','Confidence score','Pensyarah verify','Save & Auto-sync']
           .map((s,i)=>`<div class="step" id="step${i}"><div class="num">${i+1}</div><div><b>${s}</b></div></div>`).join('')}
       </div>
       <div class="hint" style="margin-top:12px">
@@ -1476,8 +1453,7 @@ function doExtract(text){
     </div>
     <div id="scanTable"></div>
     <div class="btn-row" style="margin-top:16px">
-      <button class="btn btn-primary" onclick="confirmScan()">✅ Confirm &amp; Save</button>
-      <button class="btn btn-ok" onclick="confirmScanAndSync()">✅☁️ Confirm, Save &amp; Sync</button>
+      <button class="btn btn-primary" onclick="confirmScan()">✅ Confirm &amp; Save (auto-sync ☁️)</button>
       <button class="btn" onclick="scanResult=null; document.getElementById('scanOutput').innerHTML='';">✕ Batal</button>
     </div>
     <div class="hint warn" style="margin-top:12px">Field bertanda 🟠 mempunyai confidence rendah — sila semak sebelum simpan.</div>
@@ -1523,9 +1499,9 @@ function _commitScan(){
 
   scanResult = null;
   save();
-  $('#scanOutput').innerHTML = `<div class="hint ok"><b>✅ Rekod berjaya disimpan ke ${SCHEMA[key].label}.</b> Dokumen asal tidak disimpan — hanya maklumat berstruktur.</div>`;
+  $('#scanOutput').innerHTML = `<div class="hint ok"><b>✅ Rekod berjaya disimpan ke ${SCHEMA[key].label}.</b> Auto-sync ke Cloud sedang dijalankan.</div>`;
   renderSidebar();
-  toast('Rekod AI disimpan ✔');
+  toast('Rekod AI disimpan ✔ — auto-sync…');
   SYNC.schedule('after-ai-scan');
   return key;
 }
@@ -1535,30 +1511,30 @@ function confirmScan(){
   _commitScan();
 }
 window.confirmScan = confirmScan;
-async function confirmScanAndSync(){
-  if(!scanResult) return;
-  _commitScan();
-  await SYNC.flush('manual-ai-confirm');
-}
-window.confirmScanAndSync = confirmScanAndSync;
 
 /* =========================================================
-   13. SYNC ENGINE v2 — AUTO + RETRY + QUEUE
+   13. SYNC ENGINE v3 — FULL AUTO + RETRY + BEACON
    ========================================================= */
 const SYNC = {
-  timer:null, inflight:false, retries:0, maxRetries:4, debounceMs:2500,
-  status:'idle',
+  timer:null, inflight:false, retries:0,
+  maxRetries:6, debounceMs:1200,
+  status:'idle', lastReason:'change', queue:0,
 
   schedule(reason){
+    SYNC.lastReason = reason || SYNC.lastReason || 'change';
+    SYNC.queue++;
     if(!DB.cloud.autoSync){ SYNC.setStatus('idle'); return; }
     if(!navigator.onLine){ SYNC.setStatus('offline'); return; }
     clearTimeout(SYNC.timer);
     SYNC.setStatus('pending');
-    SYNC.timer = setTimeout(()=>SYNC.flush(reason), SYNC.debounceMs);
+    SYNC.timer = setTimeout(()=>SYNC.flush(SYNC.lastReason), SYNC.debounceMs);
   },
 
   async flush(reason){
-    if(SYNC.inflight) return false;
+    if(SYNC.inflight){
+      setTimeout(()=>SYNC.flush(reason), 800);
+      return false;
+    }
     if(!navigator.onLine){ SYNC.setStatus('offline'); return false; }
     clearTimeout(SYNC.timer);
     SYNC.inflight = true;
@@ -1568,17 +1544,18 @@ const SYNC = {
 
     if(ok){
       SYNC.retries = 0;
+      SYNC.queue   = 0;
       SYNC.setStatus('ok');
       return true;
     } else {
       SYNC.retries++;
       if(SYNC.retries <= SYNC.maxRetries){
-        const wait = Math.pow(2, SYNC.retries) * 3000;
+        const wait = Math.min(2500 * SYNC.retries, 20000);
         SYNC.setStatus('retry');
         setTimeout(()=>SYNC.flush(reason + '-retry' + SYNC.retries), wait);
       } else {
         SYNC.setStatus('error');
-        toast('☁️ Sync gagal — cuba butang ☁️ di topbar');
+        setTimeout(()=>{ SYNC.retries=0; SYNC.flush('recover'); }, 60000);
       }
       return false;
     }
@@ -1589,25 +1566,47 @@ const SYNC = {
     const dot = document.getElementById('syncDot');
     const lbl = document.getElementById('syncLabel');
     if(!dot || !lbl) return;
-    const map = { idle:'off', pending:'busy', busy:'busy', ok:'on', error:'off', offline:'off', retry:'busy' };
+    const map  = { idle:'off', pending:'busy', busy:'busy', ok:'on', error:'off', offline:'off', retry:'busy' };
     const text = {
       idle:'Cloud idle', pending:'Sync pending…', busy:'Syncing…',
-      ok:'☁️ Synced', error:'⚠️ Sync failed', offline:'📴 Offline', retry:'⟳ Retrying…'
+      ok:'☁️ Auto-synced', error:'⚠️ Sync failed', offline:'📴 Offline', retry:'⟳ Retrying…'
     };
     dot.className = 'sync-dot ' + (map[s]||'off');
     lbl.textContent = text[s] || s;
+  },
+
+  beacon(){
+    try{
+      if(!DB.cloud.autoSync || !navigator.onLine) return;
+      const payload = buildCloudPayload();
+      const blob = new Blob([JSON.stringify(payload)], {type:'text/plain;charset=utf-8'});
+      navigator.sendBeacon(CLOUD_URL, blob);
+    }catch(e){}
   }
 };
 window.SYNC = SYNC;
 
-window.addEventListener('online', ()=>{ toast('🌐 Online'); if(SYNC.status==='offline') SYNC.flush('online'); });
+/* Auto-flush bila tab disembunyikan / ditutup */
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden && (SYNC.timer || SYNC.queue > 0)){
+    clearTimeout(SYNC.timer);
+    SYNC.flush('visibility-hidden');
+  }
+});
+window.addEventListener('pagehide',    ()=>{ if(SYNC.timer||SYNC.queue>0) SYNC.beacon(); });
+window.addEventListener('beforeunload',()=>{ if(SYNC.timer||SYNC.queue>0) SYNC.beacon(); });
+
+/* Online/Offline */
+window.addEventListener('online',  ()=>{ toast('🌐 Online — sync semula'); SYNC.flush('online'); });
 window.addEventListener('offline', ()=>{ SYNC.setStatus('offline'); toast('📴 Offline'); });
 
+/* Periodic keep-alive sync (setiap 3 minit) */
 setInterval(()=>{
-  if(DB.cloud.autoSync && navigator.onLine && SYNC.status !== 'ok' && SYNC.status !== 'busy'){
+  if(DB.cloud.autoSync && navigator.onLine &&
+     SYNC.status !== 'ok' && SYNC.status !== 'busy' && SYNC.status !== 'pending'){
     SYNC.flush('periodic');
   }
-}, 5*60*1000);
+}, 3*60*1000);
 
 /* ------- VIEW: Cloud Sync Panel ------- */
 VIEWS.cloudSync = function(){
@@ -1616,23 +1615,33 @@ VIEWS.cloudSync = function(){
   const status = c.lastPush ? 'on' : 'off';
 
   $('#view').innerHTML = `
-  <div class="card card-pad" style="margin-bottom:16px;border-left:4px solid var(--brand)">
+  <div class="card card-pad" style="margin-bottom:16px;border-left:4px solid var(--ok)">
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-      <div style="font-size:32px">☁️</div>
+      <div style="font-size:32px">🔄</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800;font-size:16px">Cloud Resume Sync — Google Sheets</div>
+        <div style="font-weight:800;font-size:16px">Auto Cloud Sync — Google Sheets</div>
         <div class="muted small">Endpoint: <code style="font-size:11px">${esc(CLOUD_URL.slice(0,62))}…</code></div>
         <div style="margin-top:8px;font-size:12px">
           <span class="sync-dot ${status}"></span>
-          ${c.lastPush ? `Terakhir hantar: <b>${fmtDateTime(c.lastPush)}</b>` : '<b>Belum pernah sync</b>'}
+          ${c.lastPush ? `Terakhir auto-sync: <b>${fmtDateTime(c.lastPush)}</b>` : '<b>Belum pernah sync</b>'}
           ${c.lastPull ? ` · Terakhir tarik: <b>${fmtDateTime(c.lastPull)}</b>` : ''}
         </div>
         <div class="muted small" style="margin-top:6px">👤 ${esc(CURRENT_USER.name)} (${esc(CURRENT_USER.id)})</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ok" id="btnPush" onclick="SYNC.flush('manual')">⬆ Update Resume</button>
+        <button class="btn btn-ok" id="btnPush" onclick="SYNC.flush('manual')">⚡ Force Sync Now</button>
         <button class="btn" id="btnPull" onclick="cloudPull()">⬇ Tarik dari Cloud</button>
         <button class="btn" id="btnTest" onclick="cloudTest()">🔌 Test Connection</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:16px;border-left:4px solid var(--brand)">
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:26px">✅</div>
+      <div style="flex:1;min-width:220px">
+        <div style="font-weight:800">Anda TIDAK perlu tekan butang "Update Resume"</div>
+        <div class="muted small">Setiap <b>tambah / edit / padam</b> rekod (termasuk scan AI, merge duplicate, reset) akan <b>auto-push</b> ke Google Sheets selepas ~1.2 saat. Retry automatik sehingga 6 kali jika gagal.</div>
       </div>
     </div>
   </div>
@@ -1645,7 +1654,7 @@ VIEWS.cloudSync = function(){
 
   <div class="grid g2" style="margin-bottom:16px">
     <div class="card card-pad">
-      <div class="section-title">📦 Data Yang Akan Dihantar</div>
+      <div class="section-title">📦 Data Yang Dihantar (Auto)</div>
       <dl class="kv">
         <dt>Profil</dt><dd>${esc(DB.profile.name||'—')} (${profileCompleteness()}%)</dd>
         <dt>Qualifications</dt><dd>${count('qualifications')}</dd>
@@ -1665,10 +1674,11 @@ VIEWS.cloudSync = function(){
     <div class="card card-pad">
       <div class="section-title">⚙️ Tetapan Sync</div>
       <label class="fld" style="margin-bottom:12px">
-        <span><input type="checkbox" id="autoSync" ${DB.cloud.autoSync?'checked':''}
-          onchange="DB.cloud.autoSync=this.checked; save(); SYNC.setStatus(this.checked?'ok':'idle'); toast('Auto-sync: '+(this.checked?'ON':'OFF'))"
-          style="accent-color:var(--brand);margin-right:6px">
-          Auto-sync selepas setiap perubahan rekod</span>
+        <span>
+          <input type="checkbox" id="autoSync" ${DB.cloud.autoSync?'checked':''}
+            onchange="DB.cloud.autoSync=this.checked; save(); SYNC.setStatus(this.checked?'ok':'idle'); toast('Auto-sync: '+(this.checked?'ON ✅':'OFF ⛔')); if(this.checked) SYNC.flush('manual-enable')"
+            style="accent-color:var(--brand);margin-right:6px">
+          <b>Auto-sync aktif</b> — setiap edit / tambah / padam akan auto-push ke Google Sheets</span>
       </label>
       <label class="fld" style="margin-bottom:12px">
         <span>Nama Sheet / Tab</span>
@@ -1684,7 +1694,12 @@ VIEWS.cloudSync = function(){
         <button class="btn" onclick="exportData()">⬇ Export JSON</button>
         <button class="btn" onclick="go('cv')">📄 Lihat CV</button>
       </div>
-      <div class="hint warn" style="margin-top:14px">
+      <div class="hint ok" style="margin-top:14px">
+        <b>✅ Auto-Sync Aktif:</b> Anda <b>tidak perlu</b> tekan butang <i>Update Resume</i>.
+        Sistem hantar ke Google Sheets secara automatik setiap kali data berubah
+        (debounce ~1.2s + retry automatik + beacon bila tutup tab).
+      </div>
+      <div class="hint warn" style="margin-top:10px">
         <b>Penting:</b> Apps Script mesti di-deploy <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.
       </div>
     </div>
@@ -1695,7 +1710,7 @@ VIEWS.cloudSync = function(){
       <div class="section-title" style="margin:0">🪵 Log Sync</div>
       <button class="btn btn-sm" style="margin-left:auto" onclick="document.getElementById('syncLog').innerHTML=''">Clear</button>
     </div>
-    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> Sedia.</div>
+    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> Auto-sync engine v3 sedia.</div>
   </div>`;
 };
 
@@ -1839,10 +1854,10 @@ async function cloudPush(opts){
 window.cloudPush = cloudPush;
 
 async function quickCloudPush(){
-  toast('☁️ Menghantar…');
-  const ok = await cloudPush({ silent:true, reason:'quick' });
+  toast('☁️ Force sync…');
+  clearTimeout(SYNC.timer);
+  const ok = await SYNC.flush('manual-force');
   toast(ok ? '☁️ Resume disegerakkan ✔' : 'Sync gagal — semak log');
-  SYNC.setStatus(ok ? 'ok' : 'error');
 }
 window.quickCloudPush = quickCloudPush;
 
@@ -1908,11 +1923,11 @@ VIEWS.cv = function(){
 
       <div class="btn-row" style="margin-top:18px">
         <button class="btn btn-primary" onclick="generateCV()">📄 GENERATE CV</button>
-        <button class="btn btn-ok" onclick="pushCvToCloud()">☁️ Update Resume ke Cloud</button>
+        <button class="btn btn-ok" onclick="pushCvToCloud()">☁️ Force Sync Now</button>
         <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
         <button class="btn" onclick="downloadCV()">⬇ Download HTML</button>
       </div>
-      <div class="hint" style="margin-top:12px">Sistem automatik menyusun <b>Newest → Oldest</b>, numbering publication, format author, DOI, heading, page number, header/footer, table &amp; spacing.</div>
+      <div class="hint ok" style="margin-top:12px">💡 CV <b>auto-sync</b> ke Cloud setiap kali data berubah. Butang Force Sync hanya untuk push segera.</div>
     </div>
     <div id="cvDoc"></div>
   </div>`;
@@ -1921,7 +1936,7 @@ VIEWS.cv = function(){
 
 async function pushCvToCloud(){
   generateCV();
-  await SYNC.flush('cv-push');
+  await SYNC.flush('cv-force-push');
 }
 window.pushCvToCloud = pushCvToCloud;
 
@@ -2406,7 +2421,7 @@ VIEWS.quality = function(){
             <div class="muted small">${esc(p.journal||'')} · ${esc(p.year||'')} · DOI: ${esc(p.doi||'—')}</div>
           </div>`).join('')}
         <div class="btn-row" style="margin-top:12px">
-          <button class="btn btn-sm btn-primary" onclick="mergeDup(${gi})">Merge</button>
+          <button class="btn btn-sm btn-primary" onclick="mergeDup(${gi})">Merge (auto-sync)</button>
           <button class="btn btn-sm" onclick="toast('Rekod dikekalkan berasingan')">Keep Separate</button>
         </div>
       </div>`).join('') : '<p class="muted small">Tiada pertindihan dikesan. 👍</p>'}
@@ -2421,7 +2436,7 @@ function mergeDup(gi){
   const dropIds = group.slice(1).map(g=>g.id);
   DB.publications = DB.publications.filter(p=>!dropIds.includes(p.id));
   log('Merged Duplicate', keep.title||'Publication', 'Data Quality');
-  save(); render(); toast('Rekod digabungkan ✔');
+  save(); render(); toast('Rekod digabungkan ✔ — auto-sync…');
   SYNC.schedule('after-merge');
 }
 window.mergeDup = mergeDup;
@@ -2534,7 +2549,10 @@ window.exportData = exportData;
 function resetAll(){
   if(!confirm('Reset data profil ANDA kepada keadaan asal? (Hanya data anda sahaja)')) return;
   DB = seed();
-  save(); go('dashboard'); toast('Data direset');
+  save();
+  go('dashboard');
+  toast('Data direset — auto-sync…');
+  SYNC.schedule('after-reset');
 }
 window.resetAll = resetAll;
 
@@ -2566,7 +2584,7 @@ VIEWS.audit = function(){
 /* =========================================================
    23. INIT
    ========================================================= */
-document.addEventListener('DOMContentLoaded', function(){
+function bootApp(){
   if(!sessionStorage.getItem('apsSignedInLogged')){
     sessionStorage.setItem('apsSignedInLogged','1');
     log('Signed in to portal', CURRENT_USER.name, 'Auth');
@@ -2574,17 +2592,16 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   render();
   SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
-});
 
-if(document.readyState !== 'loading'){
-  if(!sessionStorage.getItem('apsSignedInLogged')){
-    sessionStorage.setItem('apsSignedInLogged','1');
-    log('Signed in to portal', CURRENT_USER.name, 'Auth');
-    save();
+  // Auto-sync pertama jika ada data tetapi belum pernah push
+  const hasData = Object.keys(SCHEMA).some(k => (DB[k]||[]).length > 0);
+  if(hasData && DB.cloud.autoSync){
+    setTimeout(()=>SYNC.schedule('initial-load'), 1500);
   }
-  render();
-  SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
 }
+
+document.addEventListener('DOMContentLoaded', bootApp);
+if(document.readyState !== 'loading') bootApp();
 </script>
 </body>
 </html>
