@@ -232,6 +232,16 @@
         width: 20px; 
         text-align: center; 
     }
+    .portal-link-item .link-arrow {
+        margin-left: auto;
+        color: #CBD5E1;
+        font-size: 11px;
+        transition: all .2s ease;
+    }
+    .portal-link-item:hover .link-arrow {
+        color: #9B26B6;
+        transform: translateX(3px);
+    }
 
     /* Activity Trail */
     .activity-timeline { position: relative; }
@@ -844,7 +854,7 @@
     </div>
 
     <!-- ============================================================
-         NEW PORTAL MENU CARD (LIST STYLE - UPDATED)
+         PORTAL MENU CARD (LIST STYLE - WITH LAB SERVICES)
     ============================================================ -->
     <div class="portal-menu-card anim-up">
         <div class="portal-menu-header">
@@ -860,18 +870,42 @@
             </div>
         </div>
         <div class="portal-menu-body">
-            <div class="portal-section-title">Administration</div>
-            <!-- Removed grid, using flex-col for list layout. Removed Notifications. -->
-            <div class="flex flex-col">
+
+            <!-- ===== ADMINISTRATION ===== -->
+            <div class="portal-section-title" data-i18n="portal_sec_admin">Administration</div>
+            <div class="flex flex-col mb-8">
                 <a href="resume_portal.html" class="portal-link-item">
                     <i class="fas fa-file-alt"></i>
-                    Resume
+                    <span data-i18n="link_resume">Resume</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
                 </a>
                 <a href="#" class="portal-link-item">
                     <i class="fas fa-user-cog"></i>
-                    Account Settings
+                    <span data-i18n="link_account">Account Settings</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
                 </a>
             </div>
+
+            <!-- ===== LAB SERVICES (NEW) ===== -->
+            <div class="portal-section-title" data-i18n="portal_sec_lab">Perkhidmatan Makmal</div>
+            <div class="flex flex-col">
+                <a href="#" class="portal-link-item">
+                    <i class="fas fa-tools"></i>
+                    <span data-i18n="link_alat_radas">Pinjaman Alat Radas</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </a>
+                <a href="#" class="portal-link-item">
+                    <i class="fas fa-flask"></i>
+                    <span data-i18n="link_bahan_kimia">Permohonan Bahan Kimia</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </a>
+                <a href="#" class="portal-link-item">
+                    <i class="fas fa-microscope"></i>
+                    <span data-i18n="link_peralatan_makmal">Permohonan Peralatan Makmal</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </a>
+            </div>
+
         </div>
     </div>
 
@@ -1504,6 +1538,14 @@
             stat_courses: "Active Courses", stat_students: "Students Taught",
             stat_grants: "Research Grants", stat_pubs: "Publications",
             stat_sem: "This Sem", stat_active: "Active",
+            /* Portal menu */
+            portal_sec_admin: "Administration",
+            portal_sec_lab: "Laboratory Services",
+            link_resume: "Resume",
+            link_account: "Account Settings",
+            link_alat_radas: "Borrow Laboratory Apparatus",
+            link_bahan_kimia: "Chemical Materials Application",
+            link_peralatan_makmal: "Laboratory Equipment Application",
             dash_sched_label: "Schedule", dash_sched_title: "Today's Classes", view_all: "View All",
             sched_lecture: "Lecture", sched_lab: "Lab", sched_practical: "Practical",
             sched_office: "Office", sched_meeting: "Meeting",
@@ -1583,6 +1625,14 @@
             stat_courses: "Kursus Aktif", stat_students: "Pelajar Diajar",
             stat_grants: "Geran Penyelidikan", stat_pubs: "Penerbitan",
             stat_sem: "Sem Ini", stat_active: "Aktif",
+            /* Portal menu */
+            portal_sec_admin: "Pentadbiran",
+            portal_sec_lab: "Perkhidmatan Makmal",
+            link_resume: "Resume",
+            link_account: "Tetapan Akaun",
+            link_alat_radas: "Pinjaman Alat Radas",
+            link_bahan_kimia: "Permohonan Bahan Kimia",
+            link_peralatan_makmal: "Permohonan Peralatan Makmal",
             dash_sched_label: "Jadual", dash_sched_title: "Kelas Hari Ini", view_all: "Lihat Semua",
             sched_lecture: "Kuliah", sched_lab: "Makmal", sched_practical: "Amali",
             sched_office: "Pejabat", sched_meeting: "Mesyuarat",
