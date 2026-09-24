@@ -805,8 +805,9 @@
         
         <!-- Body -->
         <div class="p-6">
+            <!-- Group 1: ADMINISTRATION -->
             <div class="mb-4">
-                <h4 class="text-[#9B26B6] text-[10px] font-black uppercase tracking-widest border-b-2 border-[#9B26B6] pb-1 inline-block">ADMINISTRATION</h4>
+                <h4 class="text-[#9B26B6] text-[10px] font-black uppercase tracking-widest border-b-2 border-[#9B26B6] pb-1 inline-block" data-i18n="portal_admin">ADMINISTRATION</h4>
             </div>
             <ul class="space-y-0">
                 <li class="border-b border-slate-100">
@@ -823,6 +824,39 @@
                             <i class="fas fa-user-gear text-[#9B26B6] text-sm"></i>
                         </div>
                         <span class="text-sm font-bold">Account Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- ============================================================
+                 NEW GROUP: PINJAMAN & PERMOHONAN
+            ============================================================ -->
+            <div class="mt-8 mb-4">
+                <h4 class="text-[#9B26B6] text-[10px] font-black uppercase tracking-widest border-b-2 border-[#9B26B6] pb-1 inline-block" data-i18n="portal_request_group">PINJAMAN &amp; PERMOHONAN</h4>
+            </div>
+            <ul class="space-y-0">
+                <li class="border-b border-slate-100">
+                    <a href="pinjaman_alat_radas.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
+                            <i class="fas fa-screwdriver-wrench text-[#9B26B6] text-sm"></i>
+                        </div>
+                        <span class="text-sm font-bold" data-i18n="portal_loan_tools">Pinjaman Alat Radas</span>
+                    </a>
+                </li>
+                <li class="border-b border-slate-100">
+                    <a href="permohonan_bahan_kimia.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
+                            <i class="fas fa-flask-vial text-[#9B26B6] text-sm"></i>
+                        </div>
+                        <span class="text-sm font-bold" data-i18n="portal_loan_chem">Permohonan Bahan Kimia</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="permohonan_peralatan_makmal.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
+                            <i class="fas fa-microscope text-[#9B26B6] text-sm"></i>
+                        </div>
+                        <span class="text-sm font-bold" data-i18n="portal_loan_equip">Permohonan Peralatan Makmal</span>
                     </a>
                 </li>
             </ul>
@@ -1444,6 +1478,11 @@
         en: {
             nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Search portal...",
             menu_settings: "Settings", menu_logout: "Sign Out",
+            portal_admin: "ADMINISTRATION",
+            portal_request_group: "PINJAMAN &amp; PERMOHONAN",
+            portal_loan_tools: "Pinjaman Alat Radas",
+            portal_loan_chem: "Permohonan Bahan Kimia",
+            portal_loan_equip: "Permohonan Peralatan Makmal",
             lab_dash_online: "Lab Operational", lab_dash_welcome: "Welcome back,",
             lab_dash_today: "Today", lab_dash_lastlogin: "Last Login",
             lab_stat_week: "This Week", lab_stat_sessions: "Lab Sessions",
@@ -1529,6 +1568,11 @@
         ms: {
             nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Cari dalam portal...",
             menu_settings: "Tetapan", menu_logout: "Log Keluar",
+            portal_admin: "PENTADBIRAN",
+            portal_request_group: "PINJAMAN &amp; PERMOHONAN",
+            portal_loan_tools: "Pinjaman Alat Radas",
+            portal_loan_chem: "Permohonan Bahan Kimia",
+            portal_loan_equip: "Permohonan Peralatan Makmal",
             lab_dash_online: "Makmal Beroperasi", lab_dash_welcome: "Selamat kembali,",
             lab_dash_today: "Hari Ini", lab_dash_lastlogin: "Log Masuk Terakhir",
             lab_stat_week: "Minggu Ini", lab_stat_sessions: "Sesi Makmal",
@@ -1951,7 +1995,7 @@
         settingsAvatar.textContent = makeInitials(this.value) || '--';
     });
 
-    // NEW: Bind the "Account Settings" link in the Portal Menu to open settings
+    // Bind the "Account Settings" link in the Portal Menu to open settings
     document.getElementById('portalSettingsBtn').addEventListener('click', function(e) {
         e.preventDefault();
         openSettings();
