@@ -8,13 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  /* ============================================================
-     PALETTE — 3 SOLID COLOURS ONLY
-     NAVY   #002D62
-     PURPLE #9B26B6
-     GOLD   #FDB913
-     + neutral slate / white / black
-  ============================================================ */
   :root{
     --navy:#002D62;
     --purple:#9B26B6;
@@ -46,10 +39,8 @@
     0%,100%{transform:scale(1);opacity:1}
     50%{transform:scale(1.3);opacity:.7}
   }
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ============================================================
-     APP BAR
-  ============================================================ */
   .appbar{
     position:sticky;top:0;z-index:40;
     background:#002D62;
@@ -87,7 +78,6 @@
     flex-wrap:wrap;justify-content:flex-end;min-width:0;
   }
 
-  /* ---------- Search ---------- */
   .search-box{
     display:flex;align-items:center;gap:9px;
     background:rgba(255,255,255,.10);
@@ -113,7 +103,6 @@
   }
   .search-box input::placeholder{color:rgba(255,255,255,.55);font-weight:500}
 
-  /* ---------- Language toggle ---------- */
   .lang-toggle-wrapper{
     background:rgba(255,255,255,.12);
     border:1px solid rgba(255,255,255,.2);
@@ -133,7 +122,6 @@
     box-shadow:0 4px 14px rgba(253,185,19,.5);
   }
 
-  /* ---------- Icon button (bell) ---------- */
   .icon-btn{
     position:relative;width:40px;height:40px;border-radius:50%;
     background:rgba(255,255,255,.10);
@@ -152,7 +140,6 @@
   }
   .bell-dot.show{display:block;animation:pulse 1.8s infinite}
 
-  /* ---------- User ---------- */
   .user-wrap{position:relative;flex:none}
   .user-btn{
     display:flex;align-items:center;gap:10px;
@@ -220,17 +207,11 @@
   .dd-item.danger{color:#DC2626}
   .dd-item.danger:hover{background:#FEF2F2;color:#DC2626}
 
-  /* ============================================================
-     LAYOUT
-  ============================================================ */
   .wrap{max-width:1120px;margin:0 auto;padding:26px 18px 40px}
   .view{display:none}
   .view.active{display:block;animation:fadeUp .35s cubic-bezier(.4,0,.2,1) both}
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-  /* ============================================================
-     HERO / WELCOME
-  ============================================================ */
   .hero{
     position:relative;overflow:hidden;
     background:#002D62;border-radius:26px;
@@ -296,9 +277,6 @@
   }
   .hd-sep{height:1px;background:rgba(255,255,255,.16);margin:15px 0}
 
-  /* ============================================================
-     SESSION BAR
-  ============================================================ */
   .session-bar{
     display:flex;align-items:center;gap:14px;flex-wrap:wrap;
     background:#fff;border:1px solid #E2E8F0;
@@ -320,9 +298,6 @@
     text-transform:uppercase;padding:5px 12px;border-radius:999px;
   }
 
-  /* ============================================================
-     FORM HEADER
-  ============================================================ */
   .form-header{
     display:flex;align-items:center;gap:16px;
     margin-bottom:22px;flex-wrap:wrap;
@@ -345,9 +320,6 @@
   }
   .back-btn:hover{background:#F8FAFC;color:var(--navy);border-color:var(--navy)}
 
-  /* ============================================================
-     CARD
-  ============================================================ */
   .card{
     background:#fff;
     border-radius:24px;
@@ -382,9 +354,6 @@
     white-space:nowrap;
   }
 
-  /* ============================================================
-     GRID / FIELDS
-  ============================================================ */
   .grid{
     display:grid;gap:16px;
     grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
@@ -441,9 +410,6 @@
   }
   .locked-hint b{font-weight:900}
 
-  /* ============================================================
-     SUB-HEADING
-  ============================================================ */
   .sub{
     margin:28px 0 14px;
     font-size:.66rem;font-weight:900;
@@ -455,9 +421,6 @@
     content:'';flex:1;height:1px;background:#E2E8F0;
   }
 
-  /* ============================================================
-     TABLES
-  ============================================================ */
   .table-wrap{
     overflow-x:auto;
     border:1px solid #E2E8F0;
@@ -496,9 +459,6 @@
   }
   .col-act{width:100px;text-align:right}
 
-  /* ============================================================
-     BUTTONS
-  ============================================================ */
   .btn-del{
     background:#FEF2F2;color:#DC2626;
     border:1px solid #FECACA;border-radius:8px;
@@ -531,6 +491,7 @@
     letter-spacing:.1em;text-transform:uppercase;
     cursor:pointer;font-family:inherit;transition:.2s;
   }
+  .btn[disabled]{opacity:.55;cursor:not-allowed;pointer-events:none;transform:none !important}
   .btn.primary{
     background:var(--accent,#002D62);color:#fff;
     box-shadow:0 12px 26px -10px rgba(0,0,0,.35);
@@ -549,6 +510,14 @@
     transform:translateY(-2px);
   }
   .btn.ghost:active{transform:scale(.98)}
+
+  .spinner{
+    display:inline-block;width:13px;height:13px;
+    border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;border-radius:50%;
+    animation:spin .7s linear infinite;
+    margin-right:8px;vertical-align:-2px;
+  }
 
   .btn-approve{
     background:#DCFCE7;color:#15803D;
@@ -580,9 +549,6 @@
   }
   .btn-view:hover{background:#002D62;color:#fff;border-color:#002D62}
 
-  /* ============================================================
-     CHECKLINE
-  ============================================================ */
   .checkline{
     display:flex;gap:14px;align-items:flex-start;
     background:#F8FAFC;border:1px solid #E2E8F0;
@@ -602,9 +568,6 @@
     flex-wrap:wrap;margin-top:22px;
   }
 
-  /* ============================================================
-     FILTER TABS
-  ============================================================ */
   .filter-bar{
     display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;
   }
@@ -627,9 +590,6 @@
   }
   .filter-btn.active .fcount{background:#FDB913;color:#002D62}
 
-  /* ============================================================
-     APPLICATION / APPROVAL CARDS
-  ============================================================ */
   .app-list{display:flex;flex-direction:column;gap:14px}
 
   .app-card{
@@ -761,9 +721,6 @@
     background:#fff;
   }
 
-  /* ============================================================
-     EMPTY STATE
-  ============================================================ */
   .empty-state{
     text-align:center;padding:56px 24px;
     color:#94A3B8;background:#fff;
@@ -775,9 +732,6 @@
   }
   .empty-state p{margin:0;font-size:.85rem;font-weight:500}
 
-  /* ============================================================
-     MODAL
-  ============================================================ */
   .modal{
     position:fixed;top:0;right:0;bottom:0;left:0;
     background:rgba(15,23,42,.55);
@@ -817,9 +771,6 @@
     border-top:1px solid #E2E8F0;background:#F8FAFC;
   }
 
-  /* ============================================================
-     SUMMARY
-  ============================================================ */
   .sum-sec{margin-bottom:24px}
   .sum-sec:last-child{margin-bottom:0}
   .sum-sec h5{
@@ -870,9 +821,6 @@
     font-style:italic;margin:0;font-weight:500;
   }
 
-  /* ============================================================
-     SUCCESS
-  ============================================================ */
   .success{text-align:center;padding:16px 8px}
   .success .tick{
     width:72px;height:72px;border-radius:50%;
@@ -895,9 +843,6 @@
     box-shadow:0 8px 20px -10px rgba(0,45,98,.5);
   }
 
-  /* ============================================================
-     TOAST
-  ============================================================ */
   .toast{
     position:fixed;left:50%;bottom:28px;
     transform:translate(-50%,80px);
@@ -912,9 +857,6 @@
   }
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
-  /* ============================================================
-     FOOTER
-  ============================================================ */
   .foot{
     text-align:center;font-size:.72rem;font-weight:600;
     color:#94A3B8;padding:34px 0 12px;
@@ -928,9 +870,6 @@
     background:#FDB913;border-radius:2px;
   }
 
-  /* ============================================================
-     ERROR BANNER
-  ============================================================ */
   .error-banner{
     background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;
     padding:14px 18px;border-radius:12px;margin-bottom:16px;
@@ -938,9 +877,6 @@
   }
   .error-banner.show{display:block;animation:fadeUp .25s ease-out both}
 
-  /* ============================================================
-     STATS STRIP
-  ============================================================ */
   .stats-strip{
     display:grid;gap:14px;margin-bottom:22px;
     grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
@@ -966,9 +902,6 @@
     color:var(--navy);line-height:1;
   }
 
-  /* ============================================================
-     AUTH LOADING SCREEN
-  ============================================================ */
   .auth-loading{
     min-height:100vh;display:grid;place-items:center;
     background:#F8FAFC;font-family:"Plus Jakarta Sans",system-ui,sans-serif;
@@ -986,9 +919,6 @@
   }
   .auth-loading p{margin:0;font-size:.82rem;font-weight:600}
 
-  /* ============================================================
-     RESPONSIVE
-  ============================================================ */
   @media (max-width:1000px){
     .search-box{width:200px}
   }
@@ -1095,10 +1025,8 @@
 
   <div class="error-banner" id="errorBanner"></div>
 
-  <!-- ==================== FORM (LANGSUNG) ==================== -->
   <section class="view active" data-view="form">
 
-    <!-- HERO / WELCOME -->
     <div class="hero">
       <div class="hero-left">
         <span class="hero-pill">
@@ -1125,7 +1053,6 @@
       </div>
     </div>
 
-    <!-- SESSION BAR -->
     <div class="session-bar">
       <div class="sb-ico">🔐</div>
       <div class="sb-info">
@@ -1144,7 +1071,6 @@
     <div id="formContent"></div>
   </section>
 
-  <!-- ==================== APPLICATIONS (ALL) ==================== -->
   <section class="view" data-view="apps">
     <div class="form-header">
       <button type="button" class="back-btn" onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
@@ -1174,7 +1100,6 @@
     <div id="appsContent"></div>
   </section>
 
-  <!-- ==================== APPROVAL ==================== -->
   <section class="view" data-view="approval">
     <div class="form-header">
       <button type="button" class="back-btn" onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
@@ -1189,7 +1114,6 @@
     <div id="approvalContent"></div>
   </section>
 
-  <!-- ==================== STATUS (MINE) ==================== -->
   <section class="view" data-view="status">
     <div class="form-header">
       <button type="button" class="back-btn" onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
@@ -1197,8 +1121,6 @@
         <div class="breadcrumb" data-i18n="statusCrumb">Sejarah Permohonan</div>
         <h2 data-i18n="statusTitle">Semak Status Permohonan</h2>
       </div>
-      <button type="button" class="back-btn" id="clearStatus"
-              style="border-color:#FECACA;color:#DC2626" data-i18n="statusPadam">Padam Sejarah</button>
     </div>
     <div id="statusContent"></div>
   </section>
@@ -1206,7 +1128,6 @@
   <p class="foot" data-i18n="footer">© Hak Cipta Terpelihara Fakulti Kejuruteraan Kimia UiTM Pasir Gudang</p>
 </main>
 
-<!-- ==================== MODAL ==================== -->
 <div class="modal" id="modal" aria-hidden="true">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-head">
@@ -1220,22 +1141,16 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- ============================================================
-     AUTH LAYER — same file as the Academic Profile System
-     ============================================================ -->
 <script src="auth.js"></script>
 
 <script>
 /* ============================================================
    SISTEM PERMOHONAN MAKMAL — PINJAMAN ALAT RADAS (BORANG B)
-   Dengan integrasi auth (FMSAuth) berasaskan Academic Profile System
+   Dengan integrasi auth (FMSAuth) + Google Apps Script backend
    ============================================================ */
 
 /* ============================================================
-   1) AUTH GUARD  —  SEBELUM SEMUA LOGIK BORANG
-   ------------------------------------------------------------
-   Boleh guna FMSAuth jika ada. Jika auth.js tiada, sistem akan
-   teruskan dengan "demo user" supaya borang masih boleh diuji.
+   1) AUTH GUARD
    ============================================================ */
 (function bootstrapAuth(){
   var ALLOWED_AUTH_ROLES = ['student','academic_staff','lab_staff','coordinator','admin'];
@@ -1244,14 +1159,10 @@
   var hasAuthLib = !!(window.FMSAuth && typeof window.FMSAuth.requireAuth === 'function');
 
   if(hasAuthLib){
-    try {
-      session = FMSAuth.requireAuth(ALLOWED_AUTH_ROLES);
-    } catch(err){
-      session = null;
-    }
+    try { session = FMSAuth.requireAuth(ALLOWED_AUTH_ROLES); }
+    catch(err){ session = null; }
   }
 
-  /* If auth.js is present but no valid session → show redirect screen + stop */
   if(hasAuthLib && !session){
     document.body.innerHTML =
       '<div class="auth-loading">' +
@@ -1267,7 +1178,6 @@
     throw new Error('Unauthenticated — redirecting to login');
   }
 
-  /* If auth.js is missing → use a demo fallback user so the form still works */
   if(!hasAuthLib){
     session = {
       user: {
@@ -1282,14 +1192,12 @@
     try { console.warn('[AUTH] auth.js not loaded — using demo fallback session.'); } catch(e){}
   }
 
-  /* Activity tracking for session keep-alive */
   ['click','keydown','mousemove','scroll'].forEach(function(evt){
     document.addEventListener(evt, function(){
       try { FMSAuth && FMSAuth.touch && FMSAuth.touch(); } catch(e){}
     }, { passive:true });
   });
 
-  /* Map auth role → app role */
   var AUTH_TO_APP_ROLE = {
     student:         'Student',
     academic_staff:  'Lecturer',
@@ -1337,7 +1245,10 @@
 (function () {
   "use strict";
 
-  /* ---------- Logged-in user (from AUTH) ---------- */
+  /* ---------- Google Apps Script endpoint ---------- */
+  var API_URL = "https://script.google.com/macros/s/AKfycbxHYU8540ZiK-EMaPuEy9sc3AEf6M_31wPxwYBN1Te9sT4lpYDutwMSDU6xI34WlfVe/exec";
+
+  /* ---------- Logged-in user ---------- */
   var USER = {
     id:       AUTH.user.id,
     name:     AUTH.user.name,
@@ -1348,7 +1259,6 @@
     initials: AUTH.initials
   };
 
-  /* ---------- Utility ---------- */
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
@@ -1367,22 +1277,15 @@
   }
 
   /* ---------- Storage keys ---------- */
-  var SHARED_KEY   = "ppm-fkk-alat-shared-v2-" + USER.id;
-  var DRAFT_KEY    = "ppm-fkk-alat-draft-v2-"  + USER.id;
-  var SUBMIT_KEY   = "ppm-fkk-alat-submitted-v2-" + USER.id;
+  var SUBMIT_KEY   = "ppm-fkk-alat-submitted-v3-" + USER.id;
+  var DRAFT_KEY    = "ppm-fkk-alat-draft-v3-"  + USER.id;
+  var SHARED_KEY   = "ppm-fkk-alat-shared-v3-" + USER.id;
   var LANG_KEY     = "ppm-fkk-alat-lang";
-  var LOGIN_KEY    = "ppm-fkk-lastlogin-v2-" + USER.id;
+  var LOGIN_KEY    = "ppm-fkk-lastlogin-v3-" + USER.id;
 
-  /* ---------- Storage helpers ---------- */
-  function lsGet(key) {
-    try { return localStorage.getItem(key); } catch (e) { return null; }
-  }
-  function lsSet(key, val) {
-    try { localStorage.setItem(key, val); return true; } catch (e) { return false; }
-  }
-  function lsDel(key) {
-    try { localStorage.removeItem(key); } catch (e) {}
-  }
+  function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function lsSet(key, val) { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
+  function lsDel(key) { try { localStorage.removeItem(key); } catch (e) {} }
   function safeParse(str, fallback) {
     if (!str) return fallback;
     try {
@@ -1390,6 +1293,86 @@
       return (v === null || v === undefined) ? fallback : v;
     } catch (e) { return fallback; }
   }
+
+  /* ============================================================
+     REMOTE API LAYER (Google Apps Script)
+     ============================================================ */
+  function apiPost(body) {
+    return fetch(API_URL, {
+      method: "POST",
+      // text/plain → simple request, no CORS preflight (Apps Script friendly)
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(body),
+      redirect: "follow"
+    }).then(function (res) {
+      return res.text().then(function (txt) {
+        try { return JSON.parse(txt); }
+        catch (e) { throw new Error("Respons pelayan tidak sah: " + txt.slice(0, 120)); }
+      });
+    });
+  }
+
+  function apiGet(params) {
+    var qs = Object.keys(params || {}).map(function (k) {
+      return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
+    }).join("&");
+    var url = API_URL + (qs ? ("?" + qs) : "");
+    return fetch(url, { method: "GET", redirect: "follow" })
+      .then(function (res) {
+        return res.text().then(function (txt) {
+          try { return JSON.parse(txt); }
+          catch (e) { throw new Error("Respons pelayan tidak sah."); }
+        });
+      });
+  }
+
+  function normalizeEntry(e) {
+    if (!e) return null;
+    if (!e.status) e.status = "pending";
+    if (typeof e.notes !== "string") e.notes = e.notes || "";
+    if (e.reviewedAt === undefined) e.reviewedAt = null;
+    if (!Array.isArray(e.items)) e.items = [];
+    if (!e.shared || typeof e.shared !== "object") e.shared = {};
+    if (typeof e.itemCount !== "number") e.itemCount = e.items.length || 0;
+    return e;
+  }
+
+  /* ============================================================
+     LOCAL CACHE (mirror of remote list)
+     ============================================================ */
+  var REMOTE_LIST = null;
+
+  function getSubmitted() {
+    if (REMOTE_LIST === null) {
+      var cached = safeParse(lsGet(SUBMIT_KEY), []);
+      if (!Array.isArray(cached)) cached = [];
+      REMOTE_LIST = cached.map(normalizeEntry).filter(Boolean);
+    }
+    return REMOTE_LIST;
+  }
+  function setSubmitted(list) {
+    if (!Array.isArray(list)) list = [];
+    REMOTE_LIST = list.map(normalizeEntry).filter(Boolean);
+    lsSet(SUBMIT_KEY, JSON.stringify(REMOTE_LIST));
+    return REMOTE_LIST;
+  }
+  function pushSubmitted(entry) {
+    var list = getSubmitted().slice();
+    list.unshift(normalizeEntry(entry));
+    setSubmitted(list.slice(0, 200));
+  }
+  function updateSubmitted(ref, patch) {
+    var list = getSubmitted().slice();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].ref === ref) {
+        for (var k in patch) if (patch.hasOwnProperty(k)) list[i][k] = patch[k];
+        break;
+      }
+    }
+    setSubmitted(list);
+  }
+
+  /* ---------- Draft / shared (local only) ---------- */
   function getShared() { return safeParse(lsGet(SHARED_KEY), {}); }
   function saveShared(data) { lsSet(SHARED_KEY, JSON.stringify(data)); }
 
@@ -1401,39 +1384,6 @@
   function saveDraft(data) { lsSet(DRAFT_KEY, JSON.stringify(data)); }
   function clearDraft() { lsDel(DRAFT_KEY); }
 
-  function getSubmitted() {
-    var v = safeParse(lsGet(SUBMIT_KEY), []);
-    if (!Array.isArray(v)) v = [];
-    for (var i = 0; i < v.length; i++) {
-      if (!v[i].status) v[i].status = "pending";
-      if (typeof v[i].notes !== "string") v[i].notes = "";
-      if (v[i].reviewedAt === undefined) v[i].reviewedAt = null;
-    }
-    return v;
-  }
-  function setSubmitted(list) { lsSet(SUBMIT_KEY, JSON.stringify(list)); }
-  function pushSubmitted(entry) {
-    var list = getSubmitted();
-    if (!entry.status) entry.status = "pending";
-    if (typeof entry.notes !== "string") entry.notes = "";
-    if (entry.reviewedAt === undefined) entry.reviewedAt = null;
-    list.unshift(entry);
-    setSubmitted(list.slice(0, 100));
-  }
-  function clearSubmitted() { lsDel(SUBMIT_KEY); }
-  function updateSubmitted(ref, patch) {
-    var list = getSubmitted();
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].ref === ref) {
-        for (var k in patch) {
-          if (patch.hasOwnProperty(k)) list[i][k] = patch[k];
-        }
-        break;
-      }
-    }
-    setSubmitted(list);
-  }
-
   /* ---------- Language ---------- */
   var currentLang = "ms";
   function getSavedLang() {
@@ -1442,7 +1392,7 @@
   }
   function saveLang(l) { lsSet(LANG_KEY, l); }
 
-  /* ---------- Escape / format ---------- */
+  /* ---------- Format helpers ---------- */
   function esc(s) {
     if (s === undefined || s === null) s = "";
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -1451,6 +1401,7 @@
   }
   function localeTag() { return currentLang === "ms" ? "ms-MY" : "en-GB"; }
   function formatDateTime(iso) {
+    if (!iso) return "—";
     try {
       return new Date(iso).toLocaleString(localeTag(),
         { dateStyle: "medium", timeStyle: "short" });
@@ -1463,7 +1414,7 @@
     } catch (e) { return ""; }
   }
 
-  /* ---------- i18n dictionary ---------- */
+  /* ---------- i18n ---------- */
   var I18N = {
     ms: {
       brandSmall: "FAKULTI",
@@ -1517,6 +1468,7 @@
       akuanText: "Saya bersetuju bertanggungjawab menjaga keselamatan/kebersihan peralatan, menyimpan semula di tempat asal, dan membuang sisa bahan kimia mengikut prosedur yang betul.",
       btnPadamDraf: "Padam Draf",
       btnHantar: "Hantar Permohonan",
+      btnHantarLoading: "Menghantar…",
       phNamaAhli: "Nama Penuh Ahli",
       phIdAhli: "Contoh: 2023123456",
       phAlat: "Contoh: Bikar 250 mL",
@@ -1565,17 +1517,17 @@
       toastBorangBaharu: "Borang baharu sedia diisi.",
       statusCrumb: "Sejarah Permohonan",
       statusTitle: "Semak Status Permohonan",
-      statusPadam: "Padam Sejarah",
       statusEmptyTitle: "Tiada Permohonan Dihantar",
       statusEmptyDesc: "Permohonan yang dihantar akan dipaparkan di sini untuk semakan status.",
-      statusConfirmPadam: "Padam semua sejarah permohonan yang dihantar?",
-      toastSejarahDipadam: "Sejarah permohonan dipadam.",
       toastRalatBuka: "Ralat membuka borang. Sila muat semula halaman.",
       toastDrafDipadam: "Draf borang telah dipadam.",
       toastDemo: 'Demo: "{0}" tidak disambungkan.',
       toastNoNotif: "Tiada notifikasi baharu.",
       toastNotif: "{0} permohonan menunggu kelulusan.",
       toastLogout: "Sedang log keluar…",
+      toastSubmitFail: "Gagal menghantar permohonan. Sila cuba lagi.",
+      toastSyncFail: "Ralat memuatkan data dari pelayan.",
+      toastReviewFail: "Ralat mengemas kini status permohonan.",
       confirmPadamDraf: "Padam draf borang ini? Maklumat pemohon yang dikongsi akan dikekalkan.",
       appsCrumb: "Senarai Permohonan",
       appsTitle: "Semua Permohonan",
@@ -1661,6 +1613,7 @@
       akuanText: "I agree to be responsible for the safety/cleanliness of the equipment, to store it back in its original place, and to dispose of chemical waste according to proper procedures.",
       btnPadamDraf: "Delete Draft",
       btnHantar: "Submit Application",
+      btnHantarLoading: "Submitting…",
       phNamaAhli: "Member Full Name",
       phIdAhli: "Example: 2023123456",
       phAlat: "Example: Beaker 250 mL",
@@ -1709,17 +1662,17 @@
       toastBorangBaharu: "New form is ready to be filled.",
       statusCrumb: "Application History",
       statusTitle: "Check Application Status",
-      statusPadam: "Delete History",
       statusEmptyTitle: "No Applications Submitted",
       statusEmptyDesc: "Submitted applications will be displayed here for status review.",
-      statusConfirmPadam: "Delete all submitted application history?",
-      toastSejarahDipadam: "Application history deleted.",
       toastRalatBuka: "Error opening form. Please reload the page.",
       toastDrafDipadam: "Form draft has been deleted.",
       toastDemo: 'Demo: "{0}" is not connected.',
       toastNoNotif: "No new notifications.",
       toastNotif: "{0} application(s) awaiting approval.",
       toastLogout: "Logging out…",
+      toastSubmitFail: "Failed to submit application. Please try again.",
+      toastSyncFail: "Error loading data from server.",
+      toastReviewFail: "Error updating application status.",
       confirmPadamDraf: "Delete this form draft? Shared applicant information will be retained.",
       appsCrumb: "Application List",
       appsTitle: "All Applications",
@@ -1789,10 +1742,10 @@
     el.textContent = msg;
     el.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2600);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2800);
   }
 
-  /* ---------- Constants (single form type) ---------- */
+  /* ---------- Constants ---------- */
   var TYPE = "alat";
   var BADGE = "B";
   var ACCENT = "#002D62";
@@ -1822,6 +1775,18 @@
     return '<span class="status-badge ' + cls + '"><span class="dot"></span>' + esc(lbl) + '</span>';
   }
 
+  /* ---------- Role helpers ---------- */
+  function canApprove() {
+    return ["Lecturer", "Lab Staff", "Head", "Admin"].indexOf(USER.role) !== -1;
+  }
+  function visibleList() {
+    var list = getSubmitted();
+    if (canApprove()) return list;
+    return list.filter(function (e) {
+      return !e.authUserId || e.authUserId === USER.id;
+    });
+  }
+
   /* ---------- Row templates ---------- */
   function rowTemplate(kind) {
     if (kind === "ahli") {
@@ -1848,7 +1813,6 @@
     return tr;
   }
 
-  /* ---------- Empty-state sync ---------- */
   function syncEmpty(formEl, kind) {
     var tbody = formEl.querySelector("#tbody-" + kind);
     if (!tbody) return;
@@ -1879,7 +1843,6 @@
     if (hint) hint.textContent = rowCount(formEl, TYPE) + " " + t("itemCount");
   }
 
-  /* ---------- Collect ---------- */
   function collectRows(formEl, kind) {
     var tbody = formEl.querySelector("#tbody-" + kind);
     if (!tbody) return [];
@@ -1919,16 +1882,12 @@
     };
   }
 
-  /* ---------- Persist draft ---------- */
   function persistDraft(formEl) {
     saveShared(collectShared(formEl));
     saveDraft({ rows: collectRows(formEl, TYPE) });
-    refreshNavCounts();
   }
 
-  /* ---------- Applicant fields HTML ----------
-     Nama & ID diambil dari AUTH dan dikunci (readonly)
-  ------------------------------------------------ */
+  /* ---------- Applicant fields ---------- */
   function applicantFieldsHTML(shared) {
     var v = function (k) { return esc(shared[k] || ""); };
     var tujuanVal = migrateTujuan(shared.tujuan || "");
@@ -2003,7 +1962,6 @@
     var shared = getShared();
     var draft  = getDraft();
 
-    /* Pre-seed shared with auth data if empty */
     if (!shared.nama) shared.nama = USER.name;
     if (!shared.id)   shared.id   = USER.id;
 
@@ -2019,7 +1977,6 @@
     formEl.style.setProperty("--accent-soft", ACCENT_SOFT);
     formEl.style.setProperty("--accent-rgb", ACCENT_RGB);
 
-    /* ---- Card A : Maklumat Pemohon + Ahli Kumpulan ---- */
     var cardA = document.createElement("section");
     cardA.className = "card";
     cardA.innerHTML =
@@ -2049,7 +2006,6 @@
       ahliTbody.appendChild(buildRow("ahli", ahliList[i]));
     }
 
-    /* ---- Card B : Butiran Pinjaman Alat Radas ---- */
     var cardB = document.createElement("section");
     cardB.className = "card";
     cardB.innerHTML =
@@ -2077,7 +2033,6 @@
       itemTbody.appendChild(buildRow("alat", itemList[j]));
     }
 
-    /* ---- Card E : Pengakuan ---- */
     var cardE = document.createElement("section");
     cardE.className = "card";
     cardE.innerHTML =
@@ -2096,7 +2051,6 @@
       '</div>';
     formEl.appendChild(cardE);
 
-    /* ---- Inject ---- */
     var container = $("#formContent");
     container.innerHTML = "";
     container.appendChild(formEl);
@@ -2109,7 +2063,7 @@
   }
 
   /* ============================================================
-     FORM EVENT WIRING
+     FORM EVENTS
      ============================================================ */
   function attachFormEvents(formEl) {
     formEl.addEventListener("click", function (e) {
@@ -2171,7 +2125,7 @@
 
   /* ============================================================
      VALIDATION
-  ============================================================ */
+     ============================================================ */
   var REQUIRED = [
     ["nama",     "errNama"],
     ["id",       "errId"],
@@ -2346,7 +2300,7 @@
   }
 
   /* ============================================================
-     MODAL
+     MODAL HELPERS
      ============================================================ */
   function openModal() {
     var modal = $("#modal");
@@ -2361,8 +2315,52 @@
     modal.setAttribute("aria-hidden", "true");
   }
 
+  function buildConfirmFooter() {
+    var mf = $("#modalFoot");
+    if (!mf) return;
+    mf.innerHTML = "";
+
+    var btnCancel = document.createElement("button");
+    btnCancel.type = "button";
+    btnCancel.className = "btn ghost";
+    btnCancel.textContent = t("btnBatal");
+    btnCancel.addEventListener("click", closeModal);
+
+    var btnConfirm = document.createElement("button");
+    btnConfirm.type = "button";
+    btnConfirm.className = "btn primary";
+    btnConfirm.style.setProperty("--accent", ACCENT);
+    btnConfirm.textContent = t("btnSahkan");
+    btnConfirm.addEventListener("click", finalizeSubmit);
+
+    mf.appendChild(btnCancel);
+    mf.appendChild(btnConfirm);
+  }
+
+  function buildLoadingFooter() {
+    var mf = $("#modalFoot");
+    if (!mf) return;
+    mf.innerHTML = "";
+
+    var btnCancel = document.createElement("button");
+    btnCancel.type = "button";
+    btnCancel.className = "btn ghost";
+    btnCancel.disabled = true;
+    btnCancel.textContent = t("btnBatal");
+
+    var btnLoading = document.createElement("button");
+    btnLoading.type = "button";
+    btnLoading.className = "btn primary";
+    btnLoading.disabled = true;
+    btnLoading.style.setProperty("--accent", ACCENT);
+    btnLoading.innerHTML = '<span class="spinner"></span>' + esc(t("btnHantarLoading"));
+
+    mf.appendChild(btnCancel);
+    mf.appendChild(btnLoading);
+  }
+
   /* ============================================================
-     SUBMIT
+     SUBMIT (via Google Apps Script)
      ============================================================ */
   function submitForm(formEl) {
     if (!validateForm(formEl)) {
@@ -2376,30 +2374,9 @@
 
     var mt = $("#modalTitle");
     var mb = $("#modalBody");
-    var mf = $("#modalFoot");
     if (mt) mt.textContent = t("modalRingkasan");
     if (mb) mb.innerHTML = summaryHTML(shared, rows);
-
-    if (mf) {
-      mf.innerHTML = "";
-
-      var btnCancel = document.createElement("button");
-      btnCancel.type = "button";
-      btnCancel.className = "btn ghost";
-      btnCancel.textContent = t("btnBatal");
-      btnCancel.addEventListener("click", closeModal);
-
-      var btnConfirm = document.createElement("button");
-      btnConfirm.type = "button";
-      btnConfirm.className = "btn primary";
-      btnConfirm.style.setProperty("--accent", ACCENT);
-      btnConfirm.textContent = t("btnSahkan");
-      btnConfirm.addEventListener("click", finalizeSubmit);
-
-      mf.appendChild(btnCancel);
-      mf.appendChild(btnConfirm);
-    }
-
+    buildConfirmFooter();
     openModal();
   }
 
@@ -2408,29 +2385,42 @@
     var draft  = getDraft();
     var rows   = draft.rows || [];
 
-    var ref = "PPM-" + new Date().getFullYear() + "-ALT-" +
-              Math.floor(1000 + Math.random() * 9000);
+    buildLoadingFooter();
 
-    var entry = {
-      ref: ref,
-      type: TYPE,
-      typeName: typeName(),
-      submittedAt: new Date().toISOString(),
-      nama: shared.nama || USER.name,
-      id:   shared.id   || USER.id,
-      authUserId: USER.id,
-      authRole:   AUTH.rawRole,
-      itemCount: rows.length,
-      items: rows,
-      shared: shared,
-      status: "pending",
-      reviewedAt: null,
-      notes: ""
+    var payload = {
+      action: "submit",
+      payload: {
+        type: TYPE,
+        typeName: typeName(),
+        nama: shared.nama || USER.name,
+        id:   shared.id   || USER.id,
+        authUserId: USER.id,
+        authRole:   AUTH.rawRole,
+        userEmail:  USER.email,
+        userUnit:   USER.unit,
+        itemCount:  rows.length,
+        items:      rows,
+        shared:     shared
+      }
     };
 
-    pushSubmitted(entry);
-    clearDraft();
+    apiPost(payload).then(function (res) {
+      if (!res || res.status !== "success" || !res.data) {
+        throw new Error((res && res.message) || t("toastSubmitFail"));
+      }
+      var entry = normalizeEntry(res.data);
+      pushSubmitted(entry);
+      clearDraft();
+      showSuccessScreen(entry, rows.length);
+      refreshNavCounts();
+    }).catch(function (err) {
+      try { console.error("[SUBMIT]", err); } catch (e) {}
+      buildConfirmFooter(); // restore buttons so user can retry
+      toast((err && err.message) ? err.message : t("toastSubmitFail"));
+    });
+  }
 
+  function showSuccessScreen(entry, count) {
     var mt = $("#modalTitle");
     var mb = $("#modalBody");
     var mf = $("#modalFoot");
@@ -2443,8 +2433,8 @@
           '<h4>' + esc(t("successTitle")) + '</h4>' +
           '<p class="muted small">' + esc(typeName()) + '</p>' +
           '<p>' + esc(t("successRef")) + '</p>' +
-          '<p class="ref-pill">' + esc(ref) + '</p>' +
-          '<p class="muted small">' + rows.length + ' ' + esc(t("successItems")) + '</p>' +
+          '<p class="ref-pill">' + esc(entry.ref) + '</p>' +
+          '<p class="muted small">' + count + ' ' + esc(t("successItems")) + '</p>' +
           '<p class="muted small" style="margin-top:14px">' + t("successNote") + '</p>' +
         '</div>';
     }
@@ -2476,8 +2466,27 @@
       mf.appendChild(btnHome);
       mf.appendChild(btnNew);
     }
+  }
 
-    refreshNavCounts();
+  /* ============================================================
+     SERVER SYNC
+     ============================================================ */
+  function syncFromServer(opts) {
+    opts = opts || {};
+    return apiGet({ action: "list", userId: USER.id })
+      .then(function (res) {
+        if (res && res.status === "success" && Array.isArray(res.data)) {
+          setSubmitted(res.data);
+          refreshNavCounts();
+          return getSubmitted();
+        }
+        throw new Error((res && res.message) || t("toastSyncFail"));
+      })
+      .catch(function (err) {
+        try { console.warn("[SYNC]", err); } catch (e) {}
+        if (!opts.silent) toast(t("toastSyncFail"));
+        return getSubmitted();
+      });
   }
 
   /* ============================================================
@@ -2504,15 +2513,15 @@
     catch (e) { window.scrollTo(0, 0); }
   }
 
-  /* ---------- Nav counts ---------- */
   function refreshNavCounts() {
     var list = getSubmitted();
+    var mine = visibleList();
     var pendingCount = 0;
     for (var j = 0; j < list.length; j++) {
       if (!list[j].status || list[j].status === "pending") pendingCount++;
     }
-    setText("#ddStatusCount", list.length);
-    setText("#ddAppsCount", list.length);
+    setText("#ddStatusCount", mine.length);
+    setText("#ddAppsCount", mine.length);
     setText("#ddApprovalCount", pendingCount);
 
     var dot = $("#bellDot");
@@ -2520,7 +2529,7 @@
   }
 
   /* ============================================================
-     HERO / USER CHROME
+     HERO / USER
      ============================================================ */
   var lastLoginISO = null;
 
@@ -2536,13 +2545,11 @@
     setText("#userName", USER.name.toUpperCase());
     setText("#userAvatar", USER.initials);
     setText("#ddName", USER.name);
-
     setText("#heroRoleLabel", USER.role + " · " + USER.position);
 
     var ddSub = $("#ddSub");
     if (ddSub) ddSub.textContent = USER.unit || t("ddSub");
 
-    /* Session bar */
     var detail = t("sessionDetailTpl")
       .replace("{id}", USER.id)
       .replace("{email}", USER.email || "—")
@@ -2557,7 +2564,6 @@
     if (lastEl) lastEl.textContent = lastLoginISO ? formatDateTime(lastLoginISO) : "—";
   }
 
-  /* ---------- User dropdown ---------- */
   function openUserMenu() {
     var wrap = $("#userWrap");
     var btn = $("#userBtn");
@@ -2580,7 +2586,7 @@
   }
 
   /* ============================================================
-     APPLICATIONS VIEW (ALL)
+     APPS VIEW
      ============================================================ */
   var currentAppsFilter = "all";
 
@@ -2664,7 +2670,7 @@
           '<div class="app-card-meta">' +
             '<span>👤 ' + esc(entry.nama || "—") + '</span>' +
             '<span>🆔 ' + esc(entry.id || "—") + '</span>' +
-            '<span>📦 ' + entry.itemCount + ' ' + esc(t("itemCount")) + '</span>' +
+            '<span>📦 ' + (entry.itemCount || 0) + ' ' + esc(t("itemCount")) + '</span>' +
             '<span>🕒 ' + esc(formatDateTime(entry.submittedAt)) + '</span>' +
           '</div>' +
           itemPreviewHTML(entry) +
@@ -2695,7 +2701,7 @@
   }
 
   function renderApps() {
-    var list = getSubmitted();
+    var list = visibleList();
     var stats = computeStats(list);
     renderStatsStrip("appsStats", stats);
 
@@ -2778,7 +2784,6 @@
     content.innerHTML = html;
   }
 
-  /* ---------- Delegated list actions ---------- */
   function attachListActions() {
     var appsContent = $("#appsContent");
     if (appsContent && !appsContent.dataset.wired) {
@@ -2789,6 +2794,11 @@
     if (approvalContent && !approvalContent.dataset.wired) {
       approvalContent.dataset.wired = "1";
       approvalContent.addEventListener("click", handleListClick);
+    }
+    var statusContent = $("#statusContent");
+    if (statusContent && !statusContent.dataset.wired) {
+      statusContent.dataset.wired = "1";
+      statusContent.addEventListener("click", handleListClick);
     }
   }
 
@@ -2829,8 +2839,7 @@
     if (mt) mt.textContent = t("modalDetail");
     if (mb) mb.innerHTML = summaryHTML(shared, entry.items || [], {
       showStatus: true,
-      entry: entry,
-      hideDeclaration: false
+      entry: entry
     });
 
     if (mf) {
@@ -2850,39 +2859,67 @@
     if (!confirm(t("approvalConfirmApprove"))) return;
     var noteEl = document.querySelector('[data-note-for="' + ref + '"]');
     var notes = noteEl ? (noteEl.value || "").trim() : "";
-    updateSubmitted(ref, {
-      status: "approved",
-      reviewedAt: new Date().toISOString(),
+
+    apiPost({
+      action: "approve",
+      ref: ref,
       reviewedBy: USER.name,
+      reviewerId: USER.id,
       notes: notes
+    }).then(function (res) {
+      if (!res || res.status !== "success") {
+        throw new Error((res && res.message) || t("toastReviewFail"));
+      }
+      updateSubmitted(ref, {
+        status: "approved",
+        reviewedAt: new Date().toISOString(),
+        reviewedBy: USER.name,
+        notes: notes
+      });
+      toast(t("approvalToastApproved"));
+      refreshNavCounts();
+      renderApproval();
+      renderApps();
+    }).catch(function (err) {
+      toast((err && err.message) ? err.message : t("toastReviewFail"));
     });
-    toast(t("approvalToastApproved"));
-    refreshNavCounts();
-    renderApproval();
-    renderApps();
   }
 
   function rejectEntry(ref) {
     if (!confirm(t("approvalConfirmReject"))) return;
     var noteEl = document.querySelector('[data-note-for="' + ref + '"]');
     var notes = noteEl ? (noteEl.value || "").trim() : "";
-    updateSubmitted(ref, {
-      status: "rejected",
-      reviewedAt: new Date().toISOString(),
+
+    apiPost({
+      action: "reject",
+      ref: ref,
       reviewedBy: USER.name,
+      reviewerId: USER.id,
       notes: notes
+    }).then(function (res) {
+      if (!res || res.status !== "success") {
+        throw new Error((res && res.message) || t("toastReviewFail"));
+      }
+      updateSubmitted(ref, {
+        status: "rejected",
+        reviewedAt: new Date().toISOString(),
+        reviewedBy: USER.name,
+        notes: notes
+      });
+      toast(t("approvalToastRejected"));
+      refreshNavCounts();
+      renderApproval();
+      renderApps();
+    }).catch(function (err) {
+      toast((err && err.message) ? err.message : t("toastReviewFail"));
     });
-    toast(t("approvalToastRejected"));
-    refreshNavCounts();
-    renderApproval();
-    renderApps();
   }
 
   /* ============================================================
-     STATUS VIEW (MY SUBMISSIONS)
+     STATUS VIEW
      ============================================================ */
   function renderStatus() {
-    var list = getSubmitted();
+    var list = visibleList();
     var content = $("#statusContent");
     if (!content) return;
 
@@ -2905,7 +2942,7 @@
   }
 
   /* ============================================================
-     LANGUAGE SWITCH
+     LANGUAGE
      ============================================================ */
   function applyStaticTranslations() {
     $$("[data-i18n]").forEach(function (el) {
@@ -2954,7 +2991,7 @@
   }
 
   /* ============================================================
-     LOGOUT (uses FMSAuth)
+     LOGOUT
      ============================================================ */
   function doLogout() {
     toast(t("toastLogout"));
@@ -2975,21 +3012,31 @@
       }
     },
     goApps: function () {
-      try { renderApps(); showView("apps"); }
-      catch (err) { logError(err); }
+      try {
+        renderApps();
+        showView("apps");
+        syncFromServer({ silent: true }).then(renderApps);
+      } catch (err) { logError(err); }
     },
     goApproval: function () {
-      try { renderApproval(); showView("approval"); }
-      catch (err) { logError(err); }
+      try {
+        renderApproval();
+        showView("approval");
+        syncFromServer({ silent: true }).then(renderApproval);
+      } catch (err) { logError(err); }
     },
     goStatus: function () {
-      try { renderStatus(); showView("status"); }
-      catch (err) { logError(err); }
+      try {
+        renderStatus();
+        showView("status");
+        syncFromServer({ silent: true }).then(renderStatus);
+      } catch (err) { logError(err); }
     },
     logout: doLogout,
     switchLanguage: switchLanguage,
     toast: toast,
-    closeModal: closeModal
+    closeModal: closeModal,
+    sync: syncFromServer
   };
 
   /* ============================================================
@@ -3013,7 +3060,6 @@
         if (e.key === "Escape") { closeModal(); closeUserMenu(); }
       });
 
-      /* Brand click - reload form */
       var brandHome = $("#brandHome");
       if (brandHome) {
         brandHome.addEventListener("click", function () { APP.goForm(); });
@@ -3025,7 +3071,6 @@
         });
       }
 
-      /* ---- User dropdown ---- */
       var userBtn = $("#userBtn");
       if (userBtn) {
         userBtn.addEventListener("click", function (e) {
@@ -3054,7 +3099,6 @@
         doLogout();
       });
 
-      /* ---- Bell ---- */
       var bellBtn = $("#bellBtn");
       if (bellBtn) {
         bellBtn.addEventListener("click", function () {
@@ -3072,7 +3116,6 @@
         });
       }
 
-      /* ---- Search (demo) ---- */
       var search = $("#portalSearch");
       if (search) {
         search.addEventListener("keydown", function (e) {
@@ -3083,21 +3126,6 @@
         });
       }
 
-      /* ---- Clear history ---- */
-      var clearStatus = $("#clearStatus");
-      if (clearStatus) {
-        clearStatus.addEventListener("click", function () {
-          if (!confirm(t("statusConfirmPadam"))) return;
-          clearSubmitted();
-          renderStatus();
-          renderApps();
-          renderApproval();
-          refreshNavCounts();
-          toast(t("toastSejarahDipadam"));
-        });
-      }
-
-      /* ---- Filter buttons ---- */
       var filterBar = $("#appsFilterBar");
       if (filterBar) {
         filterBar.addEventListener("click", function (e) {
@@ -3120,11 +3148,16 @@
       renderHero();
       refreshNavCounts();
 
-      /* Langsung ke borang */
       renderForm();
       showView("form");
 
-      try { console.log("[AUTH] Signed in as", USER.name, "(" + USER.id + ") · role:", AUTH.rawRole, "→ app role:", USER.role); } catch(e){}
+      // Pull latest from Google Sheet on load (quietly)
+      syncFromServer({ silent: true });
+
+      try {
+        console.log("[AUTH] Signed in as", USER.name, "(" + USER.id + ") · role:", AUTH.rawRole, "→ app role:", USER.role);
+        console.log("[API]", API_URL);
+      } catch(e){}
     } catch (err) {
       logError(err);
     }
