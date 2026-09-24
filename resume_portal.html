@@ -183,7 +183,6 @@ tbody tr:hover{background:#fafbff}
 .user-badge .urole{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 @media(max-width:640px){.user-badge .uinfo{display:none}}
 
-/* Logout modal specific */
 .logout-progress{background:#f8faff;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;font-size:12.5px}
 .logout-progress.done{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
 .logout-progress.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}
@@ -856,7 +855,7 @@ VIEWS.dashboard = function(){
       <div style="font-size:26px">🔄</div>
       <div style="flex:1;min-width:220px">
         <div style="font-weight:800">Auto Cloud Sync — Aktif ✅</div>
-        <div class="muted small">Setiap <b>edit / tambah / padam</b> data akan <b>auto-push</b> ke Google Sheets. Bila <b>Log Out</b> atau tutup browser, sistem akan minta anda update resume dahulu.</div>
+        <div class="muted small">Setiap <b>edit / tambah / padam</b> akan <b>auto-push</b> ke Google Sheets. Bila <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b>, atau <b>refresh</b> — sistem akan minta anda update resume dahulu.</div>
       </div>
       <div class="btn-row">
         <button class="btn" onclick="quickCloudPush()">⚡ Force Sync Now</button>
@@ -1648,26 +1647,25 @@ setInterval(()=>{
 }, 3*60*1000);
 
 /* =========================================================
-   13b. LOGOUT & BROWSER-CLOSE PROMPT
+   13b. LOGOUT MODAL
    ========================================================= */
-let _logoutBypass = false;   // bila true, beforeunload tak prompt
-let _pendingLogout = false;
+let _logoutBypass = false;
+let _allowExit = false;
+let _exitGuardShown = false;
 
 function hasUnsavedCloudChanges(){
   return SYNC.dirty || SYNC.timer || SYNC.queue > 0 || SYNC.status === 'pending' || SYNC.status === 'busy' || SYNC.status === 'retry';
 }
 
-/* --- Modal Logout --- */
 function doLogout(){
-  // Kalau takde perubahan, terus logout
   if(!hasUnsavedCloudChanges()){
     _logoutBypass = true;
+    _allowExit = true;
     try { FMSAuth.clearSession(); } catch(e){}
     window.location.href = 'login.html';
     return;
   }
 
-  // Papar modal
   $('#logoutRoot').innerHTML = `
   <div class="modal-bg" onclick="if(event.target===this)closeLogoutModal()">
     <div class="modal" style="max-width:560px">
@@ -1713,7 +1711,7 @@ async function syncAndLogout(){
     const ok = await cloudPush({ silent:true, reason:'logout' });
 
     if(ok){
-      if(prog){ prog.className='logout-progress done'; prog.innerHTML = `✅ Resume berjaya dihantar ke Google Sheets. Melog keluar…`; }
+      if(prog){ prog.className='logout-progress done'; prog.innerHTML = `✅ Resume berjaya dihantar. Melog keluar…`; }
       SYNC.dirty = false;
       setTimeout(()=>forceLogout(), 900);
     } else {
@@ -1729,23 +1727,110 @@ window.syncAndLogout = syncAndLogout;
 
 function forceLogout(){
   _logoutBypass = true;
+  _allowExit = true;
   closeLogoutModal();
   try { FMSAuth.clearSession(); } catch(e){}
   window.location.href = 'login.html';
 }
 window.forceLogout = forceLogout;
 
-/* --- Browser back / close / refresh prompt --- */
+/* =========================================================
+   13c. EXIT GUARD — Back / Close / Refresh
+   ========================================================= */
+function showExitGuardModal(reason){
+  if(_exitGuardShown) return;
+  _exitGuardShown = true;
+
+  const reasonText = reason === 'back'  ? 'tekan butang Back (←)'
+                   : reason === 'close' ? 'tutup tab'
+                   : 'refresh halaman';
+
+  $('#logoutRoot').innerHTML = `
+  <div class="modal-bg" onclick="event.stopPropagation()">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-head">
+        <div style="font-size:22px">🛑</div>
+        <h3>Update Resume Terlebih Dahulu</h3>
+      </div>
+      <div class="modal-body">
+        <div class="hint warn">
+          Anda cuba <b>${reasonText}</b> tetapi ada <b>perubahan yang belum disegerakkan</b> ke Google Sheets.
+        </div>
+        <p style="margin-top:14px;font-size:13px">
+          Sila tekan butang <b>☁️ Update Resume</b> di bawah untuk simpan semua perubahan terkini.
+          Selepas sync berjaya, anda akan dibenarkan keluar.
+        </p>
+        <div id="exitGuardProgress" class="logout-progress" style="display:none"></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="cancelExitGuard()">❌ Kekal di Halaman</button>
+        <button type="button" class="btn btn-ok" id="btnExitUpdate" onclick="syncThenExit()">☁️ Update Resume &amp; Keluar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function cancelExitGuard(){
+  _exitGuardShown = false;
+  $('#logoutRoot').innerHTML = '';
+}
+window.cancelExitGuard = cancelExitGuard;
+
+async function syncThenExit(){
+  const btn  = document.getElementById('btnExitUpdate');
+  const prog = document.getElementById('exitGuardProgress');
+  if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Menghantar…`; }
+  if(prog){ prog.style.display='block'; prog.className='logout-progress'; prog.innerHTML = `⏳ Menghantar data ke Google Sheets…`; }
+
+  try{
+    clearTimeout(SYNC.timer);
+    SYNC.queue = 0;
+    const ok = await cloudPush({ silent:true, reason:'exit-guard' });
+
+    if(ok){
+      SYNC.dirty = false;
+      SYNC.setStatus('ok');
+      if(prog){ prog.className='logout-progress done'; prog.innerHTML = `✅ Resume berjaya dihantar. Anda boleh keluar sekarang.`; }
+      setTimeout(() => {
+        _exitGuardShown = false;
+        _allowExit = true;
+        $('#logoutRoot').innerHTML = '';
+        toast('✅ Update selesai — anda boleh tekan Back / tutup tab / refresh sekarang.');
+      }, 1200);
+    } else {
+      if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ Sync gagal. Sila cuba lagi atau semak sambungan.`; }
+      if(btn){ btn.disabled = false; btn.innerHTML = `☁️ Cuba Lagi`; }
+    }
+  } catch(err){
+    if(prog){ prog.className='logout-progress err'; prog.innerHTML = `❌ Ralat: ${esc(err.message)}`; }
+    if(btn){ btn.disabled = false; btn.innerHTML = `☁️ Cuba Lagi`; }
+  }
+}
+window.syncThenExit = syncThenExit;
+
+/* ---- Trap Back Button ---- */
+(function trapBack(){
+  try{ history.pushState(null, '', location.href); }catch(e){}
+  window.addEventListener('popstate', () => {
+    if(_allowExit || _logoutBypass) return;
+    if(hasUnsavedCloudChanges()){
+      try{ history.pushState(null, '', location.href); }catch(e){}
+      showExitGuardModal('back');
+    } else {
+      _allowExit = true;
+      try{ history.back(); }catch(e){}
+    }
+  });
+})();
+
+/* ---- Native prompt untuk Close / Refresh ---- */
 window.addEventListener('beforeunload', (e) => {
-  // Bila logout programmatically, jangan prompt
-  if(_logoutBypass) return;
+  if(_allowExit || _logoutBypass) return;
 
   if(hasUnsavedCloudChanges()){
-    // Cuba sync keepalive
     SYNC.flushKeepalive();
-    // Prompt native browser
     e.preventDefault();
-    const msg = 'Data anda belum disegerakkan ke Google Sheets. Yakin mahu keluar tanpa sync?';
+    const msg = 'Data belum disegerakkan ke Google Sheets. Sila tekan "Update Resume" dahulu.';
     e.returnValue = msg;
     return msg;
   }
@@ -1785,14 +1870,10 @@ VIEWS.cloudSync = function(){
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <div style="font-size:26px">✅</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800">Auto-sync + Logout Prompt Aktif</div>
+        <div style="font-weight:800">Auto-sync + Exit Guard Aktif</div>
         <div class="muted small">
           Setiap <b>edit / tambah / padam</b> akan auto-push ke Google Sheets.<br>
-          Bila anda tekan <b>Log Out</b> atau <b>tutup browser</b>, sistem akan:
-          <ul style="margin:8px 0 0 20px;font-size:12.5px">
-            <li>Papar modal <b>Update Resume & Log Out</b> (Log Out)</li>
-            <li>Papar prompt native browser + auto keepalive sync (tutup/back)</li>
-          </ul>
+          Bila anda <b>Log Out</b>, tekan <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b> — sistem akan minta anda tekan <b>Update Resume</b> dahulu.
         </div>
       </div>
     </div>
@@ -1832,22 +1913,12 @@ VIEWS.cloudSync = function(){
             style="accent-color:var(--brand);margin-right:6px">
           <b>Auto-sync aktif</b> — setiap edit / tambah / padam akan auto-push ke Google Sheets</span>
       </label>
-      <label class="fld" style="margin-bottom:12px">
-        <span>Nama Sheet / Tab</span>
-        <input type="text" id="cloudSheet" value="${esc(DB.cloud.sheet||'Resume')}"
-          onchange="DB.cloud.sheet=this.value; save();">
-      </label>
-      <label class="fld" style="margin-bottom:12px">
-        <span>Kunci Keselamatan (optional)</span>
-        <input type="text" id="cloudKey" value="${esc(DB.cloud.key||'')}"
-          onchange="DB.cloud.key=this.value; save();">
-      </label>
       <div class="btn-row">
         <button class="btn" onclick="exportData()">⬇ Export JSON</button>
         <button class="btn" onclick="go('cv')">📄 Lihat CV</button>
       </div>
       <div class="hint ok" style="margin-top:14px">
-        <b>✅ Logout Prompt Aktif:</b> Bila anda tekan <b>Log Out</b>, sistem akan minta anda update resume dulu. Bila tutup/back browser, akan keluar prompt native + auto-sync keepalive.
+        <b>✅ Exit Guard Aktif:</b> Bila anda tekan <b>Log Out</b>, <b>Back</b>, <b>tutup tab</b> atau <b>refresh</b>, sistem akan minta anda tekan <b>Update Resume</b> dahulu sebelum keluar.
       </div>
       <div class="hint warn" style="margin-top:10px">
         <b>Penting:</b> Apps Script mesti di-deploy <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.
