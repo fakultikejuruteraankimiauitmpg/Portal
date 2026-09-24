@@ -150,32 +150,6 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    .quick-link {
-        position: relative; overflow: hidden;
-        border-radius: 14px; color: #fff;
-        transition: all .28s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 8px 20px -10px rgba(0,0,0,.25);
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-        padding: 20px 12px; text-align: center; text-decoration: none;
-    }
-    .quick-link::before {
-        content: ''; position: absolute;
-        top: -30px; right: -30px;
-        width: 90px; height: 90px; border-radius: 50%;
-        background: rgba(255,255,255,0.14); transition: transform .35s;
-    }
-    .quick-link:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 34px -14px rgba(0,0,0,.35); }
-    .quick-link:hover::before { transform: scale(1.4); }
-    .quick-link i { font-size: 22px; position: relative; z-index: 1; }
-    .quick-link span {
-        font-size: 10px; font-weight: 800; letter-spacing: .1em;
-        text-transform: uppercase; line-height: 1.25; position: relative; z-index: 1;
-        word-break: break-word;
-    }
-    .ql-navy   { background: #002D62; }
-    .ql-purple { background: #9B26B6; }
-    .ql-gold   { background: #FDB913; }
-
     .activity-timeline { position: relative; }
     .activity-timeline::before {
         content: ''; position: absolute;
@@ -793,18 +767,51 @@
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="card p-6 mb-6 anim-up rounded-3xl">
-        <div class="mb-5 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <span class="section-label" data-i18n="stu_quick_links_label">Quick Menu</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="stu_quick_links_title">Student Quick Links</h3>
+    <!-- ============================================================
+         PORTAL MENU (NEW)
+    ============================================================ -->
+    <div class="card rounded-3xl mb-6 anim-up overflow-hidden">
+        <!-- Header -->
+        <div class="bg-[#002D62] p-5 flex justify-between items-center relative overflow-hidden">
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: #FDB913;">
+                    <i class="fas fa-th-large text-white text-base"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-white uppercase tracking-wider">Portal Menu</h3>
+                    <p class="text-[10px] font-bold text-[#FDB913] uppercase tracking-widest mt-1">Quick Access to All Systems</p>
+                </div>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="stu_quick_links_hint">Opens in new tab</span>
+            <div class="relative z-10">
+                <span class="text-[10px] font-black text-[#FDB913] uppercase tracking-widest border border-[#FDB913] px-4 py-1.5 rounded-full flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#FDB913]"></span> Updated 2026
+                </span>
+            </div>
+            <!-- Decorative circles -->
+            <div class="absolute right-[-30px] top-[-60px] w-40 h-40 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="absolute right-[20px] bottom-[-40px] w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
         </div>
-
-        <div id="quickLinksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- rendered by JS -->
+        <!-- Body -->
+        <div class="p-6">
+            <div class="mb-6">
+                <h4 class="text-[11px] font-black text-[#9B26B6] uppercase tracking-[0.2em] relative inline-block pb-2 border-b-2 border-[#FDB913]">Administration</h4>
+            </div>
+            <div class="space-y-2">
+                <!-- Resume Link -->
+                <a href="resume_portal.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200 group">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
+                        <i class="fas fa-file-lines text-base"></i>
+                    </div>
+                    <span class="text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition">Resume</span>
+                </a>
+                <!-- Account Settings Button -->
+                <button id="portalSettingsBtn" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200 text-left group">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
+                        <i class="fas fa-user-gear text-base"></i>
+                    </div>
+                    <span class="text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition">Account Settings</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1409,18 +1416,6 @@
     let charts = { grade: null, att: null, cred: null, gpaTrend: null };
     let activities = [];
 
-    /* Static quick links (read-only) — 3 SOLID colours only */
-    const QUICK_LINKS = [
-        { href: 'https://elearning.uitm.edu.my',  icon: 'fa-graduation-cap',      color: 'ql-navy',   labelKey: 'stu_link_elearning' },
-        { href: 'https://istudent.uitm.edu.my',   icon: 'fa-user-graduate',       color: 'ql-purple', labelKey: 'stu_link_istudent' },
-        { href: 'https://library.uitm.edu.my',    icon: 'fa-book-open',           color: 'ql-gold',   labelKey: 'stu_link_library' },
-        { href: 'https://exam.uitm.edu.my',       icon: 'fa-file-pen',            color: 'ql-navy',   labelKey: 'stu_link_exam' },
-        { href: 'https://ir.uitm.edu.my',         icon: 'fa-file-lines',          color: 'ql-purple', labelKey: 'stu_link_results' },
-        { href: 'https://finance.uitm.edu.my',    icon: 'fa-file-invoice-dollar', color: 'ql-gold',   labelKey: 'stu_link_fees' },
-        { href: 'https://library.uitm.edu.my',    icon: 'fa-database',            color: 'ql-navy',   labelKey: 'stu_link_repository' },
-        { href: 'https://helpdesk.uitm.edu.my',   icon: 'fa-headset',             color: 'ql-purple', labelKey: 'stu_link_helpdesk' }
-    ];
-
     /* Activity type meta — SOLID colours */
     const ACTIVITY_TYPES = {
         login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
@@ -1443,11 +1438,6 @@
             stu_stat_cgpa: "Current CGPA", stu_stat_courses: "Enrolled Courses",
             stu_stat_credits: "Total Credits", stu_stat_assignments: "Pending Assignments",
             stu_stat_sem: "This Sem", stu_stat_due: "Due",
-            stu_quick_links_label: "Quick Menu", stu_quick_links_title: "Student Quick Links", stu_quick_links_hint: "Opens in new tab",
-            stu_link_elearning: "E-Learning", stu_link_istudent: "iStudent",
-            stu_link_library: "Library", stu_link_exam: "Exam Unit",
-            stu_link_results: "Results", stu_link_fees: "Fees",
-            stu_link_repository: "Repository", stu_link_helpdesk: "IT Helpdesk",
             stu_ach_tag: "Academic Performance", stu_ach_title: "My Progress",
             stu_ach_sub: "Grades, attendance & credit progress · FKK Johor", stu_ach_trend: "Improving",
             stu_grades: "Grades", stu_grades_sub: "Current CGPA (out of 4.00)",
@@ -1526,11 +1516,6 @@
             stu_stat_cgpa: "PNGK Semasa", stu_stat_courses: "Kursus Berdaftar",
             stu_stat_credits: "Jumlah Kredit", stu_stat_assignments: "Tugasan Tertunggak",
             stu_stat_sem: "Sem Ini", stu_stat_due: "Perlu",
-            stu_quick_links_label: "Menu Pantas", stu_quick_links_title: "Pautan Pantas Pelajar", stu_quick_links_hint: "Buka dalam tab baharu",
-            stu_link_elearning: "E-Pembelajaran", stu_link_istudent: "iStudent",
-            stu_link_library: "Perpustakaan", stu_link_exam: "Unit Peperiksaan",
-            stu_link_results: "Keputusan", stu_link_fees: "Yuran",
-            stu_link_repository: "Repositori", stu_link_helpdesk: "Helpdesk IT",
             stu_ach_tag: "Prestasi Akademik", stu_ach_title: "Kemajuan Saya",
             stu_ach_sub: "Gred, kehadiran & kemajuan kredit · FKK Johor", stu_ach_trend: "Meningkat",
             stu_grades: "Gred", stu_grades_sub: "PNGK semasa (daripada 4.00)",
@@ -1651,7 +1636,6 @@
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (student) fillStudent(student);
-        renderQuickLinks();
         renderActivities();
         updateStrength();
     };
@@ -1680,35 +1664,6 @@
         }
         const sAvatar = document.getElementById('settingsAvatar');
         if (sAvatar) sAvatar.textContent = initials;
-    }
-
-    /* =========================================================
-       QUICK LINKS
-    ========================================================== */
-    function renderQuickLinks() {
-        const grid = document.getElementById('quickLinksGrid');
-        if (!grid) return;
-
-        grid.innerHTML = QUICK_LINKS.map(link => {
-            const label = i18n[currentLang][link.labelKey] || link.labelKey;
-            return `
-                <a href="${escapeHtml(link.href)}" target="_blank" rel="noopener"
-                   class="quick-link ${link.color}"
-                   data-label-key="${escapeHtml(link.labelKey)}"
-                   data-href="${escapeHtml(link.href)}">
-                    <i class="fas ${escapeHtml(link.icon)}"></i>
-                    <span>${escapeHtml(label)}</span>
-                </a>`;
-        }).join('');
-
-        grid.querySelectorAll('.quick-link').forEach(a => {
-            a.addEventListener('click', () => {
-                const labelKey = a.dataset.labelKey;
-                const href = a.dataset.href;
-                const label = i18n[currentLang][labelKey] || labelKey;
-                logActivity('link_click', label, href);
-            });
-        });
     }
 
     /* =========================================================
@@ -2149,6 +2104,12 @@
         fillStudent(student);
 
         setTimeout(initCharts, 150);
+
+        // Bind Portal Menu "Account Settings" button to open the settings modal
+        const portalSettingsBtn = document.getElementById('portalSettingsBtn');
+        if (portalSettingsBtn) {
+            portalSettingsBtn.addEventListener('click', openSettings);
+        }
 
         if (!sessionStorage.getItem('fkkStudentLoginLogged')) {
             sessionStorage.setItem('fkkStudentLoginLogged', '1');
