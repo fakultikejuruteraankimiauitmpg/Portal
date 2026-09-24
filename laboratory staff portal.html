@@ -150,32 +150,6 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    .quick-link {
-        position: relative; overflow: hidden;
-        border-radius: 14px; color: #fff;
-        transition: all .28s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 8px 20px -10px rgba(0,0,0,.25);
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-        padding: 20px 12px; text-align: center; text-decoration: none;
-    }
-    .quick-link::before {
-        content: ''; position: absolute;
-        top: -30px; right: -30px;
-        width: 90px; height: 90px; border-radius: 50%;
-        background: rgba(255,255,255,0.14); transition: transform .35s;
-    }
-    .quick-link:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 34px -14px rgba(0,0,0,.35); }
-    .quick-link:hover::before { transform: scale(1.4); }
-    .quick-link i { font-size: 22px; position: relative; z-index: 1; }
-    .quick-link span {
-        font-size: 10px; font-weight: 800; letter-spacing: .1em;
-        text-transform: uppercase; line-height: 1.25; position: relative; z-index: 1;
-        word-break: break-word;
-    }
-    .ql-navy   { background: #002D62; }
-    .ql-purple { background: #9B26B6; }
-    .ql-gold   { background: #FDB913; }
-
     .activity-timeline { position: relative; }
     .activity-timeline::before {
         content: ''; position: absolute;
@@ -808,18 +782,50 @@
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="card p-6 mb-6 anim-up rounded-3xl">
-        <div class="mb-5 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <span class="section-label" data-i18n="lab_quick_links_label">Quick Menu</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="lab_quick_links_title">Lab Staff Quick Links</h3>
+    <!-- ============================================================
+         PORTAL MENU (NEW SECTION)
+    ============================================================ -->
+    <div class="card rounded-3xl mb-6 anim-up">
+        <!-- Header -->
+        <div class="bg-[#002D62] px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#FDB913] flex items-center justify-center shadow-md">
+                    <i class="fas fa-table-cells text-white text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-white font-black text-sm uppercase tracking-wide">PORTAL MENU</h3>
+                    <p class="text-[#FDB913] text-[9px] font-bold uppercase tracking-widest">QUICK ACCESS TO ALL SYSTEMS</p>
+                </div>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="lab_quick_links_hint">Opens in new tab</span>
+            <div class="flex items-center gap-2 border border-yellow-500/50 rounded-full px-3 py-1 bg-yellow-500/10">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#FDB913]"></span>
+                <span class="text-[#FDB913] text-[9px] font-black uppercase tracking-widest">UPDATED 2026</span>
+            </div>
         </div>
-
-        <div id="quickLinksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- rendered by JS -->
+        
+        <!-- Body -->
+        <div class="p-6">
+            <div class="mb-4">
+                <h4 class="text-[#9B26B6] text-[10px] font-black uppercase tracking-widest border-b-2 border-[#9B26B6] pb-1 inline-block">ADMINISTRATION</h4>
+            </div>
+            <ul class="space-y-0">
+                <li class="border-b border-slate-100">
+                    <a href="resume_portal.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
+                            <i class="fas fa-file-lines text-[#9B26B6] text-sm"></i>
+                        </div>
+                        <span class="text-sm font-bold">Resume</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="portalSettingsBtn" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
+                            <i class="fas fa-user-gear text-[#9B26B6] text-sm"></i>
+                        </div>
+                        <span class="text-sm font-bold">Account Settings</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
@@ -1422,22 +1428,9 @@
     let charts = { equip: null, safety: null, inv: null, labTrend: null };
     let activities = [];
 
-    /* Static quick links (read-only) — 3 SOLID colours only */
-    const QUICK_LINKS = [
-        { href: 'https://elearning.uitm.edu.my',  icon: 'fa-graduation-cap',       color: 'ql-navy',   labelKey: 'lab_link_elearning' },
-        { href: 'https://istudent.uitm.edu.my',   icon: 'fa-flask-vial',           color: 'ql-purple', labelKey: 'lab_link_labinv' },
-        { href: 'https://library.uitm.edu.my',    icon: 'fa-book-open',            color: 'ql-gold',   labelKey: 'lab_link_sop' },
-        { href: 'https://research.uitm.edu.my',   icon: 'fa-microscope',           color: 'ql-navy',   labelKey: 'lab_link_equip' },
-        { href: 'https://ir.uitm.edu.my',         icon: 'fa-truck-ramp-box',       color: 'ql-purple', labelKey: 'lab_link_orders' },
-        { href: 'https://hr.uitm.edu.my',         icon: 'fa-user-tie',             color: 'ql-gold',   labelKey: 'lab_link_hr' },
-        { href: 'https://finance.uitm.edu.my',    icon: 'fa-file-invoice-dollar',  color: 'ql-navy',   labelKey: 'lab_link_finance' },
-        { href: 'https://helpdesk.uitm.edu.my',   icon: 'fa-headset',              color: 'ql-purple', labelKey: 'lab_link_helpdesk' }
-    ];
-
     /* Activity type meta — SOLID colours */
     const ACTIVITY_TYPES = {
         login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
-        link_click:      { icon: 'fa-arrow-up-right-from-square', bg: '#002D62', en: 'Opened quick link',      ms: 'Buka pautan pantas' },
         profile_update:  { icon: 'fa-user-pen',                   bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
         password_change: { icon: 'fa-key',                        bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
         settings_open:   { icon: 'fa-gear',                       bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
@@ -1457,11 +1450,6 @@
             lab_stat_active: "Active", lab_stat_equipment: "Equipment Items",
             lab_stat_low: "Low Stock", lab_stat_chemicals: "Chemical Alerts",
             lab_stat_safety: "Safety Compliance",
-            lab_quick_links_label: "Quick Menu", lab_quick_links_title: "Lab Staff Quick Links", lab_quick_links_hint: "Opens in new tab",
-            lab_link_elearning: "E-Learning", lab_link_labinv: "Lab Inventory",
-            lab_link_sop: "SOP Manual", lab_link_equip: "Equipment Portal",
-            lab_link_orders: "Supply Orders", lab_link_hr: "HR System",
-            lab_link_finance: "Finance", lab_link_helpdesk: "IT Helpdesk",
             lab_ach_tag: "Lab Performance", lab_ach_title: "Laboratory Dashboard",
             lab_ach_sub: "Equipment, safety &amp; operations · FKK Johor", lab_ach_trend: "Improving",
             lab_equipment: "Equipment", lab_equipment_sub: "Overall uptime rate",
@@ -1547,11 +1535,6 @@
             lab_stat_active: "Aktif", lab_stat_equipment: "Item Peralatan",
             lab_stat_low: "Stok Rendah", lab_stat_chemicals: "Amaran Kimia",
             lab_stat_safety: "Pematuhan Keselamatan",
-            lab_quick_links_label: "Menu Pantas", lab_quick_links_title: "Pautan Pantas Staf Makmal", lab_quick_links_hint: "Buka dalam tab baharu",
-            lab_link_elearning: "E-Pembelajaran", lab_link_labinv: "Inventori Makmal",
-            lab_link_sop: "Manual SOP", lab_link_equip: "Portal Peralatan",
-            lab_link_orders: "Pesanan Bekalan", lab_link_hr: "Sistem HR",
-            lab_link_finance: "Kewangan", lab_link_helpdesk: "Helpdesk IT",
             lab_ach_tag: "Prestasi Makmal", lab_ach_title: "Papan Pemuka Makmal",
             lab_ach_sub: "Peralatan, keselamatan &amp; operasi · FKK Johor", lab_ach_trend: "Meningkat",
             lab_equipment: "Peralatan", lab_equipment_sub: "Kadar masa operasi keseluruhan",
@@ -1678,7 +1661,6 @@
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (staff) fillStaff(staff);
-        renderQuickLinks();
         renderActivities();
         updateStrength();
     };
@@ -1707,35 +1689,6 @@
         }
         const sAvatar = document.getElementById('settingsAvatar');
         if (sAvatar) sAvatar.textContent = initials;
-    }
-
-    /* =========================================================
-       QUICK LINKS
-    ========================================================== */
-    function renderQuickLinks() {
-        const grid = document.getElementById('quickLinksGrid');
-        if (!grid) return;
-
-        grid.innerHTML = QUICK_LINKS.map(link => {
-            const label = i18n[currentLang][link.labelKey] || link.labelKey;
-            return `
-                <a href="${escapeHtml(link.href)}" target="_blank" rel="noopener"
-                   class="quick-link ${link.color}"
-                   data-label-key="${escapeHtml(link.labelKey)}"
-                   data-href="${escapeHtml(link.href)}">
-                    <i class="fas ${escapeHtml(link.icon)}"></i>
-                    <span>${escapeHtml(label)}</span>
-                </a>`;
-        }).join('');
-
-        grid.querySelectorAll('.quick-link').forEach(a => {
-            a.addEventListener('click', () => {
-                const labelKey = a.dataset.labelKey;
-                const href = a.dataset.href;
-                const label = i18n[currentLang][labelKey] || labelKey;
-                logActivity('link_click', label, href);
-            });
-        });
     }
 
     /* =========================================================
@@ -1996,6 +1949,12 @@
     settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
     setName.addEventListener('input', function () {
         settingsAvatar.textContent = makeInitials(this.value) || '--';
+    });
+
+    // NEW: Bind the "Account Settings" link in the Portal Menu to open settings
+    document.getElementById('portalSettingsBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        openSettings();
     });
 
     document.getElementById('settingsSave').addEventListener('click', function () {
