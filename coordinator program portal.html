@@ -158,33 +158,6 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    /* Quick Links — SOLID colours */
-    .quick-link {
-        position: relative; overflow: hidden;
-        border-radius: 14px; color: #fff;
-        transition: all .28s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 8px 20px -10px rgba(0,0,0,.25);
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-        padding: 20px 12px; text-align: center; text-decoration: none;
-    }
-    .quick-link::before {
-        content: ''; position: absolute;
-        top: -30px; right: -30px;
-        width: 90px; height: 90px; border-radius: 50%;
-        background: rgba(255,255,255,0.14); transition: transform .35s;
-    }
-    .quick-link:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 34px -14px rgba(0,0,0,.35); }
-    .quick-link:hover::before { transform: scale(1.4); }
-    .quick-link i { font-size: 22px; position: relative; z-index: 1; }
-    .quick-link span {
-        font-size: 10px; font-weight: 800; letter-spacing: .1em;
-        text-transform: uppercase; line-height: 1.25; position: relative; z-index: 1;
-        word-break: break-word;
-    }
-    .ql-navy   { background: #002D62; }
-    .ql-purple { background: #9B26B6; }
-    .ql-gold   { background: #FDB913; }
-
     /* Activity Trail */
     .activity-timeline { position: relative; }
     .activity-timeline::before {
@@ -855,21 +828,6 @@
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="card p-6 mb-6 anim-up rounded-3xl">
-        <div class="mb-5 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <span class="section-label" data-i18n="quick_links_label">Quick Menu</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="quick_links_title">Coordinator Quick Links</h3>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="quick_links_hint">Opens in new tab</span>
-        </div>
-
-        <div id="quickLinksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- rendered by JS -->
-        </div>
-    </div>
-
     <!-- Coordinator stat cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
         <div class="stat-card stat-navy card-hover p-6 rounded-2xl">
@@ -906,6 +864,56 @@
             </div>
             <p class="text-3xl font-black leading-none mb-2 relative z-10">9</p>
             <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stat_approvals">Pending Approvals</p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PORTAL MENU (NEWLY ADDED)
+    ============================================================ -->
+    <div class="bg-white rounded-3xl shadow-[0_18px_40px_-20px_rgba(0,45,98,0.25)] border border-slate-200 overflow-hidden mb-6 anim-up">
+        <!-- Header -->
+        <div class="bg-[#002D62] p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-[#FDB913] flex items-center justify-center text-white shadow-lg">
+                    <i class="fas fa-th-large text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-white font-black text-lg tracking-wide uppercase leading-tight" data-i18n="portal_menu_title">Portal Menu</h3>
+                    <p class="text-white/70 text-[10px] font-bold tracking-[0.2em] uppercase mt-0.5" data-i18n="portal_menu_sub">Quick Access To All Systems</p>
+                </div>
+            </div>
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#FDB913] text-[#FDB913] text-[10px] font-black uppercase tracking-widest bg-[#002D62]/50 backdrop-blur-sm">
+                    <span class="w-2 h-2 rounded-full bg-[#FDB913] animate-pulse"></span>
+                    <span data-i18n="portal_menu_updated">Updated 2026</span>
+                </span>
+            </div>
+            <!-- Decorative circles -->
+            <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="absolute -right-5 -bottom-10 w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+            <div class="mb-4">
+                <span class="text-[#9B26B6] font-black text-[10px] tracking-[0.2em] uppercase border-b-2 border-[#9B26B6] pb-1" data-i18n="portal_admin_label">Administration</span>
+            </div>
+            <div class="space-y-1">
+                <!-- Resume -->
+                <div onclick="window.location.href='resume_portal.html'" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 group">
+                    <div class="w-8 text-center text-[#9B26B6]">
+                        <i class="fas fa-file-alt text-lg group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <span class="text-[#002D62] font-bold text-sm" data-i18n="portal_resume">Resume</span>
+                </div>
+                <!-- Account Settings -->
+                <div onclick="document.getElementById('settingsBtn').click()" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition cursor-pointer group">
+                    <div class="w-8 text-center text-[#9B26B6]">
+                        <i class="fas fa-users-cog text-lg group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <span class="text-[#002D62] font-bold text-sm" data-i18n="portal_settings">Account Settings</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1599,22 +1607,9 @@
     let charts = { enrol: null, cgpa: null, grad: null, trend: null };
     let activities = [];
 
-    /* Static quick links (read-only) — 3 SOLID colours only */
-    const QUICK_LINKS = [
-        { href: 'https://istudent.uitm.edu.my',    icon: 'fa-users',                color: 'ql-navy',   labelKey: 'link_istudent' },
-        { href: 'https://elearning.uitm.edu.my',   icon: 'fa-graduation-cap',       color: 'ql-purple', labelKey: 'link_elearning' },
-        { href: 'https://hea.uitm.edu.my',         icon: 'fa-file-signature',       color: 'ql-gold',   labelKey: 'link_academic' },
-        { href: 'https://hea.uitm.edu.my/exam',    icon: 'fa-clipboard-check',      color: 'ql-navy',   labelKey: 'link_exam' },
-        { href: 'https://library.uitm.edu.my',     icon: 'fa-book-open',            color: 'ql-purple', labelKey: 'link_library' },
-        { href: 'https://research.uitm.edu.my',    icon: 'fa-flask-vial',           color: 'ql-gold',   labelKey: 'link_research' },
-        { href: 'https://hr.uitm.edu.my',          icon: 'fa-user-tie',             color: 'ql-navy',   labelKey: 'link_hr' },
-        { href: 'https://helpdesk.uitm.edu.my',    icon: 'fa-headset',              color: 'ql-purple', labelKey: 'link_helpdesk' }
-    ];
-
     /* Activity type meta — SOLID colours */
     const ACTIVITY_TYPES = {
         login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',       ms: 'Log masuk ke portal' },
-        link_click:      { icon: 'fa-arrow-up-right-from-square', bg: '#002D62', en: 'Opened quick link',         ms: 'Buka pautan pantas' },
         approval:        { icon: 'fa-clipboard-check',            bg: '#9B26B6', en: 'Reviewed approval item',    ms: 'Semak item kelulusan' },
         course_update:   { icon: 'fa-book-bookmark',              bg: '#FDB913', en: 'Updated course info',       ms: 'Kemas kini maklumat kursus' },
         student_consult: { icon: 'fa-comments',                   bg: '#9B26B6', en: 'Student consultation',      ms: 'Konsultasi pelajar' },
@@ -1667,10 +1662,9 @@
             stu_total: "Total Students", stu_active: "Active",
             stu_leave: "On Leave", stu_graduating: "Graduating 2026",
             stu_capacity: "Enrolment Capacity",
-            quick_links_label: "Quick Menu", quick_links_title: "Coordinator Quick Links", quick_links_hint: "Opens in new tab",
-            link_istudent: "iStudent", link_elearning: "E-Learning", link_academic: "Academic Affairs",
-            link_exam: "Exam Unit", link_library: "Library", link_research: "Research Portal",
-            link_hr: "HR System", link_helpdesk: "IT Helpdesk",
+            portal_menu_title: "Portal Menu", portal_menu_sub: "Quick Access To All Systems",
+            portal_menu_updated: "Updated 2026", portal_admin_label: "Administration",
+            portal_resume: "Resume", portal_settings: "Account Settings",
             news_tag: "Latest Updates", news_title: "Newsroom & Events", btn_archive: "View Archive",
             news_1_title: "FKK Researchers Secure RM500k Grant for Green Hydrogen.",
             news_2_title: "Dean's List Ceremony: Celebrating Academic Excellence.",
@@ -1773,10 +1767,9 @@
             stu_total: "Jumlah Pelajar", stu_active: "Aktif",
             stu_leave: "Bercuti", stu_graduating: "Bergraduat 2026",
             stu_capacity: "Kapasiti Enrolmen",
-            quick_links_label: "Menu Pantas", quick_links_title: "Pautan Pantas Koordinator", quick_links_hint: "Buka dalam tab baharu",
-            link_istudent: "iStudent", link_elearning: "E-Pembelajaran", link_academic: "Hal Ehwal Akademik",
-            link_exam: "Unit Peperiksaan", link_library: "Perpustakaan", link_research: "Portal Penyelidikan",
-            link_hr: "Sistem HR", link_helpdesk: "Helpdesk IT",
+            portal_menu_title: "Menu Portal", portal_menu_sub: "Akses Pantas Ke Semua Sistem",
+            portal_menu_updated: "Dikemas kini 2026", portal_admin_label: "Pentadbiran",
+            portal_resume: "Resume", portal_settings: "Tetapan Akaun",
             news_tag: "Terkini", news_title: "Berita & Acara", btn_archive: "Lihat Arkib",
             news_1_title: "Penyelidik FKK Raih Geran RM500k untuk Hidrogen Hijau.",
             news_2_title: "Majlis Anugerah Dekan: Meraikan Kecemerlangan Akademik.",
@@ -1891,7 +1884,6 @@
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (staff) fillStaff(staff);
-        renderQuickLinks();
         renderActivities();
         updateStrength();
     };
@@ -1919,35 +1911,6 @@
         }
         const sAvatar = document.getElementById('settingsAvatar');
         if (sAvatar) sAvatar.textContent = initials;
-    }
-
-    /* =========================================================
-       QUICK LINKS — read-only render
-    ========================================================== */
-    function renderQuickLinks() {
-        const grid = document.getElementById('quickLinksGrid');
-        if (!grid) return;
-
-        grid.innerHTML = QUICK_LINKS.map(link => {
-            const label = i18n[currentLang][link.labelKey] || link.labelKey;
-            return `
-                <a href="${escapeHtml(link.href)}" target="_blank" rel="noopener"
-                   class="quick-link ${link.color}"
-                   data-label-key="${escapeHtml(link.labelKey)}"
-                   data-href="${escapeHtml(link.href)}">
-                    <i class="fas ${escapeHtml(link.icon)}"></i>
-                    <span>${escapeHtml(label)}</span>
-                </a>`;
-        }).join('');
-
-        grid.querySelectorAll('.quick-link').forEach(a => {
-            a.addEventListener('click', () => {
-                const labelKey = a.dataset.labelKey;
-                const href = a.dataset.href;
-                const label = i18n[currentLang][labelKey] || labelKey;
-                logActivity('link_click', label, href);
-            });
-        });
     }
 
     /* =========================================================
