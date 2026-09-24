@@ -8,6 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<script src="auth.js"></script>
+<script>
+    window.__FMS_SESSION__ = FMSAuth.requireAuth(['admin']);
+</script>
+
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     :root { --navy:#002D62; --purple:#9B26B6; --gold:#FDB913; }
@@ -58,7 +63,7 @@
     .hero-banner::before { content:''; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,.18) 1px, transparent 1px); background-size:26px 26px; opacity:.35; }
 
     .tbl-scroll { overflow-x:auto; }
-    .tbl { width:100%; border-collapse:separate; border-spacing:0; min-width:900px; }
+    .tbl { width:100%; border-collapse:separate; border-spacing:0; min-width:1040px; }
     .tbl thead th { font-size:9px; font-weight:900; letter-spacing:.16em; text-transform:uppercase; color:#94A3B8; padding:12px 14px; text-align:left; border-bottom:1px solid #E2E8F0; white-space:nowrap; background:#F8FAFC; }
     .tbl tbody td { padding:13px 14px; border-bottom:1px solid #F1F5F9; font-size:12px; font-weight:600; color:#334155; vertical-align:middle; }
     .tbl tbody tr { transition:background .2s ease; }
@@ -83,6 +88,7 @@
     .status-warn { background:rgba(253,185,19,.18); color:#B45309; border:1px solid rgba(253,185,19,.4); }
 
     .badge-session { background:rgba(0,45,98,.08); color:#002D62; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:800; font-family:'Courier New',monospace; border:1px solid rgba(0,45,98,.15); letter-spacing:.03em; }
+    .badge-id { background:rgba(155,38,182,.10); color:#9B26B6; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:800; font-family:'Courier New',monospace; border:1px solid rgba(155,38,182,.22); letter-spacing:.03em; white-space:nowrap; display:inline-block; }
 
     .modal-backdrop { background:rgba(15,23,42,0.55); backdrop-filter:blur(6px); opacity:0; visibility:hidden; transition:all .25s ease; z-index:100; }
     .modal-backdrop.open { opacity:1; visibility:visible; }
@@ -325,6 +331,7 @@
                 <thead>
                     <tr>
                         <th data-i18n="th_user">User</th>
+                        <th data-i18n="th_userid">User ID</th>
                         <th data-i18n="th_role">Role</th>
                         <th data-i18n="th_program">Program / Department</th>
                         <th data-i18n="th_session">Session ID</th>
@@ -672,15 +679,8 @@
 
 <div id="toast" class="toast"><i class="fas fa-circle-check"></i><span id="toastMsg">Saved</span></div>
 
-<script src="auth.js"></script>
 <script>
 (function () {
-
-    /* =========================================================
-       AUTH GUARD
-    ========================================================== */
-    const session = FMSAuth.requireAuth(['admin']);
-    if (!session) return;
 
     /* =========================================================
        API CONFIG
@@ -712,6 +712,7 @@
     /* =========================================================
        CURRENT ADMIN
     ========================================================== */
+    const session = window.__FMS_SESSION__;
     const sessionUser = (session && session.user) || {};
 
     function makeAdminInitials(name) {
@@ -775,7 +776,7 @@
             role_coordinator:"Coordinator", role_admin:"Administrator", role_admin_short:"Admin",
             status_active:"Active", status_inactive:"Inactive",
             btn_add:"Add User", btn_import:"Excel", btn_cancel:"Cancel", btn_save:"Save User", btn_close:"Close",
-            th_user:"User", th_role:"Role", th_program:"Program / Department",
+            th_user:"User", th_userid:"User ID", th_role:"Role", th_program:"Program / Department",
             th_session:"Session ID", th_status:"Status", th_actions:"Actions",
             th_name_short:"Name", th_password:"Password", th_email:"Email",
             showing:"Showing", of:"of", accounts:"accounts",
@@ -850,7 +851,7 @@
             role_coordinator:"Penyelaras", role_admin:"Pentadbir", role_admin_short:"Admin",
             status_active:"Aktif", status_inactive:"Tidak Aktif",
             btn_add:"Tambah Pengguna", btn_import:"Excel", btn_cancel:"Batal", btn_save:"Simpan Pengguna", btn_close:"Tutup",
-            th_user:"Pengguna", th_role:"Peranan", th_program:"Program / Jabatan",
+            th_user:"Pengguna", th_userid:"ID Pengguna", th_role:"Peranan", th_program:"Program / Jabatan",
             th_session:"ID Sesi", th_status:"Status", th_actions:"Tindakan",
             th_name_short:"Nama", th_password:"Kata Laluan", th_email:"E-mel",
             showing:"Memaparkan", of:"daripada", accounts:"akaun",
@@ -1088,7 +1089,7 @@
         document.getElementById('statAdmins').textContent = appState.users.filter(function(u){ return u.role === 'admin'; }).length;
 
         if (!filtered.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:34px;color:#94A3B8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;">'
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:34px;color:#94A3B8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;">'
                 + '<i class="fas fa-user-slash" style="display:block;font-size:22px;margin-bottom:10px;opacity:.4;"></i>' + escapeHtml(t('no_results')) + '</td></tr>';
             return;
         }
@@ -1100,8 +1101,9 @@
             return '<tr class="row-clickable" data-user-id="' + escapeHtml(String(u.id)) + '" title="' + escapeHtml(t('click_hint')) + '">'
                 + '<td><div class="tbl-user"><div class="tbl-avatar" style="background:' + rm.bg + ';">' + escapeHtml(initials) + '</div><div class="min-w-0">'
                 + '<p class="tbl-user-name">' + escapeHtml(u.name) + '<i class="fas fa-key key-hint"></i></p>'
-                + '<p class="tbl-user-mail">' + escapeHtml(u.email) + ' · #' + escapeHtml(String(u.id)) + '</p>'
+                + '<p class="tbl-user-mail">' + escapeHtml(u.email) + '</p>'
                 + '</div></div></td>'
+                + '<td><span class="badge-id">' + escapeHtml(String(u.id)) + '</span></td>'
                 + '<td><span class="chip ' + rm.chip + '">' + escapeHtml(roleLabel(u.role)) + '</span></td>'
                 + '<td style="color:#475569;font-size:11px;font-weight:700;">' + escapeHtml(u.program || '—') + '</td>'
                 + '<td><span class="badge-session">' + escapeHtml(u.sessionId || '—') + '</span></td>'
