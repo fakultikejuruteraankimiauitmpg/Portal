@@ -768,7 +768,7 @@
     </div>
 
     <!-- ============================================================
-         PORTAL MENU (NEW)
+         PORTAL MENU
     ============================================================ -->
     <div class="card rounded-3xl mb-6 anim-up overflow-hidden">
         <!-- Header -->
@@ -793,8 +793,10 @@
         </div>
         <!-- Body -->
         <div class="p-6">
+
+            <!-- ---------- ADMINISTRATION ---------- -->
             <div class="mb-6">
-                <h4 class="text-[11px] font-black text-[#9B26B6] uppercase tracking-[0.2em] relative inline-block pb-2 border-b-2 border-[#FDB913]">Administration</h4>
+                <h4 class="text-[11px] font-black text-[#9B26B6] uppercase tracking-[0.2em] relative inline-block pb-2 border-b-2 border-[#FDB913]" data-i18n="menu_admin_heading">Administration</h4>
             </div>
             <div class="space-y-2">
                 <!-- Resume Link -->
@@ -802,15 +804,59 @@
                     <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
                         <i class="fas fa-file-lines text-base"></i>
                     </div>
-                    <span class="text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition">Resume</span>
+                    <span class="text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition" data-i18n="menu_resume">Resume</span>
                 </a>
                 <!-- Account Settings Button -->
                 <button id="portalSettingsBtn" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200 text-left group">
                     <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
                         <i class="fas fa-user-gear text-base"></i>
                     </div>
-                    <span class="text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition">Account Settings</span>
+                    <span class="text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition" data-i18n="menu_account_settings">Account Settings</span>
                 </button>
+            </div>
+
+            <!-- ---------- LABORATORY SERVICES (NEW) ---------- -->
+            <div class="mt-8 mb-6">
+                <h4 class="text-[11px] font-black text-[#9B26B6] uppercase tracking-[0.2em] relative inline-block pb-2 border-b-2 border-[#FDB913]" data-i18n="menu_lab_heading">Perkhidmatan Makmal</h4>
+            </div>
+            <div class="space-y-2">
+
+                <!-- Pinjaman Alat Radas -->
+                <a href="pinjaman_alat_radas.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200 group">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
+                        <i class="fas fa-screwdriver-wrench text-base"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <span class="block text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition" data-i18n="menu_equipment_loan">Pinjaman Alat Radas</span>
+                        <span class="block text-[10px] font-semibold text-slate-400 mt-0.5" data-i18n="menu_equipment_loan_sub">Borrow laboratory apparatus &amp; tools</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-[#9B26B6] transition"></i>
+                </a>
+
+                <!-- Permohonan Bahan Kimia -->
+                <a href="permohonan_bahan_kimia.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200 group">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
+                        <i class="fas fa-flask-vial text-base"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <span class="block text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition" data-i18n="menu_chemical_request">Permohonan Bahan Kimia</span>
+                        <span class="block text-[10px] font-semibold text-slate-400 mt-0.5" data-i18n="menu_chemical_request_sub">Request chemical substances for lab use</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-[#9B26B6] transition"></i>
+                </a>
+
+                <!-- Permohonan Peralatan Makmal -->
+                <a href="permohonan_peralatan_makmal.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200 group">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#9B26B6] bg-purple-50 group-hover:bg-purple-100 transition">
+                        <i class="fas fa-microscope text-base"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <span class="block text-sm font-bold text-[#002D62] group-hover:text-[#9B26B6] transition" data-i18n="menu_lab_equipment_request">Permohonan Peralatan Makmal</span>
+                        <span class="block text-[10px] font-semibold text-slate-400 mt-0.5" data-i18n="menu_lab_equipment_request_sub">Apply for laboratory equipment usage</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-[#9B26B6] transition"></i>
+                </a>
+
             </div>
         </div>
     </div>
@@ -1433,6 +1479,16 @@
         en: {
             nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Search portal...",
             menu_settings: "Settings", menu_logout: "Sign Out",
+            menu_admin_heading: "Administration",
+            menu_resume: "Resume",
+            menu_account_settings: "Account Settings",
+            menu_lab_heading: "Laboratory Services",
+            menu_equipment_loan: "Equipment Loan",
+            menu_equipment_loan_sub: "Borrow laboratory apparatus & tools",
+            menu_chemical_request: "Chemical Request",
+            menu_chemical_request_sub: "Request chemical substances for lab use",
+            menu_lab_equipment_request: "Lab Equipment Request",
+            menu_lab_equipment_request_sub: "Apply for laboratory equipment usage",
             stu_dash_online: "Semester Active", stu_dash_welcome: "Welcome back,",
             stu_dash_today: "Today", stu_dash_lastlogin: "Last Login",
             stu_stat_cgpa: "Current CGPA", stu_stat_courses: "Enrolled Courses",
@@ -1511,6 +1567,16 @@
         ms: {
             nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Cari dalam portal...",
             menu_settings: "Tetapan", menu_logout: "Log Keluar",
+            menu_admin_heading: "Pentadbiran",
+            menu_resume: "Resume",
+            menu_account_settings: "Tetapan Akaun",
+            menu_lab_heading: "Perkhidmatan Makmal",
+            menu_equipment_loan: "Pinjaman Alat Radas",
+            menu_equipment_loan_sub: "Pinjam alat radas & perkakas makmal",
+            menu_chemical_request: "Permohonan Bahan Kimia",
+            menu_chemical_request_sub: "Mohon bahan kimia untuk kegunaan makmal",
+            menu_lab_equipment_request: "Permohonan Peralatan Makmal",
+            menu_lab_equipment_request_sub: "Mohon penggunaan peralatan makmal",
             stu_dash_online: "Semester Aktif", stu_dash_welcome: "Selamat kembali,",
             stu_dash_today: "Hari Ini", stu_dash_lastlogin: "Log Masuk Terakhir",
             stu_stat_cgpa: "PNGK Semasa", stu_stat_courses: "Kursus Berdaftar",
