@@ -47,6 +47,15 @@ a{color:var(--brand);text-decoration:none}
 .avatar{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
 .view{padding:24px 26px 60px;flex:1}
 
+/* Sync status pill */
+.sync-status{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s}
+.sync-status:hover{border-color:#c7d2fe;background:#f8faff}
+.sync-status .sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.sync-status .sync-dot.on{background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.2)}
+.sync-status .sync-dot.off{background:#94a3b8}
+.sync-status .sync-dot.busy{background:#f59e0b;animation:pulse 1s infinite}
+@media(max-width:640px){.sync-status span:last-child{display:none}}
+
 /* ---------- COMPONENTS ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .card-pad{padding:18px 20px}
@@ -177,7 +186,7 @@ tbody tr:hover{background:#fafbff}
 .log .er{color:#f87171}
 .log .in{color:#38bdf8}
 
-/* User badge in topbar */
+/* User badge */
 .user-badge{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;background:#fff;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:.15s}
 .user-badge:hover{border-color:#c7d2fe;background:#f8faff}
 .user-badge .uinfo{display:flex;flex-direction:column;line-height:1.1}
@@ -210,6 +219,10 @@ tbody tr:hover{background:#fafbff}
           <option value="Head">👨‍💼 Head / Coordinator</option>
           <option value="Admin">🔐 Admin</option>
         </select>
+        <div class="sync-status" onclick="go('cloudSync')" title="Cloud Sync Status">
+          <span class="sync-dot off" id="syncDot"></span>
+          <span id="syncLabel">Cloud idle</span>
+        </div>
         <button class="icon-btn" onclick="quickCloudPush()" title="Sync ke Cloud">☁️</button>
         <button class="icon-btn" onclick="go('notifications')" title="Notifications">🔔<span class="dot" id="notifDot"></span></button>
         <div class="user-badge" onclick="go('profile')" title="Profil Saya">
@@ -227,22 +240,15 @@ tbody tr:hover{background:#fafbff}
 </div>
 <div id="modalRoot"></div>
 
-<!-- ============================================================
-     AUTH GUARD LOADER
-     Sesuaikan path/auth.js jika perlu. Fail ini mesti wujud
-     dan menyediakan objek global `FMSAuth`.
-============================================================= -->
 <script src="auth.js"></script>
 
 <script>
 /* =========================================================
-   AUTH GUARD — Hanya pengguna yang telah sign in boleh akses
+   AUTH GUARD
    ========================================================= */
 const session = (window.FMSAuth && FMSAuth.requireAuth(['academic_staff']));
 
 if (!session) {
-  /* FMSAuth.requireAuth sudah redirect ke login.html.
-     Kita hentikan eksekusi skrip ini sahaja. */
   document.body.innerHTML = `
     <div style="min-height:100vh;display:grid;place-items:center;font-family:system-ui;color:#64748b;background:#f4f6fb">
       <div style="text-align:center">
@@ -254,12 +260,10 @@ if (!session) {
   throw new Error('Unauthenticated — redirecting');
 }
 
-/* Keep session alive on user activity */
 ['click','keydown','mousemove','scroll'].forEach(evt =>
   document.addEventListener(evt, () => { try { FMSAuth.touch(); } catch(e){} }, { passive:true })
 );
 
-/* Build a small context from session */
 const CURRENT_USER = {
   id:       (session.user && session.user.id)       || 'anon',
   name:     (session.user && session.user.name)     || 'User',
@@ -296,12 +300,12 @@ function doLogout(){
 window.doLogout = doLogout;
 
 /* =========================================================
-   0b. CLOUD ENDPOINT (Google Apps Script Web App)
+   0b. CLOUD ENDPOINT
    ========================================================= */
 const CLOUD_URL = 'https://script.google.com/macros/s/AKfycbwTf6R87uxIhon3uB5ZW4E2M3o37J58UMRDu494bBQESo1YmaAT0gPDTnmYgmd4gh2IKg/exec';
 
 /* =========================================================
-   1. SCHEMA — definisi semua modul
+   1. SCHEMA
    ========================================================= */
 const SCHEMA = {
   qualifications:{ label:'Academic Qualification', icon:'🎓', singular:'Qualification', dateKey:'gradYear', cols:['university','gradYear'],
@@ -582,12 +586,12 @@ function seed(){
     conferences:[], books:[], awards:[], media:[], adminExp:[],
     supervision:[], consultancy:[], memberships:[], community:[], innovation:[], ip:[],
     audit:[], readNotifs:[],
-    cloud:{ lastPush:null, lastPull:null, autoSync:false, sheet:'Resume', key:'' }
+    cloud:{ lastPush:null, lastPull:null, autoSync:true, sheet:'Resume', key:'' }
   };
 }
 
 /* =========================================================
-   3. PERSISTENCE — data is scoped per authenticated user
+   3. PERSISTENCE
    ========================================================= */
 const LS_KEY = 'academic_profile_system_v2_' + (CURRENT_USER.id || 'anon');
 let DB;
@@ -601,14 +605,14 @@ function load(){
     if(!d.profile) d.profile = {};
     if(!d.audit) d.audit = [];
     if(!d.readNotifs) d.readNotifs = [];
-    if(!d.cloud) d.cloud = { lastPush:null, lastPull:null, autoSync:false, sheet:'Resume', key:'' };
+    if(!d.cloud) d.cloud = { lastPush:null, lastPull:null, autoSync:true, sheet:'Resume', key:'' };
+    if(d.cloud.autoSync === undefined) d.cloud.autoSync = true;
     return d;
   }catch(e){ return null; }
 }
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
 DB = load() || seed();
 
-/* Hydrate profile with session info (only fill empty fields) */
 (function hydrateProfile(){
   if(!DB.profile.name || DB.profile.name === 'User') DB.profile.name = CURRENT_USER.name;
   if(!DB.profile.email) DB.profile.email = CURRENT_USER.email;
@@ -731,6 +735,10 @@ function render(){
   $('#roleSelect').value = DB.role;
   $('#notifDot').classList.toggle('on', notifications().some(n=>!DB.readNotifs.includes(n.id)));
 
+  if(typeof SYNC !== 'undefined' && SYNC.setStatus){
+    SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
+  }
+
   if(SCHEMA[state.view] && NAV.find(n=>n.id===state.view && n.coll)){
     viewCollection(state.view);
   } else {
@@ -740,7 +748,7 @@ function render(){
 }
 
 /* =========================================================
-   6. UTILITIES — stats, quality, notifications, audit
+   6. UTILITIES
    ========================================================= */
 function count(k){ return (DB[k]||[]).length; }
 function totalGrants(){ return (DB.grants||[]).reduce((s,g)=>s+Number(g.amount||0),0); }
@@ -858,8 +866,8 @@ VIEWS.dashboard = function(){
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <div style="font-size:26px">☁️</div>
       <div style="flex:1;min-width:220px">
-        <div style="font-weight:800">Cloud Resume Sync</div>
-        <div class="muted small">Hantar resume/CV ke Google Sheets melalui Apps Script — satu klik sahaja.</div>
+        <div style="font-weight:800">Cloud Resume Sync (Auto)</div>
+        <div class="muted small">Data akan dihantar secara automatik ke Google Sheets selepas setiap perubahan.</div>
       </div>
       <div class="btn-row">
         <button class="btn btn-ok" onclick="quickCloudPush()">⬆ Update Resume ke Cloud</button>
@@ -988,7 +996,6 @@ VIEWS.profile = function(){
 
 function saveProfile(){
   document.querySelectorAll('[data-p]').forEach(el=>{ DB.profile[el.dataset.p] = el.value; });
-  /* Sync the profile name/email back into the session so the topbar stays consistent */
   try {
     const s = FMSAuth.getSession && FMSAuth.getSession();
     if(s && s.user){
@@ -1001,6 +1008,7 @@ function saveProfile(){
   } catch(e){}
   log('Updated Profile','My Profile','Manual Entry');
   save(); render(); toast('Profil disimpan ✔');
+  SYNC.schedule('after-profile-save');
 }
 window.saveProfile = saveProfile;
 
@@ -1018,7 +1026,7 @@ async function saveProfileAndSync(){
   } catch(e){}
   log('Updated Profile','My Profile','Manual Entry');
   save();
-  await cloudPush({ silent:false, reason:'save-profile' });
+  await SYNC.flush('manual-save-profile');
 }
 window.saveProfileAndSync = saveProfileAndSync;
 
@@ -1044,6 +1052,7 @@ function aiBiography(){
 
   log('AI Generated Biography','My Profile','AI Generator',{confidence:94, verified:false});
   save(); render(); toast('✨ Biografi dijana oleh AI — sila semak');
+  SYNC.schedule('after-ai-bio');
 }
 window.aiBiography = aiBiography;
 
@@ -1088,13 +1097,14 @@ function saveExpertise(){
   document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
   log('Updated Expertise','Expertise & Research','Manual Entry');
   save(); render(); toast('Disimpan ✔');
+  SYNC.schedule('after-expertise');
 }
 window.saveExpertise = saveExpertise;
 async function saveExpertiseAndSync(){
   document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
   log('Updated Expertise','Expertise & Research','Manual Entry');
   save();
-  await cloudPush({ silent:false, reason:'save-expertise' });
+  await SYNC.flush('manual-save-expertise');
 }
 window.saveExpertiseAndSync = saveExpertiseAndSync;
 
@@ -1176,6 +1186,7 @@ function delRec(key, id){
   DB[key] = DB[key].filter(r=>r.id!==id);
   log('Deleted Record', (SCHEMA[key].title(rec)||key), 'Manual Entry');
   save(); render(); toast('Rekod dipadam');
+  SYNC.schedule('after-delete');
 }
 window.delRec = delRec;
 
@@ -1236,8 +1247,7 @@ function submitForm(e, key, id){
     log('Added Record', SCHEMA[key].title(data)||key, 'Manual Entry');
   }
   closeModal(); save(); render(); toast('Rekod disimpan ✔');
-
-  if(DB.cloud.autoSync) cloudPush({ silent:true, reason:'auto-after-save' });
+  SYNC.schedule('after-save');
 }
 window.submitForm = submitForm;
 
@@ -1516,6 +1526,7 @@ function _commitScan(){
   $('#scanOutput').innerHTML = `<div class="hint ok"><b>✅ Rekod berjaya disimpan ke ${SCHEMA[key].label}.</b> Dokumen asal tidak disimpan — hanya maklumat berstruktur.</div>`;
   renderSidebar();
   toast('Rekod AI disimpan ✔');
+  SYNC.schedule('after-ai-scan');
   return key;
 }
 
@@ -1527,13 +1538,78 @@ window.confirmScan = confirmScan;
 async function confirmScanAndSync(){
   if(!scanResult) return;
   _commitScan();
-  await cloudPush({ silent:false, reason:'ai-confirm' });
+  await SYNC.flush('manual-ai-confirm');
 }
 window.confirmScanAndSync = confirmScanAndSync;
 
 /* =========================================================
-   13. VIEW: CLOUD RESUME SYNC
+   13. SYNC ENGINE v2 — AUTO + RETRY + QUEUE
    ========================================================= */
+const SYNC = {
+  timer:null, inflight:false, retries:0, maxRetries:4, debounceMs:2500,
+  status:'idle',
+
+  schedule(reason){
+    if(!DB.cloud.autoSync){ SYNC.setStatus('idle'); return; }
+    if(!navigator.onLine){ SYNC.setStatus('offline'); return; }
+    clearTimeout(SYNC.timer);
+    SYNC.setStatus('pending');
+    SYNC.timer = setTimeout(()=>SYNC.flush(reason), SYNC.debounceMs);
+  },
+
+  async flush(reason){
+    if(SYNC.inflight) return false;
+    if(!navigator.onLine){ SYNC.setStatus('offline'); return false; }
+    clearTimeout(SYNC.timer);
+    SYNC.inflight = true;
+    SYNC.setStatus('busy');
+    const ok = await cloudPush({ silent:true, reason });
+    SYNC.inflight = false;
+
+    if(ok){
+      SYNC.retries = 0;
+      SYNC.setStatus('ok');
+      return true;
+    } else {
+      SYNC.retries++;
+      if(SYNC.retries <= SYNC.maxRetries){
+        const wait = Math.pow(2, SYNC.retries) * 3000;
+        SYNC.setStatus('retry');
+        setTimeout(()=>SYNC.flush(reason + '-retry' + SYNC.retries), wait);
+      } else {
+        SYNC.setStatus('error');
+        toast('☁️ Sync gagal — cuba butang ☁️ di topbar');
+      }
+      return false;
+    }
+  },
+
+  setStatus(s){
+    SYNC.status = s;
+    const dot = document.getElementById('syncDot');
+    const lbl = document.getElementById('syncLabel');
+    if(!dot || !lbl) return;
+    const map = { idle:'off', pending:'busy', busy:'busy', ok:'on', error:'off', offline:'off', retry:'busy' };
+    const text = {
+      idle:'Cloud idle', pending:'Sync pending…', busy:'Syncing…',
+      ok:'☁️ Synced', error:'⚠️ Sync failed', offline:'📴 Offline', retry:'⟳ Retrying…'
+    };
+    dot.className = 'sync-dot ' + (map[s]||'off');
+    lbl.textContent = text[s] || s;
+  }
+};
+window.SYNC = SYNC;
+
+window.addEventListener('online', ()=>{ toast('🌐 Online'); if(SYNC.status==='offline') SYNC.flush('online'); });
+window.addEventListener('offline', ()=>{ SYNC.setStatus('offline'); toast('📴 Offline'); });
+
+setInterval(()=>{
+  if(DB.cloud.autoSync && navigator.onLine && SYNC.status !== 'ok' && SYNC.status !== 'busy'){
+    SYNC.flush('periodic');
+  }
+}, 5*60*1000);
+
+/* ------- VIEW: Cloud Sync Panel ------- */
 VIEWS.cloudSync = function(){
   const c = DB.cloud;
   const summary = cloudSummary();
@@ -1545,20 +1621,16 @@ VIEWS.cloudSync = function(){
       <div style="font-size:32px">☁️</div>
       <div style="flex:1;min-width:220px">
         <div style="font-weight:800;font-size:16px">Cloud Resume Sync — Google Sheets</div>
-        <div class="muted small">
-          Endpoint: <code style="font-size:11px">${esc(CLOUD_URL.slice(0,62))}…</code>
-        </div>
+        <div class="muted small">Endpoint: <code style="font-size:11px">${esc(CLOUD_URL.slice(0,62))}…</code></div>
         <div style="margin-top:8px;font-size:12px">
           <span class="sync-dot ${status}"></span>
           ${c.lastPush ? `Terakhir hantar: <b>${fmtDateTime(c.lastPush)}</b>` : '<b>Belum pernah sync</b>'}
           ${c.lastPull ? ` · Terakhir tarik: <b>${fmtDateTime(c.lastPull)}</b>` : ''}
         </div>
-        <div class="muted small" style="margin-top:6px">
-          👤 Signed in as <b>${esc(CURRENT_USER.name)}</b> (${esc(CURRENT_USER.id)})
-        </div>
+        <div class="muted small" style="margin-top:6px">👤 ${esc(CURRENT_USER.name)} (${esc(CURRENT_USER.id)})</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ok" id="btnPush" onclick="cloudPush({silent:false})">⬆ Update Resume</button>
+        <button class="btn btn-ok" id="btnPush" onclick="SYNC.flush('manual')">⬆ Update Resume</button>
         <button class="btn" id="btnPull" onclick="cloudPull()">⬇ Tarik dari Cloud</button>
         <button class="btn" id="btnTest" onclick="cloudTest()">🔌 Test Connection</button>
       </div>
@@ -1588,27 +1660,24 @@ VIEWS.cloudSync = function(){
         <dt>Innovation</dt><dd>${count('innovation')}</dd>
         <dt>IP Records</dt><dd>${count('ip')}</dd>
       </dl>
-      <div class="hint" style="margin-top:14px">
-        Payload dihantar sebagai JSON (<code>text/plain</code>) supaya serasi dengan Google Apps Script tanpa isu CORS preflight.
-      </div>
     </div>
 
     <div class="card card-pad">
       <div class="section-title">⚙️ Tetapan Sync</div>
       <label class="fld" style="margin-bottom:12px">
         <span><input type="checkbox" id="autoSync" ${DB.cloud.autoSync?'checked':''}
-          onchange="DB.cloud.autoSync=this.checked; save(); toast('Auto-sync: '+(this.checked?'ON':'OFF'))" style="accent-color:var(--brand);margin-right:6px">
+          onchange="DB.cloud.autoSync=this.checked; save(); SYNC.setStatus(this.checked?'ok':'idle'); toast('Auto-sync: '+(this.checked?'ON':'OFF'))"
+          style="accent-color:var(--brand);margin-right:6px">
           Auto-sync selepas setiap perubahan rekod</span>
       </label>
       <label class="fld" style="margin-bottom:12px">
-        <span>Nama Sheet / Tab (optional)</span>
+        <span>Nama Sheet / Tab</span>
         <input type="text" id="cloudSheet" value="${esc(DB.cloud.sheet||'Resume')}"
           onchange="DB.cloud.sheet=this.value; save();">
       </label>
       <label class="fld" style="margin-bottom:12px">
         <span>Kunci Keselamatan (optional)</span>
         <input type="text" id="cloudKey" value="${esc(DB.cloud.key||'')}"
-          placeholder="Jika Apps Script anda memerlukan token"
           onchange="DB.cloud.key=this.value; save();">
       </label>
       <div class="btn-row">
@@ -1616,8 +1685,7 @@ VIEWS.cloudSync = function(){
         <button class="btn" onclick="go('cv')">📄 Lihat CV</button>
       </div>
       <div class="hint warn" style="margin-top:14px">
-        <b>Nota:</b> Pastikan Web App Apps Script anda di-deploy sebagai <b>“Anyone”</b> dan fungsi <code>doPost(e)</code> menggunakan
-        <code>JSON.parse(e.postData.contents)</code>.
+        <b>Penting:</b> Apps Script mesti di-deploy <b>Execute as: Me</b> + <b>Who has access: Anyone</b>.
       </div>
     </div>
   </div>
@@ -1627,16 +1695,12 @@ VIEWS.cloudSync = function(){
       <div class="section-title" style="margin:0">🪵 Log Sync</div>
       <button class="btn btn-sm" style="margin-left:auto" onclick="document.getElementById('syncLog').innerHTML=''">Clear</button>
     </div>
-    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> Sedia. Tekan <b>Test Connection</b> atau <b>Update Resume</b>.</div>
+    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> Sedia.</div>
   </div>`;
 };
 
 function cloudSummary(){
-  return {
-    publications: count('publications'),
-    totalGrants: totalGrants(),
-    awards: count('awards')
-  };
+  return { publications: count('publications'), totalGrants: totalGrants(), awards: count('awards') };
 }
 
 function syncLog(msg, cls){
@@ -1650,20 +1714,13 @@ function syncLog(msg, cls){
 }
 
 function buildCloudPayload(){
-  const { audit, readNotifs, ...rest } = DB;
   return {
     action: 'updateResume',
     timestamp: new Date().toISOString(),
     source: 'Academic Profile System',
     key: DB.cloud.key || '',
     sheet: DB.cloud.sheet || 'Resume',
-    /* include authenticated identity */
-    auth: {
-      userId: CURRENT_USER.id,
-      name: CURRENT_USER.name,
-      email: CURRENT_USER.email,
-      role: CURRENT_ROLE
-    },
+    auth: { userId: CURRENT_USER.id, name: CURRENT_USER.name, email: CURRENT_USER.email, role: CURRENT_ROLE },
     profile: DB.profile,
     summary: {
       publications: (DB.publications||[]).length,
@@ -1673,78 +1730,74 @@ function buildCloudPayload(){
       awards: (DB.awards||[]).length,
       completeness: profileCompleteness()
     },
-    data: {
-      qualifications: DB.qualifications||[],
-      teaching: DB.teaching||[],
-      projects: DB.projects||[],
-      grants: DB.grants||[],
-      publications: DB.publications||[],
-      conferences: DB.conferences||[],
-      books: DB.books||[],
-      awards: DB.awards||[],
-      media: DB.media||[],
-      adminExp: DB.adminExp||[],
-      supervision: DB.supervision||[],
-      consultancy: DB.consultancy||[],
-      memberships: DB.memberships||[],
-      community: DB.community||[],
-      innovation: DB.innovation||[],
-      ip: DB.ip||[]
-    },
     cvHtml: (function(){
       try {
-        if(typeof generateCV === 'function' && document.getElementById('cvDoc')){
-          generateCV();
-          return document.getElementById('cvDoc').innerHTML;
-        }
-      } catch(e){}
-      return '';
-    })()
+        let el = document.getElementById('cvDoc');
+        let created = false;
+        if(!el){ el = document.createElement('div'); el.id='cvDoc'; el.style.display='none'; document.body.appendChild(el); created=true; }
+        const prev = el.innerHTML;
+        generateCV();
+        const html = el.innerHTML;
+        if(created){ el.remove(); } else { el.innerHTML = prev; }
+        return html;
+      } catch(e){ return ''; }
+    })(),
+    data: {
+      qualifications: DB.qualifications||[], teaching: DB.teaching||[], projects: DB.projects||[],
+      grants: DB.grants||[], publications: DB.publications||[], conferences: DB.conferences||[],
+      books: DB.books||[], awards: DB.awards||[], media: DB.media||[], adminExp: DB.adminExp||[],
+      supervision: DB.supervision||[], consultancy: DB.consultancy||[], memberships: DB.memberships||[],
+      community: DB.community||[], innovation: DB.innovation||[], ip: DB.ip||[]
+    }
   };
 }
 
 async function cloudPost(payload){
-  const res = await fetch(CLOUD_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
-    redirect: 'follow'
-  });
-  const text = await res.text();
-  let json = null;
-  try { json = JSON.parse(text); } catch(e){}
-  return { ok: res.ok, status: res.status, text, json };
+  const body = JSON.stringify(payload);
+  try {
+    const res = await fetch(CLOUD_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body, redirect: 'follow'
+    });
+    const text = await res.text();
+    let json = null; try { json = JSON.parse(text); } catch(e){}
+    return { ok: res.ok, status: res.status, text, json, opaque:false };
+  } catch(err) {
+    try {
+      await fetch(CLOUD_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body, redirect: 'follow'
+      });
+      return { ok: true, status: 0, text: '(opaque — CORS blocked response)', json:null, opaque:true };
+    } catch(err2){
+      return { ok: false, status: 0, text: err2.message, json:null, error:true };
+    }
+  }
 }
 
 function setBusy(id, busy, label){
   const b = document.getElementById(id);
   if(!b) return;
-  if(busy){
-    b.dataset.label = b.innerHTML;
-    b.disabled = true;
-    b.innerHTML = `<span class="spin"></span> ${label||'Processing…'}`;
-  } else {
-    b.disabled = false;
-    if(b.dataset.label) b.innerHTML = b.dataset.label;
-  }
+  if(busy){ b.dataset.label = b.innerHTML; b.disabled = true; b.innerHTML = `<span class="spin"></span> ${label||'Processing…'}`; }
+  else { b.disabled = false; if(b.dataset.label) b.innerHTML = b.dataset.label; }
 }
 
 async function cloudTest(){
   setBusy('btnTest', true, 'Testing…');
-  syncLog('🔌 Menyemak sambungan ke Apps Script…','in');
+  syncLog('🔌 Menyemak sambungan…','in');
   try{
     const url = CLOUD_URL + '?action=ping&t=' + Date.now();
     const res = await fetch(url, { method:'GET', redirect:'follow' });
     const text = await res.text();
-    syncLog(`✅ Sambungan OK (HTTP ${res.status}). Respons: <i>${esc(text.slice(0,120))}</i>`,'ok');
+    syncLog(`✅ Sambungan OK (HTTP ${res.status}). ${esc(text.slice(0,120))}`,'ok');
     toast('Sambungan OK ✔');
   }catch(err){
-    syncLog(`❌ Gagal sambung: ${esc(err.message)}`,'er');
-    syncLog('💡 Pastikan Web App di-deploy sebagai "Anyone" dan akses dibenarkan.','t');
+    syncLog(`❌ Gagal: ${esc(err.message)}`,'er');
+    syncLog('💡 Semak: Deploy → Execute as "Me", Who has access "Anyone".','t');
     toast('Sambungan gagal ✖');
-  }finally{
-    setBusy('btnTest', false);
-  }
+  }finally{ setBusy('btnTest', false); }
 }
 window.cloudTest = cloudTest;
 
@@ -1752,36 +1805,33 @@ async function cloudPush(opts){
   opts = opts || {};
   const silent = !!opts.silent;
   if(!silent) setBusy('btnPush', true, 'Menghantar…');
-  syncLog(`⬆ Menghantar resume ke Cloud${opts.reason?' ('+opts.reason+')':''}…`,'in');
+  syncLog(`⬆ Push${opts.reason?' ('+opts.reason+')':''}…`,'in');
 
   const payload = buildCloudPayload();
-  syncLog(`📦 Saiz payload: ${(JSON.stringify(payload).length/1024).toFixed(1)} KB`,'t');
-  syncLog(`👤 Signed in as: <b>${esc(CURRENT_USER.name)}</b> (${esc(CURRENT_USER.id)})`,'t');
+  syncLog(`📦 Payload: ${(JSON.stringify(payload).length/1024).toFixed(1)} KB`,'t');
 
   try{
     const r = await cloudPost(payload);
 
-    if(r.status >= 200 && r.status < 400){
+    if(r.ok){
       DB.cloud.lastPush = new Date().toISOString();
-      log('Cloud Sync — Pushed Resume', DB.profile.name||'Profile', 'Cloud Sync', { confidence:100, verified:true });
+      log('Cloud Sync — Pushed', DB.profile.name||'Profile', 'Cloud Sync', { confidence:100, verified:true });
       save();
-
-      if(r.json){
-        syncLog(`✅ Berjaya. Respons: <i>${esc(JSON.stringify(r.json).slice(0,160))}</i>`,'ok');
-      } else {
-        syncLog(`✅ Berjaya (HTTP ${r.status}). Respons: <i>${esc((r.text||'').slice(0,160))}</i>`,'ok');
-      }
-      if(!silent) toast('☁️ Resume dihantar ke Cloud ✔');
-      if(state.view==='cloudSync') render();
-      else renderSidebar();
+      syncLog(r.opaque
+        ? '✅ Hantar berjaya (respons opaque — normal untuk Apps Script).'
+        : `✅ Berjaya. ${esc((r.text||'').slice(0,160))}`,'ok');
+      if(!silent) toast('☁️ Resume dihantar ✔');
+      if(state.view==='cloudSync') render(); else renderSidebar();
+      return true;
     } else {
       syncLog(`❌ HTTP ${r.status}: ${esc((r.text||'').slice(0,200))}`,'er');
       if(!silent) toast('Sync gagal ✖');
+      return false;
     }
   }catch(err){
     syncLog(`❌ Ralat: ${esc(err.message)}`,'er');
-    syncLog('💡 Semak deployment Apps Script (Execute as: Me, Who has access: Anyone).','t');
-    if(!silent) toast('Sync gagal ✖ — semak log');
+    if(!silent) toast('Sync gagal ✖');
+    return false;
   }finally{
     if(!silent) setBusy('btnPush', false);
   }
@@ -1789,51 +1839,39 @@ async function cloudPush(opts){
 window.cloudPush = cloudPush;
 
 async function quickCloudPush(){
-  toast('☁️ Menghantar resume…');
-  await cloudPush({ silent:true, reason:'quick' });
-  toast('☁️ Resume disegerakkan ✔');
+  toast('☁️ Menghantar…');
+  const ok = await cloudPush({ silent:true, reason:'quick' });
+  toast(ok ? '☁️ Resume disegerakkan ✔' : 'Sync gagal — semak log');
+  SYNC.setStatus(ok ? 'ok' : 'error');
 }
 window.quickCloudPush = quickCloudPush;
 
 async function cloudPull(){
   setBusy('btnPull', true, 'Menarik…');
-  syncLog('⬇ Menarik data dari Cloud…','in');
+  syncLog('⬇ Menarik…','in');
   try{
     const url = CLOUD_URL + '?action=getResume&userId=' + encodeURIComponent(CURRENT_USER.id) +
                 '&key=' + encodeURIComponent(DB.cloud.key||'') + '&t=' + Date.now();
     const res = await fetch(url, { method:'GET', redirect:'follow' });
     const text = await res.text();
-    let json = null;
-    try { json = JSON.parse(text); } catch(e){}
-
-    if(!json){
-      syncLog(`⚠️ Respons bukan JSON: <i>${esc(text.slice(0,200))}</i>`,'er');
-      toast('Tarik gagal — respons tidak sah');
-      return;
-    }
+    let json = null; try { json = JSON.parse(text); } catch(e){}
+    if(!json){ syncLog(`⚠️ Bukan JSON: ${esc(text.slice(0,200))}`,'er'); toast('Tarik gagal'); return; }
 
     const incoming = json.data || json.profile || json;
-
-    if(incoming.profile){
-      if(confirm('Ganti profil semasa dengan data dari Cloud?')){
-        DB.profile = { ...DB.profile, ...incoming.profile };
-      }
+    if(incoming.profile && confirm('Ganti profil dengan data Cloud?')){
+      DB.profile = { ...DB.profile, ...incoming.profile };
     }
-    Object.keys(SCHEMA).forEach(k=>{
-      if(Array.isArray(incoming[k])) DB[k] = incoming[k];
-    });
+    Object.keys(SCHEMA).forEach(k=>{ if(Array.isArray(incoming[k])) DB[k] = incoming[k]; });
 
     DB.cloud.lastPull = new Date().toISOString();
-    log('Cloud Sync — Pulled Resume', DB.profile.name||'Profile', 'Cloud Sync');
+    log('Cloud Sync — Pulled', DB.profile.name||'Profile', 'Cloud Sync');
     save(); render();
-    syncLog('✅ Data berjaya ditarik dan digabungkan.','ok');
+    syncLog('✅ Data ditarik.','ok');
     toast('⬇ Data Cloud dimuatkan ✔');
   }catch(err){
-    syncLog(`❌ Ralat: ${esc(err.message)}`,'er');
+    syncLog(`❌ ${esc(err.message)}`,'er');
     toast('Tarik gagal ✖');
-  }finally{
-    setBusy('btnPull', false);
-  }
+  }finally{ setBusy('btnPull', false); }
 }
 window.cloudPull = cloudPull;
 
@@ -1883,12 +1921,17 @@ VIEWS.cv = function(){
 
 async function pushCvToCloud(){
   generateCV();
-  await cloudPush({ silent:false, reason:'cv-push' });
+  await SYNC.flush('cv-push');
 }
 window.pushCvToCloud = pushCvToCloud;
 
 function generateCV(){
-  const chosen = [...document.querySelectorAll('.cv-sec:checked')].map(c=>c.value);
+  let chosen = [...document.querySelectorAll('.cv-sec:checked')].map(c=>c.value);
+  if(chosen.length === 0){
+    chosen = ['profile','qualifications','expertise','teaching','projects','grants',
+              'publications','conferences','books','awards','supervision','consultancy',
+              'adminExp','memberships','community','innovation','ip'];
+  }
   const p = DB.profile;
   let h = `
   <div style="text-align:center;border-bottom:3px solid #4f46e5;padding-bottom:14px;margin-bottom:6px">
@@ -2379,6 +2422,7 @@ function mergeDup(gi){
   DB.publications = DB.publications.filter(p=>!dropIds.includes(p.id));
   log('Merged Duplicate', keep.title||'Publication', 'Data Quality');
   save(); render(); toast('Rekod digabungkan ✔');
+  SYNC.schedule('after-merge');
 }
 window.mergeDup = mergeDup;
 
@@ -2460,9 +2504,6 @@ VIEWS.admin = function(){
         <button class="btn btn-primary" onclick="exportData()">⬇ Export Data (JSON)</button>
         <button class="btn" onclick="go('analytics')">📊 Generate Faculty Report</button>
       </div>
-      <div class="hint" style="margin-top:14px">
-        Eksport data merangkumi semua modul: profil, penerbitan, geran, projek, anugerah, penyeliaan dan audit trail.
-      </div>
     </div>
 
     <div class="card card-pad">
@@ -2523,19 +2564,18 @@ VIEWS.audit = function(){
 };
 
 /* =========================================================
-   23. INIT — auth session is already validated above
+   23. INIT
    ========================================================= */
 document.addEventListener('DOMContentLoaded', function(){
-  /* Log sign-in once per browser session */
   if(!sessionStorage.getItem('apsSignedInLogged')){
     sessionStorage.setItem('apsSignedInLogged','1');
     log('Signed in to portal', CURRENT_USER.name, 'Auth');
     save();
   }
   render();
+  SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
 });
 
-/* Render immediately in case DOMContentLoaded already fired */
 if(document.readyState !== 'loading'){
   if(!sessionStorage.getItem('apsSignedInLogged')){
     sessionStorage.setItem('apsSignedInLogged','1');
@@ -2543,6 +2583,7 @@ if(document.readyState !== 'loading'){
     save();
   }
   render();
+  SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
 }
 </script>
 </body>
