@@ -39,6 +39,7 @@ a{color:var(--brand);text-decoration:none}
 .topbar p{font-size:12px;color:var(--muted)}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .role-sel{padding:7px 10px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:12px;font-weight:600}
+.role-sel:disabled{opacity:.85;cursor:not-allowed;background:#f8fafc}
 .icon-btn{width:38px;height:38px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;position:relative;font-size:16px}
 .icon-btn:hover{border-color:#c7d2fe}
 .dot{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid #fff;display:none}
@@ -207,8 +208,10 @@ tbody tr:hover{background:#fafbff}
         <p id="pageSub">Ringkasan profil akademik anda</p>
       </div>
       <div class="tb-right">
-        <select class="role-sel" id="roleSelect" onchange="setRole(this.value)">
+        <select class="role-sel" id="roleSelect" onchange="setRole(this.value)" title="Peranan anda">
+          <option value="Student">🎓 Student</option>
           <option value="Lecturer">👨‍🏫 Lecturer</option>
+          <option value="Lab Staff">🔬 Lab Staff</option>
           <option value="Head">👨‍💼 Head / Coordinator</option>
           <option value="Admin">🔐 Admin</option>
         </select>
@@ -238,9 +241,18 @@ tbody tr:hover{background:#fafbff}
 
 <script>
 /* =========================================================
-   AUTH GUARD
+   AUTH GUARD — roles yang dibenarkan edit resume
+   student, academic_staff, lab_staff, coordinator, admin
    ========================================================= */
-const session = (window.FMSAuth && FMSAuth.requireAuth(['academic_staff']));
+const ALLOWED_AUTH_ROLES = [
+  'student',
+  'academic_staff',
+  'lab_staff',
+  'coordinator',
+  'admin'
+];
+
+const session = (window.FMSAuth && FMSAuth.requireAuth(ALLOWED_AUTH_ROLES));
 
 if (!session) {
   document.body.innerHTML = `
@@ -265,7 +277,19 @@ const CURRENT_USER = {
   position: (session.user && session.user.position) || '',
   unit:     (session.user && session.user.unit)     || ''
 };
+
+// Role sebenar dari auth.js
 const CURRENT_ROLE = (session.role || session.userRole || 'academic_staff');
+
+// Peta role auth -> role UI (NAV / canSee)
+const AUTH_TO_APP_ROLE = {
+  student:        'Student',
+  academic_staff: 'Lecturer',
+  lab_staff:      'Lab Staff',
+  coordinator:    'Head',
+  admin:          'Admin'
+};
+const CURRENT_APP_ROLE = AUTH_TO_APP_ROLE[CURRENT_ROLE] || 'Lecturer';
 
 /* =========================================================
    0. HELPERS
@@ -558,7 +582,7 @@ const SCHEMA = {
    ========================================================= */
 function seed(){
   return {
-    role:'Lecturer',
+    role: CURRENT_APP_ROLE,
     profile:{
       name: CURRENT_USER.name, prefName:'', title:'', staffId: CURRENT_USER.id || 'STAFF-00123',
       position: CURRENT_USER.position || 'Senior Lecturer', grade:'', faculty:'Faculty of Chemical Engineering',
@@ -572,8 +596,7 @@ function seed(){
     },
     publications:[], grants:[], projects:[], qualifications:[], teaching:[],
     conferences:[], books:[], awards:[], media:[], adminExp:[],
-    supervision:[], consultancy:[], memberships:[], community:[], innovation:[], ip:[],
-    audit:[], readNotifs:[],
+    supervision:[], consultancy:[], memberships:[], community:[], innovation:[], ip:[], audit:[], readNotifs:[],
     cloud:{ lastPush:null, lastPull:null, autoSync:true, sheet:'Resume', key:'' }
   };
 }
@@ -600,6 +623,9 @@ function load(){
 }
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
 DB = load() || seed();
+
+/* Setiap kali load, role UI diambil dari role auth (elak naik pangkat sendiri) */
+DB.role = CURRENT_APP_ROLE;
 
 (function hydrateProfile(){
   if(!DB.profile.name || DB.profile.name === 'User') DB.profile.name = CURRENT_USER.name;
@@ -670,7 +696,18 @@ const TITLES = {
 
 let state = { view:'dashboard', q:'' };
 
-function setRole(r){ DB.role = r; save(); render(); toast('Role ditukar: ' + r); }
+function setRole(r){
+  // Hanya Admin boleh tukar peranan (demo); pengguna lain terikat pada role auth
+  if(CURRENT_APP_ROLE !== 'Admin' && r !== CURRENT_APP_ROLE){
+    toast('🔒 Anda tiada kebenaran menukar peranan');
+    render();
+    return;
+  }
+  DB.role = r;
+  save();
+  render();
+  toast('Role ditukar: ' + r);
+}
 window.setRole = setRole;
 
 function canSee(item){
@@ -719,9 +756,18 @@ function render(){
   const p = DB.profile;
   $('#tbAvatar').textContent = initialsOf(p.name);
   $('#tbName').textContent = p.name || '—';
-  $('#tbRole').textContent = p.position || CURRENT_ROLE.replace('_',' ');
-  $('#roleSelect').value = DB.role;
+  $('#tbRole').textContent = p.position || DB.role;
   $('#notifDot').classList.toggle('on', notifications().some(n=>!DB.readNotifs.includes(n.id)));
+
+  const roleSel = $('#roleSelect');
+  if(roleSel){
+    roleSel.value = DB.role;
+    const isAdmin = CURRENT_APP_ROLE === 'Admin';
+    roleSel.disabled = !isAdmin;
+    roleSel.title = isAdmin
+      ? 'Tukar paparan peranan (demo)'
+      : 'Peranan anda: ' + DB.role;
+  }
 
   if(typeof SYNC !== 'undefined' && SYNC.setStatus){
     SYNC.setStatus(DB.cloud.lastPush ? 'ok' : 'idle');
@@ -935,7 +981,7 @@ VIEWS.profile = function(){
       <div style="font-size:28px">🔐</div>
       <div style="flex:1;min-width:220px">
         <div style="font-weight:800">Signed in as ${esc(CURRENT_USER.name)}</div>
-        <div class="muted small">${esc(CURRENT_USER.email||'')} · ID: <b>${esc(CURRENT_USER.id)}</b></div>
+        <div class="muted small">${esc(CURRENT_USER.email||'')} · ID: <b>${esc(CURRENT_USER.id)}</b> · Role: <b>${esc(CURRENT_ROLE)}</b></div>
       </div>
       <button class="btn btn-danger btn-sm" onclick="doLogout()">🚪 Log Keluar</button>
     </div>
@@ -1856,7 +1902,7 @@ VIEWS.cloudSync = function(){
           ${c.lastPush ? `Terakhir auto-sync: <b>${fmtDateTime(c.lastPush)}</b>` : '<b>Belum pernah sync</b>'}
           ${c.lastPull ? ` · Terakhir tarik: <b>${fmtDateTime(c.lastPull)}</b>` : ''}
         </div>
-        <div class="muted small" style="margin-top:6px">👤 ${esc(CURRENT_USER.name)} (${esc(CURRENT_USER.id)})</div>
+        <div class="muted small" style="margin-top:6px">👤 ${esc(CURRENT_USER.name)} (${esc(CURRENT_USER.id)}) · ${esc(CURRENT_ROLE)}</div>
       </div>
       <div class="btn-row">
         <button class="btn btn-ok" id="btnPush" onclick="SYNC.flush('manual')">⚡ Force Sync Now</button>
@@ -2745,8 +2791,10 @@ VIEWS.admin = function(){
     <div class="card card-pad">
       <div class="section-title">🔐 Roles &amp; Access</div>
       <dl class="kv">
-        <dt>👨‍🏫 Lecturer</dt><dd>Edit profil, tambah data, scan dokumen, jana CV, lihat analitik sendiri</dd>
-        <dt>👨‍💼 Head / Coordinator</dt><dd>Lihat staf unit, statistik, jana laporan, sahkan rekod terpilih</dd>
+        <dt>🎓 Student</dt><dd>Edit profil sendiri, tambah rekod akademik, scan dokumen, jana CV</dd>
+        <dt>👨‍🏫 Academic Staff (Lecturer)</dt><dd>Edit profil, tambah data, scan dokumen, jana CV, lihat analitik sendiri</dd>
+        <dt>🔬 Lab Staff</dt><dd>Edit profil, tambah rekod, scan dokumen, jana CV</dd>
+        <dt>👨‍💼 Coordinator (Head)</dt><dd>Lihat staf unit, statistik, jana laporan, sahkan rekod terpilih</dd>
         <dt>🔐 Admin</dt><dd>Urus pengguna, sistem, data, kategori, AI monitoring, analitik fakulti</dd>
       </dl>
       <div style="height:1px;background:var(--line);margin:16px 0"></div>
