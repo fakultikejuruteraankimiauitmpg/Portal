@@ -218,6 +218,7 @@
         border-bottom: 1px solid #E2E8F0;
         transition: all .2s ease;
         width: 100%;
+        cursor: pointer;
     }
     .portal-link-item:last-child {
         border-bottom: none;
@@ -943,7 +944,7 @@
     </div>
 
     <!-- ============================================================
-         PORTAL MENU (LIST STYLE - UPDATED)
+         PORTAL MENU (LIST STYLE)
     ============================================================ -->
     <div class="portal-menu-card anim-up">
         <div class="portal-menu-header">
@@ -972,14 +973,20 @@
             </div>
 
             <!-- ============================================================
-                 NEW: LAB & CHEMICAL SERVICES SECTION
+                 LAB & CHEMICAL SERVICES SECTION
             ============================================================ -->
             <div class="portal-section-title mt-6" data-i18n="portal_lab_label">Laboratory Services</div>
             <div class="flex flex-col">
-                <a href="pinjaman_alat_radas.html" class="portal-link-item">
+
+                <!-- ✅ PINJAMAN ALAT RADAS — terus ke pinjaman_alat_radas.html -->
+                <a href="pinjaman_alat_radas.html"
+                   data-href="pinjaman_alat_radas.html"
+                   class="portal-link-item js-portal-nav">
                     <i class="fas fa-screwdriver-wrench"></i>
                     <span data-i18n="portal_loan_equipment">Pinjaman Alat Radas</span>
+                    <i class="fas fa-chevron-right ml-auto text-[10px] text-slate-300"></i>
                 </a>
+
                 <a href="permohonan_bahan_kimia.html" class="portal-link-item">
                     <i class="fas fa-flask-vial"></i>
                     <span data-i18n="portal_chemical_request">Permohonan Bahan Kimia</span>
@@ -1692,7 +1699,9 @@
         profile_update:  { icon: 'fa-user-pen',                   bg: '#9B26B6', en: 'Updated profile',           ms: 'Kemas kini profil' },
         password_change: { icon: 'fa-key',                        bg: '#9B26B6', en: 'Changed password',          ms: 'Tukar kata laluan' },
         settings_open:   { icon: 'fa-gear',                       bg: '#FDB913', en: 'Opened settings',           ms: 'Buka tetapan' },
-        activity_clear:  { icon: 'fa-broom',                      bg: '#002D62', en: 'Cleared activity trail',    ms: 'Kosongkan jejak aktiviti' }
+        activity_clear:  { icon: 'fa-broom',                      bg: '#002D62', en: 'Cleared activity trail',    ms: 'Kosongkan jejak aktiviti' },
+        /* NEW: portal navigation */
+        portal_nav:      { icon: 'fa-up-right-from-square',       bg: '#002D62', en: 'Opened module',             ms: 'Buka modul' }
     };
 
     /* =========================================================
@@ -1740,7 +1749,6 @@
             portal_menu_title: "Portal Menu", portal_menu_sub: "Quick Access To All Systems",
             portal_menu_updated: "UPDATED 2026", portal_admin_label: "Administration",
             portal_resume: "Resume", portal_settings: "Account Settings",
-            /* NEW */
             portal_lab_label: "Laboratory Services",
             portal_loan_equipment: "Equipment & Apparatus Loan",
             portal_chemical_request: "Chemical Substance Request",
@@ -1850,7 +1858,6 @@
             portal_menu_title: "Menu Portal", portal_menu_sub: "Akses Pantas Ke Semua Sistem",
             portal_menu_updated: "DIKEMAS KINI 2026", portal_admin_label: "Pentadbiran",
             portal_resume: "Resume", portal_settings: "Tetapan Akaun",
-            /* NEW */
             portal_lab_label: "Perkhidmatan Makmal",
             portal_loan_equipment: "Pinjaman Alat Radas",
             portal_chemical_request: "Permohonan Bahan Kimia",
@@ -2075,6 +2082,29 @@
     }
 
     document.getElementById('clearActivityBtn').addEventListener('click', clearActivities);
+
+    /* =========================================================
+       PORTAL MENU NAVIGATION
+       ✅ Pastikan "Pinjaman Alat Radas" terus ke pinjaman_alat_radas.html
+    ========================================================== */
+    function initPortalNavigation() {
+        document.querySelectorAll('.js-portal-nav').forEach(link => {
+            link.addEventListener('click', function (e) {
+                const target = this.dataset.href || this.getAttribute('href');
+                if (!target || target === '#') return;
+
+                e.preventDefault();
+
+                // Optional: log the module opening into the activity trail
+                if (staff) {
+                    logActivity('portal_nav', staff.name, 'Opened: ' + target);
+                }
+
+                // ✅ TERUS pergi ke halaman
+                window.location.href = target;
+            });
+        });
+    }
 
     /* =========================================================
        CHART.JS — SOLID colours only
@@ -2439,6 +2469,9 @@
 
         switchLanguage('en');
         fillStaff(staff);
+
+        // ✅ Aktifkan navigasi menu portal
+        initPortalNavigation();
 
         setTimeout(initCharts, 150);
 
