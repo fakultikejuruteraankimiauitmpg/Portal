@@ -1,0 +1,2549 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academic Profile System — AI-Powered</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e5e9f2;
+  --brand:#4f46e5; --brand2:#0ea5e9; --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
+  --radius:14px; --shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--brand);text-decoration:none}
+
+/* ---------- LAYOUT ---------- */
+.app{display:flex;min-height:100vh}
+.sidebar{width:264px;background:#0b1220;color:#cbd5e1;position:fixed;inset:0 auto 0 0;overflow-y:auto;z-index:40;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
+.brand{padding:18px 18px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #1e293b}
+.brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-size:18px}
+.brand h2{font-size:14px;color:#fff;font-weight:700;letter-spacing:.2px}
+.brand p{font-size:11px;color:#64748b}
+.nav{padding:10px 10px 30px;flex:1}
+.nav-group{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#475569;padding:16px 10px 6px;font-weight:700}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:10px;color:#cbd5e1;font-size:13px;text-align:left;transition:.15s;margin-bottom:1px}
+.nav-item:hover{background:#151f33;color:#fff}
+.nav-item.active{background:linear-gradient(90deg,rgba(79,70,229,.9),rgba(14,165,233,.75));color:#fff;font-weight:600;box-shadow:0 4px 12px rgba(79,70,229,.3)}
+.nav-item .ic{width:20px;text-align:center;font-size:15px}
+.nav-item .badge{margin-left:auto;background:#ef4444;color:#fff;font-size:10px;padding:1px 6px;border-radius:9px;font-weight:700}
+
+.main{margin-left:264px;flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(244,246,251,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 26px;display:flex;align-items:center;gap:16px}
+.topbar h1{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.topbar p{font-size:12px;color:var(--muted)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.role-sel{padding:7px 10px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:12px;font-weight:600}
+.icon-btn{width:38px;height:38px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;position:relative;font-size:16px}
+.icon-btn:hover{border-color:#c7d2fe}
+.dot{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid #fff;display:none}
+.dot.on{display:block}
+.avatar{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.view{padding:24px 26px 60px;flex:1}
+
+/* ---------- COMPONENTS ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-pad{padding:18px 20px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.g2,.g3,.g4{grid-template-columns:1fr}.sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}.main{margin-left:0}.view{padding:16px}.topbar{padding:12px 16px}}
+
+.section-title{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;transition:.15s}
+.btn:hover{border-color:#c7d2fe;background:#f8faff}
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;box-shadow:0 4px 14px rgba(79,70,229,.28)}
+.btn-primary:hover{filter:brightness(1.06);background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.btn-danger{color:var(--danger);border-color:#fecaca}
+.btn-danger:hover{background:#fef2f2}
+.btn-ok{background:linear-gradient(135deg,#10b981,#34d399);color:#fff;border:none;box-shadow:0 4px 14px rgba(16,185,129,.28)}
+.btn-ok:hover{filter:brightness(1.06);background:linear-gradient(135deg,#10b981,#34d399)}
+.btn-sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;text-align:left;transition:.15s;box-shadow:var(--shadow);cursor:pointer;width:100%}
+.stat:hover{transform:translateY(-2px);border-color:#c7d2fe}
+.stat .n{font-size:26px;font-weight:800;letter-spacing:-1px}
+.stat .l{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.stat .ic{font-size:18px;margin-bottom:6px;display:block}
+
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#eef2ff;color:#4338ca}
+.pill.green{background:#dcfce7;color:#15803d}
+.pill.amber{background:#fef3c7;color:#b45309}
+.pill.red{background:#fee2e2;color:#b91c1c}
+.pill.gray{background:#f1f5f9;color:#475569}
+.pill.sky{background:#e0f2fe;color:#0369a1}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);font-weight:700;white-space:nowrap}
+td{padding:12px;border-bottom:1px solid #f1f5f9;vertical-align:top;font-size:13px}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafbff}
+.tbl-wrap{overflow-x:auto}
+.row-actions{display:flex;gap:6px;justify-content:flex-end}
+
+.empty{padding:48px 20px;text-align:center;color:var(--muted)}
+.empty .big{font-size:38px;margin-bottom:10px}
+
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld span{font-size:11.5px;font-weight:700;color:#475569}
+.fld input,.fld select,.fld textarea{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;outline:none;transition:.15s;width:100%}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+.fld.full{grid-column:1/-1}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr}}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:100;display:grid;place-items:center;padding:20px;overflow-y:auto}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:820px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 70px rgba(0,0,0,.35);animation:pop .18s ease}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-head{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;border-radius:18px 18px 0 0}
+.modal-head h3{font-size:16px;font-weight:800}
+.modal-body{padding:22px}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff}
+
+/* Ring */
+.ring{position:relative;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--brand) calc(var(--p)*1%),#e2e8f0 0);display:grid;place-items:center;flex-shrink:0}
+.ring span{width:72px;height:72px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
+
+/* Bars */
+.bar-row{display:grid;grid-template-columns:110px 1fr 46px;gap:10px;align-items:center;margin-bottom:9px;font-size:12px}
+.bar{height:9px;background:#eef2f7;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+
+/* Scanner */
+.drop{border:2px dashed #c7d2fe;border-radius:14px;padding:32px;text-align:center;background:#f8faff;transition:.15s;cursor:pointer}
+.drop:hover{background:#eef2ff;border-color:var(--brand)}
+.conf{display:flex;align-items:center;gap:8px;min-width:120px}
+.conf .cbar{flex:1;height:6px;background:#eef2f7;border-radius:4px;overflow:hidden}
+.conf .cbar i{display:block;height:100%;border-radius:4px}
+.conf b{font-size:11px;width:34px;text-align:right}
+.low{background:#fff7ed !important}
+
+.step{display:flex;gap:10px;align-items:flex-start;padding:10px 0}
+.step .num{width:24px;height:24px;border-radius:50%;background:#eef2ff;color:var(--brand);display:grid;place-items:center;font-size:11px;font-weight:800;flex-shrink:0}
+.step.done .num{background:var(--ok);color:#fff}
+
+/* CV */
+#cvDoc{background:#fff;padding:48px 54px;border-radius:12px;border:1px solid var(--line);box-shadow:var(--shadow);max-width:900px;margin:0 auto;font-size:13px;line-height:1.55;color:#111827}
+#cvDoc h1{font-size:26px;letter-spacing:-.5px;margin-bottom:2px}
+#cvDoc h2{font-size:13px;text-transform:uppercase;letter-spacing:1.3px;color:var(--brand);border-bottom:2px solid #e5e9f2;padding-bottom:5px;margin:22px 0 10px;font-weight:800}
+#cvDoc .cvitem{margin-bottom:10px}
+#cvDoc .cvitem b{font-weight:700}
+#cvDoc ul{margin-left:16px}
+.sec-pick{display:flex;flex-wrap:wrap;gap:8px}
+.sec-pick label{display:flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:12.5px;cursor:pointer;font-weight:600}
+.sec-pick label:hover{border-color:#c7d2fe;background:#f8faff}
+.sec-pick input{accent-color:var(--brand)}
+
+/* Public profile */
+.pub-hero{background:linear-gradient(135deg,#4f46e5,#0ea5e9);border-radius:18px;padding:30px;color:#fff;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.pub-hero .ph{width:84px;height:84px;border-radius:20px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:40px;border:2px solid rgba(255,255,255,.35)}
+.pub-hero h2{font-size:24px;letter-spacing:-.5px}
+.pub-hero p{opacity:.9;font-size:13px}
+
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:13px}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{font-weight:500}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:13px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:300;animation:pop .2s}
+.hint{background:#f0f9ff;border:1px solid #bae6fd;color:#075985;padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.6}
+.hint.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.hint.ok{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+.hint.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+
+/* Cloud sync */
+.sync-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+.sync-dot.on{background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.18)}
+.sync-dot.off{background:#94a3b8}
+.sync-dot.busy{background:#f59e0b;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.log{background:#0b1220;color:#cbd5e1;border-radius:10px;padding:12px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;max-height:240px;overflow:auto;line-height:1.7}
+.log .t{color:#64748b}
+.log .ok{color:#34d399}
+.log .er{color:#f87171}
+.log .in{color:#38bdf8}
+
+/* User badge in topbar */
+.user-badge{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;background:#fff;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:.15s}
+.user-badge:hover{border-color:#c7d2fe;background:#f8faff}
+.user-badge .uinfo{display:flex;flex-direction:column;line-height:1.1}
+.user-badge .uname{font-size:11px;font-weight:800;color:var(--ink);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.user-badge .urole{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+@media(max-width:640px){.user-badge .uinfo{display:none}}
+
+@media print{
+  .sidebar,.topbar,.no-print{display:none!important}
+  .main{margin:0!important}
+  .view{padding:0!important}
+  body{background:#fff}
+  #cvDoc{border:0;box-shadow:none;padding:0;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSub">Ringkasan profil akademik anda</p>
+      </div>
+      <div class="tb-right">
+        <select class="role-sel" id="roleSelect" onchange="setRole(this.value)">
+          <option value="Lecturer">👨‍🏫 Lecturer</option>
+          <option value="Head">👨‍💼 Head / Coordinator</option>
+          <option value="Admin">🔐 Admin</option>
+        </select>
+        <button class="icon-btn" onclick="quickCloudPush()" title="Sync ke Cloud">☁️</button>
+        <button class="icon-btn" onclick="go('notifications')" title="Notifications">🔔<span class="dot" id="notifDot"></span></button>
+        <div class="user-badge" onclick="go('profile')" title="Profil Saya">
+          <div class="avatar" id="tbAvatar">AR</div>
+          <div class="uinfo">
+            <span class="uname" id="tbName">—</span>
+            <span class="urole" id="tbRole">—</span>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="doLogout()" title="Log Keluar">🚪</button>
+      </div>
+    </header>
+    <div class="view" id="view"></div>
+  </main>
+</div>
+<div id="modalRoot"></div>
+
+<!-- ============================================================
+     AUTH GUARD LOADER
+     Sesuaikan path/auth.js jika perlu. Fail ini mesti wujud
+     dan menyediakan objek global `FMSAuth`.
+============================================================= -->
+<script src="auth.js"></script>
+
+<script>
+/* =========================================================
+   AUTH GUARD — Hanya pengguna yang telah sign in boleh akses
+   ========================================================= */
+const session = (window.FMSAuth && FMSAuth.requireAuth(['academic_staff']));
+
+if (!session) {
+  /* FMSAuth.requireAuth sudah redirect ke login.html.
+     Kita hentikan eksekusi skrip ini sahaja. */
+  document.body.innerHTML = `
+    <div style="min-height:100vh;display:grid;place-items:center;font-family:system-ui;color:#64748b;background:#f4f6fb">
+      <div style="text-align:center">
+        <div style="font-size:44px">🔒</div>
+        <h2 style="color:#0f172a;margin:10px 0 6px">Mengalih ke halaman log masuk…</h2>
+        <p style="font-size:13px">Sila tunggu sebentar.</p>
+      </div>
+    </div>`;
+  throw new Error('Unauthenticated — redirecting');
+}
+
+/* Keep session alive on user activity */
+['click','keydown','mousemove','scroll'].forEach(evt =>
+  document.addEventListener(evt, () => { try { FMSAuth.touch(); } catch(e){} }, { passive:true })
+);
+
+/* Build a small context from session */
+const CURRENT_USER = {
+  id:       (session.user && session.user.id)       || 'anon',
+  name:     (session.user && session.user.name)     || 'User',
+  email:    (session.user && session.user.email)    || '',
+  position: (session.user && session.user.position) || '',
+  unit:     (session.user && session.user.unit)     || ''
+};
+const CURRENT_ROLE = (session.role || session.userRole || 'academic_staff');
+
+/* =========================================================
+   0. HELPERS
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const uid = () => Math.random().toString(36).slice(2,9);
+const today = () => new Date().toISOString().slice(0,10);
+const fmtDate = d => { try{ return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return d; } };
+const fmtDateTime = d => { try{ return new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return d; } };
+const num = n => Number(n||0).toLocaleString('en-MY');
+const money = n => 'RM ' + Number(n||0).toLocaleString('en-MY');
+const initialsOf = name => String(name||'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase() || 'U';
+
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2400);
+}
+
+function doLogout(){
+  try { FMSAuth.clearSession(); } catch(e){}
+  window.location.href = 'login.html';
+}
+window.doLogout = doLogout;
+
+/* =========================================================
+   0b. CLOUD ENDPOINT (Google Apps Script Web App)
+   ========================================================= */
+const CLOUD_URL = 'https://script.google.com/macros/s/AKfycbwTf6R87uxIhon3uB5ZW4E2M3o37J58UMRDu494bBQESo1YmaAT0gPDTnmYgmd4gh2IKg/exec';
+
+/* =========================================================
+   1. SCHEMA — definisi semua modul
+   ========================================================= */
+const SCHEMA = {
+  qualifications:{ label:'Academic Qualification', icon:'🎓', singular:'Qualification', dateKey:'gradYear', cols:['university','gradYear'],
+    title:r=>`${r.qualification||''}${r.field?' — '+r.field:''}`,
+    fields:[
+      {k:'qualification',l:'Qualification',type:'select',opts:['PhD','Master','Bachelor','Diploma','Professional Qualification'],req:true},
+      {k:'field',l:'Field of Study'},
+      {k:'university',l:'University'},
+      {k:'faculty',l:'Faculty'},
+      {k:'country',l:'Country'},
+      {k:'startYear',l:'Start Year',type:'number'},
+      {k:'gradYear',l:'Graduation Year',type:'number'},
+      {k:'grade',l:'Grade / CGPA'},
+      {k:'supervisor',l:'Supervisor'},
+      {k:'specialisation',l:'Specialisation'},
+      {k:'thesis',l:'Thesis Title',type:'textarea',full:true}
+    ]},
+
+  teaching:{ label:'Teaching', icon:'👨‍🏫', singular:'Course', dateKey:'academicYear', cols:['courseCode','programme','role'],
+    title:r=>`${r.courseCode?r.courseCode+' — ':''}${r.courseName||''}`,
+    fields:[
+      {k:'courseCode',l:'Course Code'},{k:'courseName',l:'Course Name',req:true},
+      {k:'programme',l:'Programme'},{k:'programmeCode',l:'Programme Code'},
+      {k:'level',l:'Level',type:'select',opts:['Diploma','Degree','Master','PhD']},
+      {k:'semester',l:'Semester'},{k:'academicYear',l:'Academic Year'},
+      {k:'creditHour',l:'Credit Hour',type:'number'},
+      {k:'role',l:'Role',type:'select',opts:['Lecturer','Coordinator','Instructor']},
+      {k:'campus',l:'Campus'},
+      {k:'mode',l:'Teaching Mode',type:'select',opts:['Face to Face','Online','Hybrid','Blended Learning']},
+      {k:'innovation',l:'Teaching Innovation',type:'select',opts:['MOOC','OER','e-Learning','Digital Learning','Teaching Module','Teaching Material','Innovative Teaching','None']}
+    ]},
+
+  projects:{ label:'Research Project', icon:'🔬', singular:'Project', dateKey:'startDate', cols:['grantType','role','status'],
+    title:r=>r.title,
+    fields:[
+      {k:'title',l:'Project Title',req:true,full:true},
+      {k:'acronym',l:'Project Acronym'},
+      {k:'grantType',l:'Grant Type'},
+      {k:'grantNumber',l:'Grant Number'},
+      {k:'fundingAgency',l:'Funding Agency'},
+      {k:'totalFunding',l:'Total Funding (RM)',type:'number'},
+      {k:'startDate',l:'Start Date',type:'date'},
+      {k:'endDate',l:'End Date',type:'date'},
+      {k:'status',l:'Project Status',type:'select',opts:['Active','Completed','Pending','Terminated']},
+      {k:'role',l:'Role',type:'select',opts:['Principal Investigator','Co-Researcher','Research Member']},
+      {k:'coResearchers',l:'Co-Researchers',full:true},
+      {k:'researchArea',l:'Research Area'},
+      {k:'keywords',l:'Keywords'},
+      {k:'sdg',l:'SDG'},
+      {k:'output',l:'Output',type:'textarea',full:true},
+      {k:'publication',l:'Publication Generated'},
+      {k:'patent',l:'Patent Generated'},
+      {k:'innovation',l:'Innovation Generated'}
+    ]},
+
+  grants:{ label:'Research Grants', icon:'💰', singular:'Grant', dateKey:'year', cols:['fundingAgency','amount','status'],
+    title:r=>r.grantName||r.projectTitle,
+    fields:[
+      {k:'grantName',l:'Grant Name',req:true},
+      {k:'grantNumber',l:'Grant Number'},
+      {k:'fundingAgency',l:'Funding Agency'},
+      {k:'grantScheme',l:'Grant Scheme'},
+      {k:'amount',l:'Amount (RM)',type:'number'},
+      {k:'pi',l:'Principal Investigator'},
+      {k:'coPi',l:'Co-PI',full:true},
+      {k:'startDate',l:'Start Date',type:'date'},
+      {k:'endDate',l:'End Date',type:'date'},
+      {k:'status',l:'Status',type:'select',opts:['Active','Completed','Pending']},
+      {k:'projectTitle',l:'Project Title',full:true},
+      {k:'faculty',l:'Faculty'},
+      {k:'year',l:'Year',type:'number'},
+      {k:'output',l:'Output',type:'textarea',full:true}
+    ]},
+
+  publications:{ label:'Publications', icon:'📚', singular:'Publication', dateKey:'year', cols:['journal','year','quartile'],
+    title:r=>r.title,
+    fields:[
+      {k:'type',l:'Publication Type',type:'select',opts:['Journal Article','Review','Conference Paper','Proceedings','Book','Book Chapter','Magazine','Others']},
+      {k:'title',l:'Title',req:true,full:true},
+      {k:'authors',l:'Authors',full:true},
+      {k:'corresponding',l:'Corresponding Author'},
+      {k:'affiliation',l:'Affiliation'},
+      {k:'journal',l:'Journal Name'},
+      {k:'publisher',l:'Publisher'},
+      {k:'year',l:'Year',type:'number'},
+      {k:'volume',l:'Volume'},{k:'issue',l:'Issue'},{k:'pages',l:'Pages'},
+      {k:'doi',l:'DOI'},{k:'issn',l:'ISSN'},{k:'eissn',l:'eISSN'},{k:'isbn',l:'ISBN'},
+      {k:'abstract',l:'Abstract',type:'textarea',full:true},
+      {k:'keywords',l:'Keywords',full:true},
+      {k:'indexing',l:'Indexing',type:'select',opts:['Scopus','Web of Science','MyCite','ERA','None']},
+      {k:'quartile',l:'Quartile',type:'select',opts:['Q1','Q2','Q3','Q4','None']},
+      {k:'citation',l:'Citation',type:'number'},
+      {k:'url',l:'URL',full:true}
+    ]},
+
+  conferences:{ label:'Conference', icon:'🎤', singular:'Conference Paper', dateKey:'year', cols:['conferenceName','year','presentationType'],
+    title:r=>r.paperTitle,
+    fields:[
+      {k:'paperTitle',l:'Paper Title',req:true,full:true},
+      {k:'authors',l:'Authors',full:true},
+      {k:'conferenceName',l:'Conference Name'},
+      {k:'acronym',l:'Conference Acronym'},
+      {k:'organizer',l:'Organizer'},
+      {k:'date',l:'Date',type:'date'},
+      {k:'location',l:'Location'},
+      {k:'country',l:'Country'},
+      {k:'presentationType',l:'Presentation Type',type:'select',opts:['Oral','Poster']},
+      {k:'proceedings',l:'Proceedings'},
+      {k:'isbn',l:'ISBN'},{k:'doi',l:'DOI'},
+      {k:'year',l:'Year',type:'number'},
+      {k:'award',l:'Award / Recognition'}
+    ]},
+
+  books:{ label:'Book & Book Chapter', icon:'📖', singular:'Book', dateKey:'year', cols:['publisher','year','type'],
+    title:r=>r.title,
+    fields:[
+      {k:'type',l:'Type',type:'select',opts:['Book','Book Chapter']},
+      {k:'title',l:'Title',req:true,full:true},
+      {k:'bookTitle',l:'Book Title (untuk chapter)'},
+      {k:'authors',l:'Author(s)',full:true},
+      {k:'editors',l:'Editor(s)'},
+      {k:'publisher',l:'Publisher'},
+      {k:'isbn',l:'ISBN'},{k:'doi',l:'DOI'},
+      {k:'pages',l:'Pages'},
+      {k:'year',l:'Year',type:'number'},
+      {k:'edition',l:'Edition'},
+      {k:'country',l:'Country'}
+    ]},
+
+  awards:{ label:'Awards & Recognition', icon:'🏆', singular:'Award', dateKey:'year', cols:['organisation','level','year'],
+    title:r=>r.awardTitle,
+    fields:[
+      {k:'awardTitle',l:'Award Title',req:true,full:true},
+      {k:'category',l:'Award Category'},
+      {k:'organisation',l:'Awarding Organisation'},
+      {k:'level',l:'Level',type:'select',opts:['International','National','University','Faculty','Professional']},
+      {k:'date',l:'Date',type:'date'},
+      {k:'year',l:'Year',type:'number'},
+      {k:'position',l:'Position / Rank'},
+      {k:'role',l:'Role'},
+      {k:'description',l:'Description',type:'textarea',full:true}
+    ]},
+
+  media:{ label:'Magazine / Media', icon:'📰', singular:'Media', dateKey:'date', cols:['outlet','type','date'],
+    title:r=>r.articleTitle,
+    fields:[
+      {k:'articleTitle',l:'Article Title',req:true,full:true},
+      {k:'author',l:'Author'},
+      {k:'outlet',l:'Magazine / Newspaper'},
+      {k:'publisher',l:'Publisher'},
+      {k:'date',l:'Date',type:'date'},
+      {k:'volume',l:'Volume'},{k:'issue',l:'Issue'},{k:'pages',l:'Pages'},
+      {k:'url',l:'URL',full:true},
+      {k:'type',l:'Type',type:'select',opts:['Magazine','Newspaper','Online Media','Interview','Expert Commentary']}
+    ]},
+
+  adminExp:{ label:'Administrative Experience', icon:'💼', singular:'Appointment', dateKey:'startDate', cols:['organisation','startDate','endDate'],
+    title:r=>r.position,
+    fields:[
+      {k:'position',l:'Position',req:true},
+      {k:'organisation',l:'Organisation'},
+      {k:'faculty',l:'Faculty / Department'},
+      {k:'startDate',l:'Start Date',type:'date'},
+      {k:'endDate',l:'End Date',type:'date'},
+      {k:'appointmentType',l:'Appointment Type',type:'select',opts:['Permanent','Contract','Acting','Secondment','Ad-hoc']},
+      {k:'refNumber',l:'Reference Number'},
+      {k:'description',l:'Description',type:'textarea',full:true},
+      {k:'responsibilities',l:'Responsibilities',type:'textarea',full:true}
+    ]},
+
+  supervision:{ label:'Supervision', icon:'👨‍🎓', singular:'Student', dateKey:'startDate', cols:['programme','level','status'],
+    title:r=>r.studentName,
+    fields:[
+      {k:'studentName',l:'Student Name',req:true},
+      {k:'studentId',l:'Student ID'},
+      {k:'programme',l:'Programme'},
+      {k:'level',l:'Level',type:'select',opts:['Diploma','Degree','Master','PhD']},
+      {k:'projectTitle',l:'Project Title',full:true},
+      {k:'role',l:'Role',type:'select',opts:['Main Supervisor','Co-Supervisor','Panel']},
+      {k:'startDate',l:'Start Date',type:'date'},
+      {k:'endDate',l:'End Date',type:'date'},
+      {k:'status',l:'Status',type:'select',opts:['Active','Completed','Withdrawn']},
+      {k:'graduationYear',l:'Graduation Year',type:'number'}
+    ]},
+
+  consultancy:{ label:'Consultancy', icon:'🏢', singular:'Consultancy', dateKey:'startDate', cols:['client','value','status'],
+    title:r=>r.title,
+    fields:[
+      {k:'title',l:'Consultancy Title',req:true,full:true},
+      {k:'client',l:'Client'},
+      {k:'organisation',l:'Organisation'},
+      {k:'role',l:'Role'},
+      {k:'startDate',l:'Start Date',type:'date'},
+      {k:'endDate',l:'End Date',type:'date'},
+      {k:'value',l:'Consultancy Value (RM)',type:'number'},
+      {k:'status',l:'Status',type:'select',opts:['Active','Completed','Pending']},
+      {k:'description',l:'Description',type:'textarea',full:true},
+      {k:'output',l:'Output',type:'textarea',full:true}
+    ]},
+
+  memberships:{ label:'Professional Membership', icon:'👔', singular:'Membership', dateKey:'startYear', cols:['organisation','membershipType','status'],
+    title:r=>r.organisation,
+    fields:[
+      {k:'organisation',l:'Organisation',req:true},
+      {k:'membershipType',l:'Membership Type'},
+      {k:'membershipNumber',l:'Membership Number'},
+      {k:'position',l:'Position'},
+      {k:'startYear',l:'Start Year',type:'number'},
+      {k:'endYear',l:'End Year',type:'number'},
+      {k:'status',l:'Status',type:'select',opts:['Active','Expired','Lifetime']}
+    ]},
+
+  community:{ label:'Community Engagement', icon:'🌍', singular:'Programme', dateKey:'date', cols:['organisation','date','sdg'],
+    title:r=>r.programmeName,
+    fields:[
+      {k:'programmeName',l:'Programme Name',req:true,full:true},
+      {k:'organisation',l:'Organisation'},
+      {k:'date',l:'Date',type:'date'},
+      {k:'location',l:'Location'},
+      {k:'targetGroup',l:'Target Group'},
+      {k:'role',l:'Role'},
+      {k:'participants',l:'Number of Participants',type:'number'},
+      {k:'sdg',l:'SDG'},
+      {k:'description',l:'Description',type:'textarea',full:true},
+      {k:'output',l:'Output'},
+      {k:'impact',l:'Impact',type:'textarea',full:true}
+    ]},
+
+  innovation:{ label:'Innovation / Product', icon:'💡', singular:'Innovation', dateKey:'year', cols:['category','year','commercialisation'],
+    title:r=>r.title,
+    fields:[
+      {k:'title',l:'Innovation Title',req:true,full:true},
+      {k:'category',l:'Innovation Category'},
+      {k:'inventors',l:'Inventor(s)',full:true},
+      {k:'year',l:'Year',type:'number'},
+      {k:'description',l:'Description',type:'textarea',full:true},
+      {k:'patent',l:'Patent'},{k:'copyright',l:'Copyright'},{k:'trademark',l:'Trademark'},
+      {k:'competition',l:'Innovation Competition'},
+      {k:'award',l:'Award'},
+      {k:'commercialisation',l:'Commercialisation Status',type:'select',opts:['Not Commercialised','Pre-Commercial','Licensed','Commercialised']},
+      {k:'industryPartner',l:'Industry Partner'},
+      {k:'trl',l:'Technology Readiness Level (TRL)',type:'select',opts:['TRL 1','TRL 2','TRL 3','TRL 4','TRL 5','TRL 6','TRL 7','TRL 8','TRL 9']}
+    ]},
+
+  ip:{ label:'Intellectual Property', icon:'📜', singular:'IP Record', dateKey:'filingDate', cols:['ipType','registrationNumber','status'],
+    title:r=>r.title,
+    fields:[
+      {k:'ipType',l:'IP Type',type:'select',opts:['Patent','Copyright','Industrial Design','Trademark','Utility Innovation']},
+      {k:'title',l:'Title',req:true,full:true},
+      {k:'registrationNumber',l:'Registration Number'},
+      {k:'applicant',l:'Applicant'},
+      {k:'inventors',l:'Inventor(s)',full:true},
+      {k:'filingDate',l:'Filing Date',type:'date'},
+      {k:'registrationDate',l:'Registration Date',type:'date'},
+      {k:'status',l:'Status',type:'select',opts:['Filed','Pending','Granted','Expired']},
+      {k:'country',l:'Country'}
+    ]}
+};
+
+/* =========================================================
+   2. SEED DATA
+   ========================================================= */
+function seed(){
+  return {
+    role:'Lecturer',
+    profile:{
+      name: CURRENT_USER.name, prefName:'', title:'', staffId: CURRENT_USER.id || 'STAFF-00123',
+      position: CURRENT_USER.position || 'Senior Lecturer', grade:'', faculty:'Faculty of Chemical Engineering',
+      campus:'Kampus Utama', department: CURRENT_USER.unit || 'Jabatan Kejuruteraan Kimia', centre:'',
+      email: CURRENT_USER.email || 'staff@university.edu.my', officeTel:'', mobile:'',
+      officeLoc:'', photo:'👨‍🔬',
+      orcid:'', scopus:'', wos:'',
+      scholar:'', researchgate:'', linkedin:'', website:'',
+      shortBio:'', longBio:'', academicProfile:'', researchProfile:'',
+      expertise:'', researchInterest:'', keywords:'', sdg:''
+    },
+    publications:[], grants:[], projects:[], qualifications:[], teaching:[],
+    conferences:[], books:[], awards:[], media:[], adminExp:[],
+    supervision:[], consultancy:[], memberships:[], community:[], innovation:[], ip:[],
+    audit:[], readNotifs:[],
+    cloud:{ lastPush:null, lastPull:null, autoSync:false, sheet:'Resume', key:'' }
+  };
+}
+
+/* =========================================================
+   3. PERSISTENCE — data is scoped per authenticated user
+   ========================================================= */
+const LS_KEY = 'academic_profile_system_v2_' + (CURRENT_USER.id || 'anon');
+let DB;
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    Object.keys(SCHEMA).forEach(k => { if(!Array.isArray(d[k])) d[k] = []; });
+    if(!d.profile) d.profile = {};
+    if(!d.audit) d.audit = [];
+    if(!d.readNotifs) d.readNotifs = [];
+    if(!d.cloud) d.cloud = { lastPush:null, lastPull:null, autoSync:false, sheet:'Resume', key:'' };
+    return d;
+  }catch(e){ return null; }
+}
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
+DB = load() || seed();
+
+/* Hydrate profile with session info (only fill empty fields) */
+(function hydrateProfile(){
+  if(!DB.profile.name || DB.profile.name === 'User') DB.profile.name = CURRENT_USER.name;
+  if(!DB.profile.email) DB.profile.email = CURRENT_USER.email;
+  if(!DB.profile.staffId) DB.profile.staffId = CURRENT_USER.id;
+  if(!DB.profile.position && CURRENT_USER.position) DB.profile.position = CURRENT_USER.position;
+  if(!DB.profile.department && CURRENT_USER.unit) DB.profile.department = CURRENT_USER.unit;
+})();
+
+/* =========================================================
+   4. NAVIGATION
+   ========================================================= */
+const NAV = [
+  {group:'Utama'},
+  {id:'dashboard',      label:'Dashboard',            icon:'🏠'},
+  {id:'profile',        label:'My Profile',           icon:'👤'},
+  {id:'expertise',      label:'Expertise & Research', icon:'🔬'},
+  {id:'qualifications', label:'Academic Qualification', icon:'🎓', coll:true},
+  {group:'Akademik'},
+  {id:'teaching',       label:'Teaching',             icon:'👨‍🏫', coll:true},
+  {id:'projects',       label:'Research Project',     icon:'🔬', coll:true},
+  {id:'grants',         label:'Research Grants',      icon:'💰', coll:true},
+  {id:'publications',   label:'Publications',         icon:'📚', coll:true},
+  {id:'conferences',    label:'Conference',           icon:'🎤', coll:true},
+  {id:'books',          label:'Book & Chapter',       icon:'📖', coll:true},
+  {id:'awards',         label:'Awards & Recognition', icon:'🏆', coll:true},
+  {id:'media',          label:'Magazine / Media',     icon:'📰', coll:true},
+  {group:'Kerjaya'},
+  {id:'adminExp',       label:'Administrative',       icon:'💼', coll:true},
+  {id:'supervision',    label:'Supervision',          icon:'👨‍🎓', coll:true},
+  {id:'consultancy',    label:'Consultancy',          icon:'🏢', coll:true},
+  {id:'memberships',    label:'Professional Membership', icon:'👔', coll:true},
+  {id:'community',      label:'Community Engagement', icon:'🌍', coll:true},
+  {id:'innovation',     label:'Innovation / Product', icon:'💡', coll:true},
+  {id:'ip',             label:'Intellectual Property',icon:'📜', coll:true},
+  {group:'AI & Tools'},
+  {id:'scanner',        label:'AI Document Scanner',  icon:'🤖'},
+  {id:'cloudSync',      label:'Cloud Resume Sync',    icon:'☁️'},
+  {id:'cv',             label:'My CV',                icon:'📄'},
+  {id:'public',         label:'Public Academic Profile', icon:'🌐'},
+  {group:'Analitik'},
+  {id:'search',         label:'Faculty Search',       icon:'🔎'},
+  {id:'analytics',      label:'Faculty Analytics',    icon:'📊', roles:['Head','Admin']},
+  {id:'kpi',            label:'KPI Dashboard',        icon:'📈', roles:['Head','Admin']},
+  {id:'quality',        label:'Data Quality',         icon:'⚠️'},
+  {group:'Sistem'},
+  {id:'notifications',  label:'Notifications',        icon:'🔔'},
+  {id:'admin',          label:'Admin Panel',          icon:'👨‍💼', roles:['Admin']},
+  {id:'audit',          label:'Audit Trail',          icon:'📝'}
+];
+
+const TITLES = {
+  dashboard:['Dashboard','Ringkasan profil akademik anda'],
+  profile:['My Profile','Maklumat peribadi, pengecam akademik & biografi'],
+  expertise:['Expertise & Research Interest','Kepakaran, minat penyelidikan, kata kunci & SDG'],
+  scanner:['AI Document Scanner','Upload Once, Extract Automatically, Verify Once, Use Everywhere'],
+  cloudSync:['Cloud Resume Sync','Hantar & tarik data resume anda ke Google Sheets melalui Apps Script'],
+  cv:['My CV','Jana CV akademik daripada satu sumber data'],
+  public:['Public Academic Profile','Profil awam yang boleh dikongsi'],
+  search:['Faculty Search','Cari kepakaran merentas semua rekod'],
+  analytics:['Faculty Analytics','Statistik penerbitan, penyelidikan & akademik'],
+  kpi:['KPI Dashboard','Petunjuk prestasi utama fakulti'],
+  quality:['Data Quality','Semakan data tidak lengkap & pertindihan'],
+  notifications:['Notifications','Makluman sistem & peringatan'],
+  admin:['Admin Panel','Pengurusan pengguna, sistem & AI'],
+  audit:['Audit Trail','Sejarah perubahan data']
+};
+
+let state = { view:'dashboard', q:'' };
+
+function setRole(r){ DB.role = r; save(); render(); toast('Role ditukar: ' + r); }
+window.setRole = setRole;
+
+function canSee(item){
+  if(!item.roles) return true;
+  return item.roles.includes(DB.role);
+}
+
+function go(view, q){
+  state.view = view;
+  state.q = q || '';
+  window.scrollTo(0,0);
+  render();
+}
+window.go = go;
+
+/* =========================================================
+   5. RENDER CORE
+   ========================================================= */
+function renderSidebar(){
+  const unread = notifications().filter(n=>!DB.readNotifs.includes(n.id)).length;
+  let html = `<div class="brand">
+      <div class="logo">🎓</div>
+      <div><h2>Academic Profile</h2><p>AI-Powered System</p></div>
+    </div><nav class="nav">`;
+  NAV.forEach(item=>{
+    if(item.group){ html += `<div class="nav-group">${item.group}</div>`; return; }
+    if(!canSee(item)) return;
+    const active = state.view===item.id ? ' active' : '';
+    let badge = '';
+    if(item.id==='notifications' && unread) badge = `<span class="badge">${unread}</span>`;
+    if(item.id==='quality'){ const n = qualityIssues().total; if(n) badge = `<span class="badge">${n}</span>`; }
+    html += `<button class="nav-item${active}" onclick="go('${item.id}')">
+        <span class="ic">${item.icon}</span><span>${item.label}</span>${badge}
+      </button>`;
+  });
+  html += `</nav>`;
+  $('#sidebar').innerHTML = html;
+}
+
+function render(){
+  renderSidebar();
+  const t = TITLES[state.view] || (SCHEMA[state.view] ? [SCHEMA[state.view].label, 'Pengurusan rekod'] : ['Dashboard','']);
+  $('#pageTitle').textContent = t[0];
+  $('#pageSub').textContent = t[1];
+
+  const p = DB.profile;
+  $('#tbAvatar').textContent = initialsOf(p.name);
+  $('#tbName').textContent = p.name || '—';
+  $('#tbRole').textContent = p.position || CURRENT_ROLE.replace('_',' ');
+  $('#roleSelect').value = DB.role;
+  $('#notifDot').classList.toggle('on', notifications().some(n=>!DB.readNotifs.includes(n.id)));
+
+  if(SCHEMA[state.view] && NAV.find(n=>n.id===state.view && n.coll)){
+    viewCollection(state.view);
+  } else {
+    (VIEWS[state.view] || VIEWS.dashboard)();
+  }
+  save();
+}
+
+/* =========================================================
+   6. UTILITIES — stats, quality, notifications, audit
+   ========================================================= */
+function count(k){ return (DB[k]||[]).length; }
+function totalGrants(){ return (DB.grants||[]).reduce((s,g)=>s+Number(g.amount||0),0); }
+
+function profileCompleteness(){
+  const p = DB.profile;
+  const keys = ['name','title','position','faculty','campus','department','email','officeTel','officeLoc','photo',
+                'orcid','scopus','shortBio','expertise','researchInterest','keywords','sdg'];
+  const filled = keys.filter(k=>p[k] && String(p[k]).trim()).length;
+  return Math.round(filled/keys.length*100);
+}
+
+function pubByYear(){
+  const m = {};
+  (DB.publications||[]).forEach(p=>{ const y = p.year||'—'; m[y]=(m[y]||0)+1; });
+  return m;
+}
+function quartileCount(q){ return (DB.publications||[]).filter(p=>p.quartile===q).length; }
+function indexingCount(i){ return (DB.publications||[]).filter(p=>p.indexing===i).length; }
+
+function findDuplicates(){
+  const map = {};
+  (DB.publications||[]).forEach(p=>{
+    const k = (p.title||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,45);
+    if(!k) return;
+    (map[k] = map[k]||[]).push(p);
+  });
+  return Object.values(map).filter(a=>a.length>1);
+}
+
+function qualityIssues(){
+  const pubs = DB.publications||[];
+  const missingDOI = pubs.filter(p=>!p.doi).length;
+  const missingYear = pubs.filter(p=>!p.year).length;
+  const noOrcid = DB.profile.orcid ? 0 : 1;
+  const dup = findDuplicates().length;
+  const incomplete = 100 - profileCompleteness() > 0 ? 1 : 0;
+  return { missingDOI, missingYear, noOrcid, dup, incomplete, total: missingDOI + missingYear + noOrcid + dup };
+}
+
+function notifications(){
+  const q = qualityIssues();
+  const list = [];
+  if(DB.role==='Admin' || DB.role==='Head'){
+    list.push({id:'n-ai', icon:'🤖', title:'AI extraction completed', desc:'3 rekod baharu telah diekstrak dan menunggu pengesahan.', tone:'sky'});
+  }
+  if(q.missingDOI) list.push({id:'n-doi', icon:'🔍', title:`${q.missingDOI} publication(s) missing DOI`, desc:'Lengkapkan DOI untuk pengindeksan yang lebih baik.', tone:'amber'});
+  if(q.noOrcid) list.push({id:'n-orcid', icon:'🆔', title:'Profile missing ORCID', desc:'Tambah ORCID untuk penyegerakan penulis.', tone:'amber'});
+  if(q.dup) list.push({id:'n-dup', icon:'⚠️', title:'Possible duplicate publication detected', desc:'Sistem mengesan rekod yang mungkin bertindih.', tone:'red'});
+  const pc = profileCompleteness();
+  if(pc < 100) list.push({id:'n-prof', icon:'👤', title:`Your profile is ${pc}% complete`, desc:'Lengkapkan maklumat untuk CV yang lebih baik.', tone:'sky'});
+  list.push({id:'n-cv', icon:'📄', title:'CV template ready', desc:'Academic CV anda boleh dijana pada bila-bila masa.', tone:'green'});
+  if(DB.cloud && DB.cloud.lastPush) list.push({id:'n-cloud', icon:'☁️', title:'Cloud sync aktif', desc:'Kali terakhir hantar: ' + fmtDateTime(DB.cloud.lastPush), tone:'green'});
+  return list;
+}
+
+function log(action, target, source, extra){
+  DB.audit.unshift({
+    id: uid(),
+    who: DB.profile.name || CURRENT_USER.name,
+    action, target, source: source || 'Manual Entry',
+    date: new Date().toISOString(),
+    confidence: extra && extra.confidence ? extra.confidence : null,
+    verified: extra && extra.verified !== undefined ? extra.verified : true
+  });
+  if(DB.audit.length > 300) DB.audit.length = 300;
+}
+
+/* =========================================================
+   7. VIEW: DASHBOARD
+   ========================================================= */
+const VIEWS = {};
+
+VIEWS.dashboard = function(){
+  const p = DB.profile;
+  const pc = profileCompleteness();
+  const stats = [
+    ['publications','📚','Publications'], ['projects','🔬','Research Projects'],
+    ['grants','💰','Grants'], ['awards','🏆','Awards'],
+    ['conferences','🎤','Conference'], ['books','📖','Books/Chapters'],
+    ['supervision','👨‍🎓','Supervision'], ['consultancy','🏢','Consultancy'],
+    ['community','🌍','Community Engagement'], ['memberships','👔','Professional Membership']
+  ];
+  const q = qualityIssues();
+
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+    <div class="ring" style="--p:${pc}"><span>${pc}%</span></div>
+    <div style="flex:1;min-width:240px">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="font-size:40px;line-height:1">${esc(p.photo||'👤')}</div>
+        <div>
+          <h2 style="font-size:22px;letter-spacing:-.4px">${esc(p.title||'')} ${esc(p.name||'')}</h2>
+          <p class="muted small">${esc(p.position||'')} · ${esc(p.faculty||'')}</p>
+          <p class="muted small">${esc(p.campus||'')} · ${esc(p.department||'')}</p>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="pill ${pc>=85?'green':'amber'}">Status Profil: ${pc}% Complete</span>
+        <span class="pill sky">Role: ${DB.role}</span>
+        <span class="pill gray">Total Grant: ${money(totalGrants())}</span>
+        ${DB.cloud && DB.cloud.lastPush?`<span class="pill green">☁️ Synced ${fmtDateTime(DB.cloud.lastPush)}</span>`:'<span class="pill amber">☁️ Belum sync</span>'}
+      </div>
+    </div>
+    <div class="btn-row" style="align-items:flex-start">
+      <button class="btn btn-primary" onclick="openForm('publications')">＋ Add Information</button>
+      <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
+      <button class="btn btn-ok" onclick="go('cloudSync')">☁️ Update Resume</button>
+      <button class="btn" onclick="go('cv')">📄 Generate CV</button>
+      <button class="btn" onclick="go('profile')">✏️ Edit Profile</button>
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:18px;border-left:4px solid var(--brand)">
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:26px">☁️</div>
+      <div style="flex:1;min-width:220px">
+        <div style="font-weight:800">Cloud Resume Sync</div>
+        <div class="muted small">Hantar resume/CV ke Google Sheets melalui Apps Script — satu klik sahaja.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ok" onclick="quickCloudPush()">⬆ Update Resume ke Cloud</button>
+        <button class="btn" onclick="go('cloudSync')">⚙️ Buka Panel Sync</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">📊 Statistik Peribadi</div>
+  <div class="grid g4" style="margin-bottom:20px">
+    ${stats.map(([k,ic,l])=>`
+      <button class="stat" onclick="go('${k}')">
+        <span class="ic">${ic}</span>
+        <div class="n">${count(k)}</div>
+        <div class="l">${l}</div>
+      </button>`).join('')}
+  </div>
+
+  <div class="grid g2">
+    <div class="card card-pad">
+      <div class="section-title">🔔 Reminder & Tugasan</div>
+      ${q.total===0 && pc===100 ? '<p class="muted small">Tiada isu data. Profil anda lengkap! 🎉</p>' : `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${pc<100?`<div class="hint warn">👤 Maklumat profil belum lengkap — ${pc}% siap.</div>`:''}
+        ${q.missingDOI?`<div class="hint warn">🔍 ${q.missingDOI} publication belum mempunyai DOI.</div>`:''}
+        ${q.missingYear?`<div class="hint warn">📅 ${q.missingYear} rekod tiada tahun.</div>`:''}
+        ${q.dup?`<div class="hint warn">⚠️ ${q.dup} rekod berkemungkinan duplicate.</div>`:''}
+        ${q.noOrcid?`<div class="hint warn">🆔 ORCID belum diisi.</div>`:''}
+        <button class="btn btn-sm" style="align-self:flex-start" onclick="go('quality')">Buka Data Quality →</button>
+      </div>`}
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">📈 Penerbitan Mengikut Tahun</div>
+      ${barChart(pubByYear())}
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-top:18px">
+    <div class="section-title">🕘 Aktiviti Terkini (Audit)</div>
+    ${DB.audit.length===0 ? '<p class="muted small">Tiada aktiviti lagi.</p>' : `
+    <table><tbody>
+      ${DB.audit.slice(0,5).map(a=>`<tr>
+        <td><b>${esc(a.who)}</b><br><span class="muted small">${esc(a.action)} — ${esc(a.target||'')}</span></td>
+        <td style="text-align:right"><span class="pill ${a.source.includes('AI')?'sky':a.source.includes('Cloud')?'green':'gray'}">${esc(a.source)}</span><br>
+        <span class="muted small">${fmtDate(a.date)}</span></td>
+      </tr>`).join('')}
+    </tbody></table>`}
+  </div>`;
+};
+
+function barChart(map){
+  const entries = Object.entries(map).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+  if(!entries.length) return '<p class="muted small">Tiada data.</p>';
+  const max = Math.max(...entries.map(e=>e[1]));
+  return entries.map(([k,v])=>`
+    <div class="bar-row">
+      <span class="muted">${esc(k)}</span>
+      <div class="bar"><i style="width:${(v/max*100)}%"></i></div>
+      <b style="text-align:right">${v}</b>
+    </div>`).join('');
+}
+
+/* =========================================================
+   8. VIEW: PROFILE
+   ========================================================= */
+VIEWS.profile = function(){
+  const p = DB.profile;
+  const f = (k,l,type) => `<label class="fld"><span>${l}</span>
+      <input type="${type||'text'}" data-p="${k}" value="${esc(p[k]||'')}"></label>`;
+  const t = (k,l) => `<label class="fld full"><span>${l}</span>
+      <textarea rows="3" data-p="${k}">${esc(p[k]||'')}</textarea></label>`;
+
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px;border-left:4px solid var(--ok)">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:28px">🔐</div>
+      <div style="flex:1;min-width:220px">
+        <div style="font-weight:800">Signed in as ${esc(CURRENT_USER.name)}</div>
+        <div class="muted small">${esc(CURRENT_USER.email||'')} · ID: <b>${esc(CURRENT_USER.id)}</b></div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="doLogout()">🚪 Log Keluar</button>
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">👤 A. Personal Information</div>
+    <div class="form-grid">
+      ${f('name','Full Name')} ${f('prefName','Preferred Name')}
+      ${f('title','Title')} ${f('staffId','Staff ID')}
+      ${f('position','Position')} ${f('grade','Grade')}
+      ${f('faculty','Faculty')} ${f('campus','Campus')}
+      ${f('department','Department')} ${f('centre','Centre / Unit')}
+      ${f('email','Email','email')} ${f('officeTel','Office Telephone')}
+      ${f('mobile','Mobile Telephone')} ${f('officeLoc','Office Location')}
+      <label class="fld"><span>Profile Photo (emoji atau URL)</span>
+        <input type="text" data-p="photo" value="${esc(p.photo||'')}"></label>
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🆔 B. Academic Identifier</div>
+    <div class="form-grid">
+      ${f('orcid','ORCID')} ${f('scopus','Scopus Author ID')}
+      ${f('wos','Web of Science Researcher ID')} ${f('scholar','Google Scholar')}
+      ${f('researchgate','ResearchGate')} ${f('linkedin','LinkedIn')}
+      ${f('website','Personal Website')}
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">✍️ C. Biography</div>
+    <div class="form-grid">
+      ${t('shortBio','Short Biography')}
+      ${t('longBio','Long Biography')}
+      ${t('academicProfile','Academic Profile')}
+      ${t('researchProfile','Research Profile')}
+    </div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile</button>
+      <button class="btn btn-ok" onclick="saveProfileAndSync()">💾☁️ Save & Sync to Cloud</button>
+      <button class="btn" onclick="aiBiography()">✨ AI Generate Biography</button>
+    </div>
+  </div>`;
+};
+
+function saveProfile(){
+  document.querySelectorAll('[data-p]').forEach(el=>{ DB.profile[el.dataset.p] = el.value; });
+  /* Sync the profile name/email back into the session so the topbar stays consistent */
+  try {
+    const s = FMSAuth.getSession && FMSAuth.getSession();
+    if(s && s.user){
+      s.user.name = DB.profile.name || s.user.name;
+      s.user.email = DB.profile.email || s.user.email;
+      if(DB.profile.position) s.user.position = DB.profile.position;
+      if(DB.profile.department) s.user.unit = DB.profile.department;
+      FMSAuth.saveSession(s, s.role || 'academic_staff');
+    }
+  } catch(e){}
+  log('Updated Profile','My Profile','Manual Entry');
+  save(); render(); toast('Profil disimpan ✔');
+}
+window.saveProfile = saveProfile;
+
+async function saveProfileAndSync(){
+  document.querySelectorAll('[data-p]').forEach(el=>{ DB.profile[el.dataset.p] = el.value; });
+  try {
+    const s = FMSAuth.getSession && FMSAuth.getSession();
+    if(s && s.user){
+      s.user.name = DB.profile.name || s.user.name;
+      s.user.email = DB.profile.email || s.user.email;
+      if(DB.profile.position) s.user.position = DB.profile.position;
+      if(DB.profile.department) s.user.unit = DB.profile.department;
+      FMSAuth.saveSession(s, s.role || 'academic_staff');
+    }
+  } catch(e){}
+  log('Updated Profile','My Profile','Manual Entry');
+  save();
+  await cloudPush({ silent:false, reason:'save-profile' });
+}
+window.saveProfileAndSync = saveProfileAndSync;
+
+function aiBiography(){
+  const p = DB.profile;
+  const expertise = (p.expertise||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const interests = (p.researchInterest||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const topPubs = (DB.publications||[]).slice(0,3).map(x=>x.title).filter(Boolean);
+  const grants = DB.grants||[];
+  const total = grants.reduce((s,g)=>s+Number(g.amount||0),0);
+
+  p.shortBio = `${p.title||''} ${p.name||''} is a ${p.position||'lecturer'} at the ${p.faculty||'faculty'}, ${p.campus||''}. ` +
+    `His/her research focuses on ${interests.slice(0,3).join(', ')||'sustainable engineering'}, with expertise in ${expertise.slice(0,3).join(', ')||'chemical engineering'}. ` +
+    `To date, he/she has secured ${money(total)} in research funding and published ${(DB.publications||[]).length} indexed publications.`;
+
+  p.longBio = p.shortBio + `\n\nRecent works include: ${topPubs.join('; ')||'—'}. ` +
+    `He/she is actively involved in supervision, community engagement and technology commercialisation, aligning research to the United Nations Sustainable Development Goals.`;
+
+  p.academicProfile = `Academic career began with a ${(DB.qualifications||[])[0]?.qualification||'higher degree'} in ${(DB.qualifications||[])[0]?.field||'the field'} from ${(DB.qualifications||[])[0]?.university||'the university'}. ` +
+    `Currently serving as ${p.position||'lecturer'} and actively teaching at undergraduate and postgraduate levels.`;
+
+  p.researchProfile = `Research interests: ${interests.join(', ')||'—'}. Keywords: ${p.keywords||'—'}. SDG alignment: ${p.sdg||'—'}.`;
+
+  log('AI Generated Biography','My Profile','AI Generator',{confidence:94, verified:false});
+  save(); render(); toast('✨ Biografi dijana oleh AI — sila semak');
+}
+window.aiBiography = aiBiography;
+
+/* =========================================================
+   9. VIEW: EXPERTISE
+   ========================================================= */
+VIEWS.expertise = function(){
+  const p = DB.profile;
+  const chips = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>`<span class="pill">${esc(x)}</span>`).join(' ');
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🔬 Expertise</div>
+    <label class="fld"><span>Senarai kepakaran (pisah dengan koma)</span>
+      <textarea rows="2" data-e="expertise">${esc(p.expertise||'')}</textarea></label>
+    <div style="margin-top:10px">${chips(p.expertise)}</div>
+  </div>
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🎯 Research Interest</div>
+    <label class="fld"><span>Minat penyelidikan (pisah dengan koma)</span>
+      <textarea rows="2" data-e="researchInterest">${esc(p.researchInterest||'')}</textarea></label>
+    <div style="margin-top:10px">${chips(p.researchInterest)}</div>
+  </div>
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🏷️ Keywords</div>
+    <label class="fld"><span>Kata kunci (pisah dengan koma)</span>
+      <textarea rows="2" data-e="keywords">${esc(p.keywords||'')}</textarea></label>
+    <div style="margin-top:10px">${chips(p.keywords)}</div>
+  </div>
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🌱 SDG Alignment</div>
+    <label class="fld"><span>SDG (pisah dengan koma)</span>
+      <input type="text" data-e="sdg" value="${esc(p.sdg||'')}"></label>
+    <div style="margin-top:10px">${chips(p.sdg)}</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="saveExpertise()">💾 Save</button>
+    <button class="btn btn-ok" onclick="saveExpertiseAndSync()">💾☁️ Save & Sync</button>
+  </div>`;
+};
+
+function saveExpertise(){
+  document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
+  log('Updated Expertise','Expertise & Research','Manual Entry');
+  save(); render(); toast('Disimpan ✔');
+}
+window.saveExpertise = saveExpertise;
+async function saveExpertiseAndSync(){
+  document.querySelectorAll('[data-e]').forEach(el=>{ DB.profile[el.dataset.e] = el.value; });
+  log('Updated Expertise','Expertise & Research','Manual Entry');
+  save();
+  await cloudPush({ silent:false, reason:'save-expertise' });
+}
+window.saveExpertiseAndSync = saveExpertiseAndSync;
+
+/* =========================================================
+   10. GENERIC COLLECTION VIEW
+   ========================================================= */
+function viewCollection(key){
+  const sch = SCHEMA[key];
+  const rows = DB[key] || [];
+  const q = (state.q||'').toLowerCase();
+  let list = [...rows];
+  if(q) list = list.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  list.sort((a,b)=> String(b[sch.dateKey]||'').localeCompare(String(a[sch.dateKey]||'')));
+
+  const cols = sch.cols || [];
+
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:30px">${sch.icon}</div>
+      <div style="flex:1;min-width:200px">
+        <div style="font-weight:800;font-size:16px">${sch.label}</div>
+        <div class="muted small">${rows.length} rekod dalam pangkalan data</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="openForm('${key}')">＋ Add Manually</button>
+        <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <input class="fld" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px"
+        placeholder="🔎 Cari dalam ${sch.label}..." value="${esc(state.q||'')}"
+        oninput="state.q=this.value; clearTimeout(window._t); window._t=setTimeout(()=>{viewCollection('${key}')},250)">
+    </div>
+  </div>
+
+  ${key==='grants' ? `<div class="hint" style="margin-bottom:16px"><b>Auto calculation:</b> Total Grant Obtained = <b>${money(totalGrants())}</b></div>` : ''}
+
+  <div class="card">
+    ${list.length===0 ? `<div class="empty"><div class="big">${sch.icon}</div>
+        <p>Tiada rekod ${sch.label} lagi.</p>
+        <div class="btn-row" style="justify-content:center;margin-top:14px">
+          <button class="btn btn-primary" onclick="openForm('${key}')">＋ Add ${sch.singular}</button>
+          <button class="btn" onclick="go('scanner')">🤖 Scan Document</button>
+        </div></div>`
+      : `<div class="tbl-wrap"><table>
+          <thead><tr><th>${sch.singular}</th>${cols.map(c=>`<th>${labelOf(sch,c)}</th>`).join('')}<th></th></tr></thead>
+          <tbody>${list.map(r=>`
+            <tr>
+              <td><b>${esc(sch.title(r)||'(tanpa tajuk)')}</b>${r.authors?`<br><span class="muted small">${esc(r.authors)}</span>`:''}</td>
+              ${cols.map(c=>`<td>${cellVal(sch,c,r)}</td>`).join('')}
+              <td><div class="row-actions">
+                <button class="btn btn-sm" onclick="openForm('${key}','${r.id}')">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="delRec('${key}','${r.id}')">🗑</button>
+              </div></td>
+            </tr>`).join('')}</tbody>
+        </table></div>`}
+  </div>`;
+}
+
+function labelOf(sch, key){
+  const f = sch.fields.find(x=>x.k===key);
+  return f ? f.l : key;
+}
+function cellVal(sch, key, r){
+  let v = r[key];
+  if(v==null || v==='') return '<span class="muted">—</span>';
+  if(key==='amount' || key==='value') return money(v);
+  if(key==='quartile' || key==='level' || key==='status' || key==='indexing') {
+    const cls = /Q1|International|Active|Completed|Scopus/.test(v) ? 'green' : /Q4|Pending|Withdrawn/.test(v) ? 'amber' : 'gray';
+    return `<span class="pill ${cls}">${esc(v)}</span>`;
+  }
+  return esc(v);
+}
+
+function delRec(key, id){
+  if(!confirm('Padam rekod ini?')) return;
+  const rec = DB[key].find(r=>r.id===id);
+  DB[key] = DB[key].filter(r=>r.id!==id);
+  log('Deleted Record', (SCHEMA[key].title(rec)||key), 'Manual Entry');
+  save(); render(); toast('Rekod dipadam');
+}
+window.delRec = delRec;
+
+/* =========================================================
+   11. MODAL FORM
+   ========================================================= */
+function openForm(key, id){
+  const sch = SCHEMA[key];
+  const rec = id ? DB[key].find(r=>r.id===id) : {};
+  const body = sch.fields.map(f=>{
+    const v = rec[f.k]==null ? '' : rec[f.k];
+    if(f.type==='textarea')
+      return `<label class="fld ${f.full?'full':''}"><span>${f.l}${f.req?' *':''}</span>
+        <textarea name="${f.k}" rows="3">${esc(v)}</textarea></label>`;
+    if(f.type==='select')
+      return `<label class="fld ${f.full?'full':''}"><span>${f.l}${f.req?' *':''}</span>
+        <select name="${f.k}">${['',...f.opts].map(o=>`<option value="${esc(o)}" ${o==v?'selected':''}>${o||'— pilih —'}</option>`).join('')}</select></label>`;
+    return `<label class="fld ${f.full?'full':''}"><span>${f.l}${f.req?' *':''}</span>
+      <input type="${f.type||'text'}" name="${f.k}" value="${esc(v)}" ${f.req?'required':''}></label>`;
+  }).join('');
+
+  $('#modalRoot').innerHTML = `
+  <div class="modal-bg" onclick="if(event.target===this)closeModal()">
+    <form class="modal" onsubmit="submitForm(event,'${key}','${id||''}')">
+      <div class="modal-head">
+        <div style="font-size:22px">${sch.icon}</div>
+        <h3>${id?'Edit':'Add'} ${sch.singular}</h3>
+        <button type="button" class="btn btn-sm" style="margin-left:auto" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="hint" style="margin-bottom:16px">💡 Anda boleh isi secara manual, atau gunakan <b>🤖 AI Scanner</b> untuk ekstrak maklumat daripada dokumen.</div>
+        <div class="form-grid">${body}</div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">💾 Save ${sch.singular}</button>
+      </div>
+    </form>
+  </div>`;
+}
+window.openForm = openForm;
+
+function closeModal(){ $('#modalRoot').innerHTML = ''; }
+window.closeModal = closeModal;
+
+function submitForm(e, key, id){
+  e.preventDefault();
+  const form = e.target;
+  const data = { id: id || uid() };
+  new FormData(form).forEach((v,k)=>{ data[k] = typeof v === 'string' ? v.trim() : v; });
+
+  if(id){
+    const i = DB[key].findIndex(r=>r.id===id);
+    DB[key][i] = data;
+    log('Updated Record', SCHEMA[key].title(data)||key, 'Manual Entry');
+  } else {
+    DB[key].push(data);
+    log('Added Record', SCHEMA[key].title(data)||key, 'Manual Entry');
+  }
+  closeModal(); save(); render(); toast('Rekod disimpan ✔');
+
+  if(DB.cloud.autoSync) cloudPush({ silent:true, reason:'auto-after-save' });
+}
+window.submitForm = submitForm;
+
+/* =========================================================
+   12. VIEW: AI DOCUMENT SCANNER
+   ========================================================= */
+let scanResult = null;
+
+VIEWS.scanner = function(){
+  $('#view').innerHTML = `
+  <div class="grid g2" style="margin-bottom:18px">
+    <div class="card card-pad">
+      <div class="section-title">🤖 AI Document Scanner</div>
+      <div class="hint" style="margin-bottom:14px">
+        <b>“Upload Once, Extract Automatically, Verify Once, Use Everywhere.”</b><br>
+        Dokumen asal <b>tidak disimpan secara kekal</b> — sistem hanya menyimpan <i>extracted structured information</i>.
+      </div>
+
+      <div class="fld" style="margin-bottom:12px">
+        <span>Jenis Dokumen</span>
+        <select id="scanType">
+          <option value="auto">Auto Detect</option>
+          <option value="publications">Journal Article</option>
+          <option value="conferences">Conference Paper</option>
+          <option value="books">Book / Book Chapter</option>
+          <option value="awards">Award / Certificate</option>
+          <option value="grants">Grant Document</option>
+          <option value="adminExp">Appointment Letter</option>
+          <option value="media">Magazine / Media</option>
+        </select>
+      </div>
+
+      <div class="drop" onclick="document.getElementById('scanFile').click()">
+        <div style="font-size:34px">📄</div>
+        <div style="font-weight:700;margin-top:8px">Drag &amp; Drop Document</div>
+        <div class="muted small">atau klik untuk pilih fail (.txt, .pdf, .docx, gambar)</div>
+        <input type="file" id="scanFile" hidden onchange="handleFile(this)">
+      </div>
+
+      <div class="fld" style="margin-top:14px">
+        <span>Atau tampal teks dokumen di sini</span>
+        <textarea id="scanText" rows="6" placeholder="Paste abstract / metadata dokumen di sini..."></textarea>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-primary" onclick="runScan()">🤖 Scan Document</button>
+        <button class="btn" onclick="loadSample()">📋 Muat Contoh Dokumen</button>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">⚙️ Proses AI</div>
+      <div id="steps">
+        ${['Upload','AI membaca dokumen','AI mengenal pasti jenis dokumen','AI extract information','Confidence score','Pensyarah verify','Save']
+          .map((s,i)=>`<div class="step" id="step${i}"><div class="num">${i+1}</div><div><b>${s}</b></div></div>`).join('')}
+      </div>
+      <div class="hint" style="margin-top:12px">
+        Field dengan <b>confidence rendah</b> akan ditandakan untuk semakan manual.
+      </div>
+    </div>
+  </div>
+
+  <div id="scanOutput"></div>`;
+};
+
+function handleFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(/\.(txt|md|csv|json)$/i.test(file.name) || file.type.startsWith('text')){
+    const fr = new FileReader();
+    fr.onload = e => { $('#scanText').value = e.target.result; toast('Fail dibaca ✔'); };
+    fr.readAsText(file);
+  } else {
+    $('#scanText').value = `[Dokumen: ${file.name}]\n\nJournal of Cleaner Production\nSustainable Polyurethane from Waste Cooking Oil via Epoxidation Route\nA. Roslan, M. Hafiz, S. Tan\n2026, Volume 15, Issue 2, pages 120-134\nDOI: 10.1016/j.jclepro.2026.120134\nAbstract: This study investigates...`;
+    toast('Fail dikesan — teks contoh dimuatkan');
+  }
+}
+window.handleFile = handleFile;
+
+function loadSample(){
+  $('#scanText').value =
+`Journal of Cleaner Production
+Sustainable Polyurethane from Waste Cooking Oil via Epoxidation Route
+Authors: A. Roslan, M. Hafiz, S. Tan
+Affiliation: Faculty of Chemical Engineering
+Year: 2026  Volume: 15  Issue: 2  Pages: 120-134
+DOI: 10.1016/j.jclepro.2026.120134
+ISSN: 0959-6526
+Abstract: This study investigates the conversion of waste cooking oil into bio-based polyol for rigid polyurethane foam applications using a heterogeneous TiO2 catalyst.
+Keywords: Waste Cooking Oil; Polyurethane; Epoxidation; Biopolyol`;
+  toast('Contoh dokumen dimuatkan');
+}
+window.loadSample = loadSample;
+
+function runScan(){
+  const text = $('#scanText').value.trim();
+  if(!text){ toast('Sila masukkan teks dokumen'); return; }
+
+  let i = 0;
+  const timer = setInterval(()=>{
+    const el = document.getElementById('step'+i);
+    if(el) el.classList.add('done');
+    i++;
+    if(i>3){ clearInterval(timer); doExtract(text); }
+  }, 260);
+  doExtract(text);
+}
+window.runScan = runScan;
+
+function detectType(text){
+  const t = text.toLowerCase();
+  if(/appointment|lantikan|letter of appointment/.test(t)) return 'adminExp';
+  if(/grant|funding agency|grant number|rm\s?\d/.test(t)) return 'grants';
+  if(/award|certificate of|anugerah|recognition/.test(t)) return 'awards';
+  if(/conference|proceedings|symposium|colloquium/.test(t)) return 'conferences';
+  if(/isbn|book chapter|publisher/.test(t) && !/journal/.test(t)) return 'books';
+  if(/magazine|newspaper|online media/.test(t)) return 'media';
+  if(/journal|doi|abstract|issn/.test(t)) return 'publications';
+  return 'publications';
+}
+
+function doExtract(text){
+  const forced = $('#scanType').value;
+  const detected = forced === 'auto' ? detectType(text) : forced;
+
+  const lines = text.split('\n').map(s=>s.trim()).filter(Boolean);
+  const flat = text.replace(/\s+/g,' ');
+
+  const doi = (flat.match(/\b10\.\d{4,9}\/[^\s"<>]+/)||[''])[0].replace(/[.,;]$/,'');
+  const years = (flat.match(/\b(19|20)\d{2}\b/g)||[]);
+  const year = years.length ? years.sort().pop() : '';
+  const vol = (flat.match(/volume[:\s]+([0-9]+)/i)||[])[1] || '';
+  const iss = (flat.match(/issue[:\s]+([0-9]+)/i)||[])[1] || '';
+  const pages = (flat.match(/pages?[:\s]+([0-9]+\s*[-–]\s*[0-9]+)/i)||[])[1] || '';
+  const issn = (flat.match(/issn[:\s]+([0-9Xx\-]+)/)||[])[1] || '';
+  const isbn = (flat.match(/isbn[:\s]+([0-9Xx\-]+)/)||[])[1] || '';
+  const title = lines.find(l => l.length > 25 && !/^(journal|authors?|abstract|keywords|doi|volume|year)/i.test(l)) || lines[0] || '';
+  const authorLine = lines.find(l => /^authors?[:\s]/i.test(l)) || lines.find(l=>/^[A-Z]\.\s?[A-Za-z]+/.test(l) && l!==title) || '';
+  const journal = lines.find(l => /journal|proceedings|publisher/i.test(l) && l!==title) || '';
+  const kwLine = lines.find(l => /^keywords?[:\s]/i.test(l)) || '';
+
+  const f = (k, label, val, conf) => ({ k, label, value: val || '', conf: val ? conf : 0, low: !!val && conf < 85 });
+
+  let fields = [];
+  if(detected === 'publications'){
+    fields = [
+      f('type','Publication Type','Journal Article',96),
+      f('title','Title',title,97),
+      f('authors','Authors',authorLine.replace(/^authors?[:\s]*/i,''),93),
+      f('journal','Journal Name',journal,88),
+      f('year','Year',year,94),
+      f('volume','Volume',vol,72),
+      f('issue','Issue',iss,68),
+      f('pages','Pages',pages,80),
+      f('doi','DOI',doi,97),
+      f('issn','ISSN',issn,90),
+      f('keywords','Keywords',kwLine.replace(/^keywords?[:\s]*/i,''),86),
+      f('indexing','Indexing','Scopus',75),
+      f('quartile','Quartile','Q1',62)
+    ];
+  } else if(detected === 'conferences'){
+    fields = [
+      f('paperTitle','Paper Title',title,95),
+      f('authors','Authors',authorLine,90),
+      f('conferenceName','Conference Name',journal,84),
+      f('year','Year',year,92),
+      f('country','Country','Malaysia',70),
+      f('doi','DOI',doi,95)
+    ];
+  } else if(detected === 'awards'){
+    fields = [
+      f('awardTitle','Award Title',title,92),
+      f('organisation','Awarding Organisation',journal,80),
+      f('year','Year',year,90),
+      f('level','Level','International',74)
+    ];
+  } else if(detected === 'grants'){
+    fields = [
+      f('grantName','Grant Name',title,90),
+      f('grantNumber','Grant Number',(flat.match(/\b[A-Z]{2,6}\/\d[A-Za-z0-9\/\-]+/)||[''])[0],82),
+      f('fundingAgency','Funding Agency',journal,78),
+      f('amount','Amount (RM)',((flat.match(/RM\s?([\d,]+)/i)||[])[1]||'').replace(/,/g,''),85),
+      f('year','Year',year,92),
+      f('status','Status','Active',70)
+    ];
+  } else if(detected === 'adminExp'){
+    fields = [
+      f('position','Position',title,88),
+      f('organisation','Organisation',journal,84),
+      f('startDate','Start Date',year?`${year}-01-01`:'',72),
+      f('appointmentType','Appointment Type','Contract',66)
+    ];
+  } else if(detected === 'books'){
+    fields = [
+      f('type','Type','Book Chapter',80),
+      f('title','Title',title,94),
+      f('authors','Authors',authorLine,88),
+      f('publisher','Publisher',journal,80),
+      f('isbn','ISBN',isbn,88),
+      f('year','Year',year,92)
+    ];
+  } else {
+    fields = [
+      f('articleTitle','Article Title',title,92),
+      f('outlet','Magazine/Newspaper',journal,78),
+      f('date','Date',year?`${year}-01-01`:'',70),
+      f('type','Type','Online Media',72)
+    ];
+  }
+
+  scanResult = { detected, fields };
+
+  const avg = Math.round(fields.filter(x=>x.value).reduce((s,x)=>s+x.conf,0) / Math.max(1, fields.filter(x=>x.value).length));
+
+  $('#scanOutput').innerHTML = `
+  <div class="card card-pad">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <div class="section-title" style="margin:0">🧾 Hasil Ekstraksi AI</div>
+      <span class="pill sky">Jenis dikesan: ${SCHEMA[detected].icon} ${SCHEMA[detected].label}</span>
+      <span class="pill ${avg>=90?'green':avg>=80?'amber':'red'}">Purata Confidence: ${avg}%</span>
+      <div style="margin-left:auto" class="btn-row">
+        <select id="targetModule" class="role-sel" onchange="scanResult.detected=this.value; renderScanTable()">
+          ${Object.keys(SCHEMA).map(k=>`<option value="${k}" ${k===detected?'selected':''}>${SCHEMA[k].label}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div id="scanTable"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="confirmScan()">✅ Confirm &amp; Save</button>
+      <button class="btn btn-ok" onclick="confirmScanAndSync()">✅☁️ Confirm, Save &amp; Sync</button>
+      <button class="btn" onclick="scanResult=null; document.getElementById('scanOutput').innerHTML='';">✕ Batal</button>
+    </div>
+    <div class="hint warn" style="margin-top:12px">Field bertanda 🟠 mempunyai confidence rendah — sila semak sebelum simpan.</div>
+  </div>`;
+
+  renderScanTable();
+  [4,5].forEach(i=>document.getElementById('step'+i)?.classList.add('done'));
+}
+
+function renderScanTable(){
+  if(!scanResult) return;
+  const rows = scanResult.fields.map((f,i)=>`
+    <tr class="${f.low?'low':''}">
+      <td style="width:190px"><b>${esc(f.label)}</b></td>
+      <td><input style="width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px"
+            value="${esc(f.value)}" oninput="scanResult.fields[${i}].value=this.value"></td>
+      <td style="width:170px">
+        <div class="conf">
+          <div class="cbar"><i style="width:${f.conf}%;background:${f.conf>=90?'var(--ok)':f.conf>=80?'var(--warn)':'var(--danger)'}"></i></div>
+          <b>${f.conf}%</b>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  $('#scanTable').innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>Field</th><th>AI Result</th><th>Confidence</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+window.renderScanTable = renderScanTable;
+
+function _commitScan(){
+  const key = scanResult.detected;
+  const rec = { id: uid(), _source:'AI Scanner' };
+  scanResult.fields.forEach(f=>{ if(f.value) rec[f.k] = f.value; });
+
+  if(key === 'publications' && rec.type) {
+    if(/journal/i.test(rec.type)) rec.quartile = rec.quartile || 'Q1';
+  }
+  DB[key].push(rec);
+
+  const avg = Math.round(scanResult.fields.filter(x=>x.value).reduce((s,x)=>s+x.conf,0) / Math.max(1, scanResult.fields.filter(x=>x.value).length));
+  log('Added Record via AI', SCHEMA[key].title(rec)||key, 'AI Scanner', { confidence: avg, verified: true });
+
+  scanResult = null;
+  save();
+  $('#scanOutput').innerHTML = `<div class="hint ok"><b>✅ Rekod berjaya disimpan ke ${SCHEMA[key].label}.</b> Dokumen asal tidak disimpan — hanya maklumat berstruktur.</div>`;
+  renderSidebar();
+  toast('Rekod AI disimpan ✔');
+  return key;
+}
+
+function confirmScan(){
+  if(!scanResult) return;
+  _commitScan();
+}
+window.confirmScan = confirmScan;
+async function confirmScanAndSync(){
+  if(!scanResult) return;
+  _commitScan();
+  await cloudPush({ silent:false, reason:'ai-confirm' });
+}
+window.confirmScanAndSync = confirmScanAndSync;
+
+/* =========================================================
+   13. VIEW: CLOUD RESUME SYNC
+   ========================================================= */
+VIEWS.cloudSync = function(){
+  const c = DB.cloud;
+  const summary = cloudSummary();
+  const status = c.lastPush ? 'on' : 'off';
+
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px;border-left:4px solid var(--brand)">
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:32px">☁️</div>
+      <div style="flex:1;min-width:220px">
+        <div style="font-weight:800;font-size:16px">Cloud Resume Sync — Google Sheets</div>
+        <div class="muted small">
+          Endpoint: <code style="font-size:11px">${esc(CLOUD_URL.slice(0,62))}…</code>
+        </div>
+        <div style="margin-top:8px;font-size:12px">
+          <span class="sync-dot ${status}"></span>
+          ${c.lastPush ? `Terakhir hantar: <b>${fmtDateTime(c.lastPush)}</b>` : '<b>Belum pernah sync</b>'}
+          ${c.lastPull ? ` · Terakhir tarik: <b>${fmtDateTime(c.lastPull)}</b>` : ''}
+        </div>
+        <div class="muted small" style="margin-top:6px">
+          👤 Signed in as <b>${esc(CURRENT_USER.name)}</b> (${esc(CURRENT_USER.id)})
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ok" id="btnPush" onclick="cloudPush({silent:false})">⬆ Update Resume</button>
+        <button class="btn" id="btnPull" onclick="cloudPull()">⬇ Tarik dari Cloud</button>
+        <button class="btn" id="btnTest" onclick="cloudTest()">🔌 Test Connection</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g3" style="margin-bottom:16px">
+    ${statCard('📚', summary.publications, 'Publications')}
+    ${statCard('💰', money(summary.totalGrants), 'Total Grants (RM)')}
+    ${statCard('🏆', summary.awards, 'Awards')}
+  </div>
+
+  <div class="grid g2" style="margin-bottom:16px">
+    <div class="card card-pad">
+      <div class="section-title">📦 Data Yang Akan Dihantar</div>
+      <dl class="kv">
+        <dt>Profil</dt><dd>${esc(DB.profile.name||'—')} (${profileCompleteness()}%)</dd>
+        <dt>Qualifications</dt><dd>${count('qualifications')}</dd>
+        <dt>Teaching</dt><dd>${count('teaching')}</dd>
+        <dt>Projects</dt><dd>${count('projects')}</dd>
+        <dt>Grants</dt><dd>${count('grants')} · ${money(totalGrants())}</dd>
+        <dt>Publications</dt><dd>${count('publications')}</dd>
+        <dt>Conferences</dt><dd>${count('conferences')}</dd>
+        <dt>Books</dt><dd>${count('books')}</dd>
+        <dt>Awards</dt><dd>${count('awards')}</dd>
+        <dt>Supervision</dt><dd>${count('supervision')}</dd>
+        <dt>Innovation</dt><dd>${count('innovation')}</dd>
+        <dt>IP Records</dt><dd>${count('ip')}</dd>
+      </dl>
+      <div class="hint" style="margin-top:14px">
+        Payload dihantar sebagai JSON (<code>text/plain</code>) supaya serasi dengan Google Apps Script tanpa isu CORS preflight.
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">⚙️ Tetapan Sync</div>
+      <label class="fld" style="margin-bottom:12px">
+        <span><input type="checkbox" id="autoSync" ${DB.cloud.autoSync?'checked':''}
+          onchange="DB.cloud.autoSync=this.checked; save(); toast('Auto-sync: '+(this.checked?'ON':'OFF'))" style="accent-color:var(--brand);margin-right:6px">
+          Auto-sync selepas setiap perubahan rekod</span>
+      </label>
+      <label class="fld" style="margin-bottom:12px">
+        <span>Nama Sheet / Tab (optional)</span>
+        <input type="text" id="cloudSheet" value="${esc(DB.cloud.sheet||'Resume')}"
+          onchange="DB.cloud.sheet=this.value; save();">
+      </label>
+      <label class="fld" style="margin-bottom:12px">
+        <span>Kunci Keselamatan (optional)</span>
+        <input type="text" id="cloudKey" value="${esc(DB.cloud.key||'')}"
+          placeholder="Jika Apps Script anda memerlukan token"
+          onchange="DB.cloud.key=this.value; save();">
+      </label>
+      <div class="btn-row">
+        <button class="btn" onclick="exportData()">⬇ Export JSON</button>
+        <button class="btn" onclick="go('cv')">📄 Lihat CV</button>
+      </div>
+      <div class="hint warn" style="margin-top:14px">
+        <b>Nota:</b> Pastikan Web App Apps Script anda di-deploy sebagai <b>“Anyone”</b> dan fungsi <code>doPost(e)</code> menggunakan
+        <code>JSON.parse(e.postData.contents)</code>.
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-pad">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="section-title" style="margin:0">🪵 Log Sync</div>
+      <button class="btn btn-sm" style="margin-left:auto" onclick="document.getElementById('syncLog').innerHTML=''">Clear</button>
+    </div>
+    <div class="log" id="syncLog"><span class="t">[${new Date().toLocaleTimeString()}]</span> Sedia. Tekan <b>Test Connection</b> atau <b>Update Resume</b>.</div>
+  </div>`;
+};
+
+function cloudSummary(){
+  return {
+    publications: count('publications'),
+    totalGrants: totalGrants(),
+    awards: count('awards')
+  };
+}
+
+function syncLog(msg, cls){
+  const el = document.getElementById('syncLog');
+  if(!el) return;
+  const t = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.innerHTML = `<span class="t">[${t}]</span> <span class="${cls||''}">${msg}</span>`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function buildCloudPayload(){
+  const { audit, readNotifs, ...rest } = DB;
+  return {
+    action: 'updateResume',
+    timestamp: new Date().toISOString(),
+    source: 'Academic Profile System',
+    key: DB.cloud.key || '',
+    sheet: DB.cloud.sheet || 'Resume',
+    /* include authenticated identity */
+    auth: {
+      userId: CURRENT_USER.id,
+      name: CURRENT_USER.name,
+      email: CURRENT_USER.email,
+      role: CURRENT_ROLE
+    },
+    profile: DB.profile,
+    summary: {
+      publications: (DB.publications||[]).length,
+      grants: (DB.grants||[]).length,
+      totalGrants: totalGrants(),
+      projects: (DB.projects||[]).length,
+      awards: (DB.awards||[]).length,
+      completeness: profileCompleteness()
+    },
+    data: {
+      qualifications: DB.qualifications||[],
+      teaching: DB.teaching||[],
+      projects: DB.projects||[],
+      grants: DB.grants||[],
+      publications: DB.publications||[],
+      conferences: DB.conferences||[],
+      books: DB.books||[],
+      awards: DB.awards||[],
+      media: DB.media||[],
+      adminExp: DB.adminExp||[],
+      supervision: DB.supervision||[],
+      consultancy: DB.consultancy||[],
+      memberships: DB.memberships||[],
+      community: DB.community||[],
+      innovation: DB.innovation||[],
+      ip: DB.ip||[]
+    },
+    cvHtml: (function(){
+      try {
+        if(typeof generateCV === 'function' && document.getElementById('cvDoc')){
+          generateCV();
+          return document.getElementById('cvDoc').innerHTML;
+        }
+      } catch(e){}
+      return '';
+    })()
+  };
+}
+
+async function cloudPost(payload){
+  const res = await fetch(CLOUD_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  });
+  const text = await res.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch(e){}
+  return { ok: res.ok, status: res.status, text, json };
+}
+
+function setBusy(id, busy, label){
+  const b = document.getElementById(id);
+  if(!b) return;
+  if(busy){
+    b.dataset.label = b.innerHTML;
+    b.disabled = true;
+    b.innerHTML = `<span class="spin"></span> ${label||'Processing…'}`;
+  } else {
+    b.disabled = false;
+    if(b.dataset.label) b.innerHTML = b.dataset.label;
+  }
+}
+
+async function cloudTest(){
+  setBusy('btnTest', true, 'Testing…');
+  syncLog('🔌 Menyemak sambungan ke Apps Script…','in');
+  try{
+    const url = CLOUD_URL + '?action=ping&t=' + Date.now();
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    const text = await res.text();
+    syncLog(`✅ Sambungan OK (HTTP ${res.status}). Respons: <i>${esc(text.slice(0,120))}</i>`,'ok');
+    toast('Sambungan OK ✔');
+  }catch(err){
+    syncLog(`❌ Gagal sambung: ${esc(err.message)}`,'er');
+    syncLog('💡 Pastikan Web App di-deploy sebagai "Anyone" dan akses dibenarkan.','t');
+    toast('Sambungan gagal ✖');
+  }finally{
+    setBusy('btnTest', false);
+  }
+}
+window.cloudTest = cloudTest;
+
+async function cloudPush(opts){
+  opts = opts || {};
+  const silent = !!opts.silent;
+  if(!silent) setBusy('btnPush', true, 'Menghantar…');
+  syncLog(`⬆ Menghantar resume ke Cloud${opts.reason?' ('+opts.reason+')':''}…`,'in');
+
+  const payload = buildCloudPayload();
+  syncLog(`📦 Saiz payload: ${(JSON.stringify(payload).length/1024).toFixed(1)} KB`,'t');
+  syncLog(`👤 Signed in as: <b>${esc(CURRENT_USER.name)}</b> (${esc(CURRENT_USER.id)})`,'t');
+
+  try{
+    const r = await cloudPost(payload);
+
+    if(r.status >= 200 && r.status < 400){
+      DB.cloud.lastPush = new Date().toISOString();
+      log('Cloud Sync — Pushed Resume', DB.profile.name||'Profile', 'Cloud Sync', { confidence:100, verified:true });
+      save();
+
+      if(r.json){
+        syncLog(`✅ Berjaya. Respons: <i>${esc(JSON.stringify(r.json).slice(0,160))}</i>`,'ok');
+      } else {
+        syncLog(`✅ Berjaya (HTTP ${r.status}). Respons: <i>${esc((r.text||'').slice(0,160))}</i>`,'ok');
+      }
+      if(!silent) toast('☁️ Resume dihantar ke Cloud ✔');
+      if(state.view==='cloudSync') render();
+      else renderSidebar();
+    } else {
+      syncLog(`❌ HTTP ${r.status}: ${esc((r.text||'').slice(0,200))}`,'er');
+      if(!silent) toast('Sync gagal ✖');
+    }
+  }catch(err){
+    syncLog(`❌ Ralat: ${esc(err.message)}`,'er');
+    syncLog('💡 Semak deployment Apps Script (Execute as: Me, Who has access: Anyone).','t');
+    if(!silent) toast('Sync gagal ✖ — semak log');
+  }finally{
+    if(!silent) setBusy('btnPush', false);
+  }
+}
+window.cloudPush = cloudPush;
+
+async function quickCloudPush(){
+  toast('☁️ Menghantar resume…');
+  await cloudPush({ silent:true, reason:'quick' });
+  toast('☁️ Resume disegerakkan ✔');
+}
+window.quickCloudPush = quickCloudPush;
+
+async function cloudPull(){
+  setBusy('btnPull', true, 'Menarik…');
+  syncLog('⬇ Menarik data dari Cloud…','in');
+  try{
+    const url = CLOUD_URL + '?action=getResume&userId=' + encodeURIComponent(CURRENT_USER.id) +
+                '&key=' + encodeURIComponent(DB.cloud.key||'') + '&t=' + Date.now();
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    const text = await res.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch(e){}
+
+    if(!json){
+      syncLog(`⚠️ Respons bukan JSON: <i>${esc(text.slice(0,200))}</i>`,'er');
+      toast('Tarik gagal — respons tidak sah');
+      return;
+    }
+
+    const incoming = json.data || json.profile || json;
+
+    if(incoming.profile){
+      if(confirm('Ganti profil semasa dengan data dari Cloud?')){
+        DB.profile = { ...DB.profile, ...incoming.profile };
+      }
+    }
+    Object.keys(SCHEMA).forEach(k=>{
+      if(Array.isArray(incoming[k])) DB[k] = incoming[k];
+    });
+
+    DB.cloud.lastPull = new Date().toISOString();
+    log('Cloud Sync — Pulled Resume', DB.profile.name||'Profile', 'Cloud Sync');
+    save(); render();
+    syncLog('✅ Data berjaya ditarik dan digabungkan.','ok');
+    toast('⬇ Data Cloud dimuatkan ✔');
+  }catch(err){
+    syncLog(`❌ Ralat: ${esc(err.message)}`,'er');
+    toast('Tarik gagal ✖');
+  }finally{
+    setBusy('btnPull', false);
+  }
+}
+window.cloudPull = cloudPull;
+
+/* =========================================================
+   14. VIEW: MY CV
+   ========================================================= */
+VIEWS.cv = function(){
+  const sections = [
+    ['profile','Profile'], ['qualifications','Qualification'], ['expertise','Expertise'],
+    ['teaching','Teaching'], ['projects','Research Projects'], ['grants','Grants'],
+    ['publications','Publications'], ['conferences','Conference'], ['books','Book & Chapter'],
+    ['awards','Awards'], ['supervision','Supervision'], ['consultancy','Consultancy'],
+    ['adminExp','Administration'], ['memberships','Membership'], ['community','Community Engagement'],
+    ['innovation','Innovation'], ['ip','Intellectual Property']
+  ];
+  $('#view').innerHTML = `
+  <div class="no-print">
+    <div class="card card-pad" style="margin-bottom:16px">
+      <div class="section-title">📄 Pilihan CV</div>
+      <div class="form-grid">
+        <label class="fld"><span>Jenis CV</span>
+          <select id="cvType">
+            <option>Academic CV</option><option>Research CV</option><option>Teaching CV</option>
+            <option>Professional CV</option><option>Short CV</option><option>2-page CV</option><option>Full CV</option>
+          </select></label>
+        <label class="fld"><span>Susunan</span>
+          <select><option>Newest → Oldest</option><option>Oldest → Newest</option></select></label>
+      </div>
+
+      <div class="section-title" style="margin-top:18px">Pilih Section</div>
+      <div class="sec-pick">
+        ${sections.map(([k,l])=>`<label><input type="checkbox" class="cv-sec" value="${k}" checked> ${l}</label>`).join('')}
+      </div>
+
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn btn-primary" onclick="generateCV()">📄 GENERATE CV</button>
+        <button class="btn btn-ok" onclick="pushCvToCloud()">☁️ Update Resume ke Cloud</button>
+        <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        <button class="btn" onclick="downloadCV()">⬇ Download HTML</button>
+      </div>
+      <div class="hint" style="margin-top:12px">Sistem automatik menyusun <b>Newest → Oldest</b>, numbering publication, format author, DOI, heading, page number, header/footer, table &amp; spacing.</div>
+    </div>
+    <div id="cvDoc"></div>
+  </div>`;
+  generateCV();
+};
+
+async function pushCvToCloud(){
+  generateCV();
+  await cloudPush({ silent:false, reason:'cv-push' });
+}
+window.pushCvToCloud = pushCvToCloud;
+
+function generateCV(){
+  const chosen = [...document.querySelectorAll('.cv-sec:checked')].map(c=>c.value);
+  const p = DB.profile;
+  let h = `
+  <div style="text-align:center;border-bottom:3px solid #4f46e5;padding-bottom:14px;margin-bottom:6px">
+    <h1>${esc(p.title||'')} ${esc(p.name||'')}</h1>
+    <div style="font-weight:600;color:#4f46e5">${esc(p.position||'')} · ${esc(p.faculty||'')}</div>
+    <div style="font-size:12px;color:#4b5563;margin-top:6px">
+      ${esc(p.email||'')} ${p.officeTel?' · '+esc(p.officeTel):''} ${p.officeLoc?' · '+esc(p.officeLoc):''}
+    </div>
+    <div style="font-size:12px;color:#4b5563">
+      ${p.orcid?'ORCID: '+esc(p.orcid):''} ${p.scopus?' · Scopus: '+esc(p.scopus):''} ${p.wos?' · WoS: '+esc(p.wos):''}
+    </div>
+  </div>`;
+
+  if(chosen.includes('profile')){
+    h += `<h2>Profile</h2><p>${esc(p.shortBio||p.longBio||'—')}</p>`;
+  }
+  if(chosen.includes('expertise')){
+    h += `<h2>Expertise &amp; Research Interest</h2>
+      <p><b>Expertise:</b> ${esc(p.expertise||'—')}</p>
+      <p><b>Research Interest:</b> ${esc(p.researchInterest||'—')}</p>
+      <p><b>Keywords:</b> ${esc(p.keywords||'—')}</p>
+      <p><b>SDG:</b> ${esc(p.sdg||'—')}</p>`;
+  }
+  if(chosen.includes('qualifications')){
+    h += `<h2>Academic Qualification</h2>`;
+    sortBy('qualifications','gradYear').forEach(q=>{
+      h += `<div class="cvitem"><b>${esc(q.qualification||'')}${q.field?' in '+esc(q.field):''}</b> — ${esc(q.university||'')} (${esc(q.gradYear||'')})
+        ${q.thesis?`<br><i>Thesis: ${esc(q.thesis)}</i>`:''}</div>`;
+    });
+  }
+  if(chosen.includes('teaching')){
+    h += `<h2>Teaching</h2>`;
+    sortBy('teaching','academicYear').forEach(t=>{
+      h += `<div class="cvitem"><b>${esc(t.courseCode||'')} ${esc(t.courseName||'')}</b> — ${esc(t.programme||'')}, ${esc(t.academicYear||'')} (${esc(t.role||'')})</div>`;
+    });
+  }
+  if(chosen.includes('projects')){
+    h += `<h2>Research Projects</h2>`;
+    sortBy('projects','startDate').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.title||'')}</b> ${x.grantNumber?`(${esc(x.grantNumber)})`:''}<br>
+        ${esc(x.role||'')} · ${esc(x.status||'')} · ${x.totalFunding?money(x.totalFunding):''} · ${esc(x.startDate||'')} – ${esc(x.endDate||'')}</div>`;
+    });
+  }
+  if(chosen.includes('grants')){
+    h += `<h2>Research Grants</h2><p><b>Total Grant Obtained: ${money(totalGrants())}</b></p>`;
+    sortBy('grants','year').forEach(g=>{
+      h += `<div class="cvitem"><b>${esc(g.grantName||'')}</b> — ${esc(g.fundingAgency||'')} (${esc(g.year||'')})<br>
+        ${esc(g.projectTitle||'')} · ${money(g.amount)} · ${esc(g.status||'')}</div>`;
+    });
+  }
+  if(chosen.includes('publications')){
+    h += `<h2>Publications</h2>`;
+    sortBy('publications','year').forEach((x,i)=>{
+      h += `<div class="cvitem">${i+1}. ${esc(x.authors||'')} (${esc(x.year||'')}). <b>${esc(x.title||'')}</b>. <i>${esc(x.journal||'')}</i>${x.volume?', '+esc(x.volume):''}${x.issue?'('+esc(x.issue)+')':''}${x.pages?', '+esc(x.pages):''}.${x.doi?' DOI: '+esc(x.doi):''} ${x.quartile&&x.quartile!=='None'?`[${esc(x.quartile)}]`:''}</div>`;
+    });
+  }
+  if(chosen.includes('conferences')){
+    h += `<h2>Conference Presentations</h2>`;
+    sortBy('conferences','year').forEach(x=>{
+      h += `<div class="cvitem">${esc(x.authors||'')} (${esc(x.year||'')}). <b>${esc(x.paperTitle||'')}</b>. <i>${esc(x.conferenceName||'')}</i>, ${esc(x.location||'')}. (${esc(x.presentationType||'')})</div>`;
+    });
+  }
+  if(chosen.includes('books')){
+    h += `<h2>Book &amp; Book Chapter</h2>`;
+    sortBy('books','year').forEach(x=>{
+      h += `<div class="cvitem">${esc(x.authors||'')} (${esc(x.year||'')}). <b>${esc(x.title||'')}</b>. ${esc(x.publisher||'')}. ${x.isbn?'ISBN: '+esc(x.isbn):''}</div>`;
+    });
+  }
+  if(chosen.includes('awards')){
+    h += `<h2>Awards &amp; Recognition</h2>`;
+    sortBy('awards','year').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.awardTitle||'')}</b> — ${esc(x.organisation||'')} (${esc(x.level||'')}, ${esc(x.year||'')})</div>`;
+    });
+  }
+  if(chosen.includes('supervision')){
+    h += `<h2>Supervision</h2>`;
+    sortBy('supervision','startDate').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.studentName||'')}</b> (${esc(x.level||'')}) — ${esc(x.projectTitle||'')}<br>${esc(x.role||'')} · ${esc(x.status||'')}</div>`;
+    });
+  }
+  if(chosen.includes('consultancy')){
+    h += `<h2>Consultancy</h2>`;
+    sortBy('consultancy','startDate').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.title||'')}</b> — ${esc(x.client||'')} (${x.value?money(x.value):''})</div>`;
+    });
+  }
+  if(chosen.includes('adminExp')){
+    h += `<h2>Administrative Experience</h2>`;
+    sortBy('adminExp','startDate').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.position||'')}</b> — ${esc(x.organisation||'')} (${esc(x.startDate||'')} – ${esc(x.endDate||'Present')})</div>`;
+    });
+  }
+  if(chosen.includes('memberships')){
+    h += `<h2>Professional Membership</h2>`;
+    sortBy('memberships','startYear').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.organisation||'')}</b> — ${esc(x.membershipType||'')} (${esc(x.startYear||'')}–${esc(x.endYear||'kini')})</div>`;
+    });
+  }
+  if(chosen.includes('community')){
+    h += `<h2>Community Engagement</h2>`;
+    sortBy('community','date').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.programmeName||'')}</b> — ${esc(x.organisation||'')} (${esc(x.date||'')}) · ${esc(x.sdg||'')}</div>`;
+    });
+  }
+  if(chosen.includes('innovation')){
+    h += `<h2>Innovation / Product</h2>`;
+    sortBy('innovation','year').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.title||'')}</b> (${esc(x.year||'')}) — ${esc(x.commercialisation||'')} ${x.trl?'· '+esc(x.trl):''}</div>`;
+    });
+  }
+  if(chosen.includes('ip')){
+    h += `<h2>Intellectual Property</h2>`;
+    sortBy('ip','filingDate').forEach(x=>{
+      h += `<div class="cvitem"><b>${esc(x.ipType||'')}</b>: ${esc(x.title||'')} — ${esc(x.registrationNumber||'')} (${esc(x.status||'')})</div>`;
+    });
+  }
+
+  h += `<div style="margin-top:26px;border-top:1px solid #e5e9f2;padding-top:10px;font-size:10.5px;color:#9ca3af;text-align:center">
+      Generated by Academic Profile System · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}
+      · ${esc(CURRENT_USER.name)}
+    </div>`;
+
+  const el = $('#cvDoc');
+  if(el) el.innerHTML = h;
+}
+window.generateCV = generateCV;
+
+function sortBy(key, dateKey){
+  return [...(DB[key]||[])].sort((a,b)=> String(b[dateKey]||'').localeCompare(String(a[dateKey]||'')));
+}
+
+function downloadCV(){
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CV - ${esc(DB.profile.name)}</title>
+  <style>body{font-family:Georgia,serif;max-width:820px;margin:40px auto;padding:0 30px;color:#111;font-size:13px;line-height:1.6}
+  h1{font-size:26px;margin:0}h2{font-size:13px;text-transform:uppercase;letter-spacing:1.3px;color:#4f46e5;border-bottom:2px solid #e5e9f2;padding-bottom:5px;margin:22px 0 10px}
+  .cvitem{margin-bottom:10px}</style></head><body>${$('#cvDoc').innerHTML}</body></html>`;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CV_' + (DB.profile.name||'profile').replace(/\s+/g,'_') + '.html';
+  a.click();
+  toast('CV dimuat turun');
+}
+window.downloadCV = downloadCV;
+
+/* =========================================================
+   15. VIEW: PUBLIC PROFILE
+   ========================================================= */
+VIEWS.public = function(){
+  const p = DB.profile;
+  const slug = (p.name||'user').toLowerCase().replace(/\s+/g,'-');
+  const url = 'https://academic.university.edu.my/profile/' + slug;
+  const topPubs = sortBy('publications','year').slice(0,5);
+  const chips = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>`<span class="pill">${esc(x)}</span>`).join(' ');
+
+  $('#view').innerHTML = `
+  <div class="pub-hero" style="margin-bottom:18px">
+    <div class="ph">${esc(p.photo||'👤')}</div>
+    <div style="flex:1;min-width:220px">
+      <h2>${esc(p.title||'')} ${esc(p.name||'')}</h2>
+      <p>${esc(p.position||'')} · ${esc(p.faculty||'')}</p>
+      <p>${esc(p.campus||'')} · ${esc(p.email||'')}</p>
+      <div style="margin-top:10px;font-size:12px;opacity:.95">🔗 ${esc(url)}</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.35)" onclick="copyLink('${esc(url)}')">🔗 Share Profile</button>
+      <button class="btn" style="background:#fff" onclick="go('cv')">📄 View CV</button>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card card-pad">
+      <div class="section-title">👤 Biography</div>
+      <p class="small">${esc(p.shortBio||p.longBio||'—')}</p>
+      <div class="section-title" style="margin-top:18px">🔬 Expertise</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${chips(p.expertise)}</div>
+      <div class="section-title" style="margin-top:18px">🎯 Research Interest</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${chips(p.researchInterest)}</div>
+      <div class="section-title" style="margin-top:18px">🌱 SDG</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${chips(p.sdg)}</div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">📚 Publications Terkini</div>
+      ${topPubs.length? topPubs.map((x,i)=>`
+        <div style="padding:10px 0;border-bottom:1px solid #f1f5f9">
+          <b class="small">${i+1}. ${esc(x.title||'')}</b>
+          <div class="muted small">${esc(x.journal||'')} · ${esc(x.year||'')} ${x.quartile&&x.quartile!=='None'?`<span class="pill">${esc(x.quartile)}</span>`:''}</div>
+        </div>`).join('') : '<p class="muted small">Tiada penerbitan.</p>'}
+
+      <div class="section-title" style="margin-top:18px">📞 Contact</div>
+      <dl class="kv">
+        <dt>Email</dt><dd>${esc(p.email||'—')}</dd>
+        <dt>Telefon</dt><dd>${esc(p.officeTel||'—')}</dd>
+        <dt>Pejabat</dt><dd>${esc(p.officeLoc||'—')}</dd>
+        <dt>ORCID</dt><dd>${esc(p.orcid||'—')}</dd>
+        <dt>Scopus</dt><dd>${esc(p.scopus||'—')}</dd>
+      </dl>
+      <div class="section-title" style="margin-top:18px">🔗 Pautan Akademik</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['scholar','researchgate','linkedin','website'].filter(k=>p[k]).map(k=>`<span class="pill sky">${esc(p[k])}</span>`).join('') || '<span class="muted small">—</span>'}
+      </div>
+    </div>
+  </div>`;
+};
+
+function copyLink(url){
+  navigator.clipboard?.writeText(url).then(()=>toast('Pautan disalin ✔')).catch(()=>toast(url));
+}
+window.copyLink = copyLink;
+
+/* =========================================================
+   16. VIEW: FACULTY SEARCH
+   ========================================================= */
+VIEWS.search = function(){
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🔎 Faculty Search — Cari Kepakaran</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input id="sq" placeholder="Contoh: Waste Cooking Oil, Polyurethane, Catalysis, Water Treatment..."
+        style="flex:1;min-width:240px;padding:11px 14px;border:1px solid var(--line);border-radius:11px"
+        value="${esc(state.q||'')}" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn btn-primary" onclick="doSearch()">🔎 Search</button>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      ${['Waste Cooking Oil','Polyurethane','Catalysis','Waste Valorisation','Green Chemistry'].map(t=>`<button class="btn btn-sm" onclick="document.getElementById('sq').value='${t}';doSearch()">${t}</button>`).join('')}
+    </div>
+  </div>
+  <div id="searchRes"><div class="empty"><div class="big">🔎</div><p>Masukkan kata kunci untuk mencari pensyarah berdasarkan kepakaran, penerbitan, projek dan geran.</p></div></div>`;
+  if(state.q) doSearch();
+};
+
+function doSearch(){
+  const q = ($('#sq').value||'').trim().toLowerCase();
+  state.q = q;
+  if(!q){ $('#searchRes').innerHTML = ''; return; }
+
+  const p = DB.profile;
+  const hit = (txt) => String(txt||'').toLowerCase().includes(q);
+  const matches = [];
+
+  if(hit(p.expertise)) matches.push(['Expertise', p.expertise]);
+  if(hit(p.researchInterest)) matches.push(['Research Interest', p.researchInterest]);
+  if(hit(p.keywords)) matches.push(['Keywords', p.keywords]);
+
+  const rel = k => (DB[k]||[]).filter(r => JSON.stringify(r).toLowerCase().includes(q));
+
+  const pubs = rel('publications'), projs = rel('projects'), grants = rel('grants'),
+        teach = rel('teaching'), innov = rel('innovation'), comm = rel('community');
+
+  const total = pubs.length + projs.length + grants.length + teach.length + innov.length + comm.length + matches.length;
+
+  $('#searchRes').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="font-size:36px">${esc(p.photo||'👤')}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:16px">${esc(p.title||'')} ${esc(p.name||'')}</div>
+        <div class="muted small">${esc(p.position||'')} · ${esc(p.faculty||'')}</div>
+      </div>
+      <span class="pill ${total?'green':'gray'}">${total} padanan</span>
+      <button class="btn btn-sm" onclick="go('public')">Lihat Profil →</button>
+    </div>
+  </div>
+
+  ${matches.length ? `<div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🎯 Padanan Kepakaran</div>
+    ${matches.map(([l,v])=>`<div style="margin-bottom:8px"><span class="pill sky">${l}</span> <span class="small">${esc(v)}</span></div>`).join('')}
+  </div>`:''}
+
+  ${resultBlock('📚 Publications', pubs, x=>x.title, x=>`${x.journal||''} · ${x.year||''}`)}
+  ${resultBlock('🔬 Research Projects', projs, x=>x.title, x=>`${x.role||''} · ${x.status||''}`)}
+  ${resultBlock('💰 Grants', grants, x=>x.grantName, x=>`${x.fundingAgency||''} · ${money(x.amount)}`)}
+  ${resultBlock('👨‍🏫 Teaching', teach, x=>x.courseName, x=>`${x.courseCode||''} · ${x.academicYear||''}`)}
+  ${resultBlock('💡 Innovation', innov, x=>x.title, x=>`${x.category||''} · ${x.year||''}`)}
+  ${resultBlock('🌍 Community', comm, x=>x.programmeName, x=>`${x.organisation||''} · ${x.sdg||''}`)}
+
+  ${total===0 ? `<div class="card"><div class="empty"><div class="big">🤷</div><p>Tiada padanan untuk "${esc(q)}".</p></div></div>`:''}`;
+}
+window.doSearch = doSearch;
+
+function resultBlock(title, arr, tFn, sFn){
+  if(!arr.length) return '';
+  return `<div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">${title} <span class="pill gray">${arr.length}</span></div>
+    ${arr.slice(0,8).map(x=>`<div style="padding:9px 0;border-bottom:1px solid #f1f5f9">
+        <b class="small">${esc(tFn(x)||'')}</b>
+        <div class="muted small">${esc(sFn(x))}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+/* =========================================================
+   17. VIEW: FACULTY ANALYTICS
+   ========================================================= */
+VIEWS.analytics = function(){
+  const pubs = DB.publications||[];
+  const projs = DB.projects||[];
+  const pc = profileCompleteness();
+
+  $('#view').innerHTML = `
+  <div class="grid g4" style="margin-bottom:18px">
+    ${statCard('📚', pubs.length, 'Total Publications')}
+    ${statCard('💰', money(totalGrants()), 'Total Research Funding')}
+    ${statCard('🔬', projs.filter(p=>p.status==='Active').length, 'Active Projects')}
+    ${statCard('🏆', (DB.awards||[]).length, 'Total Awards')}
+  </div>
+
+  <div class="grid g2" style="margin-bottom:18px">
+    <div class="card card-pad">
+      <div class="section-title">📚 Publication Breakdown</div>
+      <div class="bar-row"><span class="muted">Scopus</span><div class="bar"><i style="width:${pct(indexingCount('Scopus'), pubs.length)}%"></i></div><b>${indexingCount('Scopus')}</b></div>
+      <div class="bar-row"><span class="muted">Web of Science</span><div class="bar"><i style="width:${pct(indexingCount('Web of Science'), pubs.length)}%"></i></div><b>${indexingCount('Web of Science')}</b></div>
+      <div class="bar-row"><span class="muted">MyCite</span><div class="bar"><i style="width:${pct(indexingCount('MyCite'), pubs.length)}%"></i></div><b>${indexingCount('MyCite')}</b></div>
+      <div class="bar-row"><span class="muted">ERA</span><div class="bar"><i style="width:${pct(indexingCount('ERA'), pubs.length)}%"></i></div><b>${indexingCount('ERA')}</b></div>
+      <div style="height:1px;background:var(--line);margin:14px 0"></div>
+      <div class="bar-row"><span class="muted">Q1</span><div class="bar"><i style="width:${pct(quartileCount('Q1'), pubs.length)}%;background:linear-gradient(90deg,#10b981,#34d399)"></i></div><b>${quartileCount('Q1')}</b></div>
+      <div class="bar-row"><span class="muted">Q2</span><div class="bar"><i style="width:${pct(quartileCount('Q2'), pubs.length)}%;background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></i></div><b>${quartileCount('Q2')}</b></div>
+      <div class="bar-row"><span class="muted">Q3</span><div class="bar"><i style="width:${pct(quartileCount('Q3'), pubs.length)}%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></i></div><b>${quartileCount('Q3')}</b></div>
+      <div class="bar-row"><span class="muted">Q4</span><div class="bar"><i style="width:${pct(quartileCount('Q4'), pubs.length)}%;background:linear-gradient(90deg,#ef4444,#f87171)"></i></div><b>${quartileCount('Q4')}</b></div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">📈 Publication Growth by Year</div>
+      ${barChart(pubByYear())}
+      <div style="height:1px;background:var(--line);margin:16px 0"></div>
+      <div class="section-title">🔬 Research</div>
+      <dl class="kv">
+        <dt>Number of Projects</dt><dd>${projs.length}</dd>
+        <dt>Active Projects</dt><dd>${projs.filter(p=>p.status==='Active').length}</dd>
+        <dt>Completed Projects</dt><dd>${projs.filter(p=>p.status==='Completed').length}</dd>
+        <dt>Total Grant</dt><dd><b>${money(totalGrants())}</b></dd>
+        <dt>As PI</dt><dd>${projs.filter(p=>p.role==='Principal Investigator').length}</dd>
+        <dt>As Co-Researcher</dt><dd>${projs.filter(p=>p.role==='Co-Researcher').length}</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card card-pad">
+      <div class="section-title">🎓 Academic</div>
+      <dl class="kv">
+        <dt>Number of Lecturers</dt><dd>1</dd>
+        <dt>PhD Qualified</dt><dd>${(DB.qualifications||[]).some(q=>q.qualification==='PhD')?1:0}</dd>
+        <dt>Master Qualified</dt><dd>${(DB.qualifications||[]).some(q=>q.qualification==='Master')?1:0}</dd>
+        <dt>Research Active Staff</dt><dd>${projs.length?1:0}</dd>
+        <dt>Profile Completeness</dt><dd>${pc}%</dd>
+      </dl>
+    </div>
+    <div class="card card-pad">
+      <div class="section-title">🏆 Awards by Level</div>
+      ${['International','National','University','Faculty','Professional'].map(l=>{
+        const n = (DB.awards||[]).filter(a=>a.level===l).length;
+        return `<div class="bar-row"><span class="muted">${l}</span><div class="bar"><i style="width:${pct(n,(DB.awards||[]).length)}%"></i></div><b>${n}</b></div>`;
+      }).join('')}
+      <div style="height:1px;background:var(--line);margin:16px 0"></div>
+      <div class="section-title">👨‍🎓 Supervision</div>
+      <dl class="kv">
+        <dt>Total Students</dt><dd>${(DB.supervision||[]).length}</dd>
+        <dt>Active</dt><dd>${(DB.supervision||[]).filter(s=>s.status==='Active').length}</dd>
+        <dt>Completed</dt><dd>${(DB.supervision||[]).filter(s=>s.status==='Completed').length}</dd>
+      </dl>
+    </div>
+  </div>`;
+};
+
+function pct(a,b){ return b ? Math.round(a/b*100) : 0; }
+function statCard(ic, n, l){
+  return `<div class="stat" style="cursor:default"><span class="ic">${ic}</span><div class="n">${n}</div><div class="l">${l}</div></div>`;
+}
+
+/* =========================================================
+   18. VIEW: KPI DASHBOARD
+   ========================================================= */
+VIEWS.kpi = function(){
+  const pubs = DB.publications||[];
+  const years = Object.keys(pubByYear()).sort();
+  const last = years[years.length-1], prev = years[years.length-2];
+  const py = pubByYear();
+  const gp = (DB.grants||[]).reduce((m,g)=>{ const y=g.year||'—'; m[y]=(m[y]||0)+Number(g.amount||0); return m; },{});
+
+  const kpis = [
+    ['Publication per Lecturer', pubs.length, 'sasaran ≥ 3/tahun'],
+    ['Q1/Q2 Publications', quartileCount('Q1')+quartileCount('Q2'), 'sasaran ≥ 50%'],
+    ['Grant per Lecturer', money(totalGrants()), 'sasaran ≥ RM100k'],
+    ['Total Research Funding', money(totalGrants()), 'kumulatif'],
+    ['Number of Awards', (DB.awards||[]).length, 'semua peringkat'],
+    ['Number of Supervision', (DB.supervision||[]).length, 'aktif + selesai'],
+    ['Consultancy Value', money((DB.consultancy||[]).reduce((s,c)=>s+Number(c.value||0),0)), 'kumulatif'],
+    ['Community Programmes', (DB.community||[]).length, 'kumulatif'],
+    ['Innovation', (DB.innovation||[]).length, 'produk/IP'],
+    ['Citations', pubs.reduce((s,p)=>s+Number(p.citation||0),0), 'jumlah sitasi']
+  ];
+
+  $('#view').innerHTML = `
+  <div class="grid g3" style="margin-bottom:18px">
+    ${kpis.map(([l,v,s])=>`
+      <div class="card card-pad">
+        <div class="muted small" style="font-weight:700">${l}</div>
+        <div style="font-size:22px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px">${v}</div>
+        <div class="muted small">${s}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="grid g2">
+    <div class="card card-pad">
+      <div class="section-title">📈 Perbandingan Tahun</div>
+      ${last ? `
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px;background:#f8faff;border:1px solid var(--line);border-radius:12px;padding:14px">
+          <div class="muted small">${prev||'—'} → ${last}</div>
+          <div style="font-size:20px;font-weight:800;margin-top:6px">Publications</div>
+          <div style="font-size:18px;font-weight:700;color:var(--brand)">${py[prev]||0} → ${py[last]||0}</div>
+        </div>
+        <div style="flex:1;min-width:160px;background:#f8faff;border:1px solid var(--line);border-radius:12px;padding:14px">
+          <div class="muted small">${prev||'—'} → ${last}</div>
+          <div style="font-size:20px;font-weight:800;margin-top:6px">Grants</div>
+          <div style="font-size:18px;font-weight:700;color:var(--brand)">${money(gp[prev]||0)} → ${money(gp[last]||0)}</div>
+        </div>
+      </div>` : '<p class="muted small">Data tahun belum mencukupi.</p>'}
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">📊 Grant by Year</div>
+      ${Object.keys(gp).length? Object.entries(gp).sort().map(([y,v])=>`
+        <div class="bar-row"><span class="muted">${esc(y)}</span>
+          <div class="bar"><i style="width:${pct(v,Math.max(...Object.values(gp)))}%"></i></div>
+          <b style="font-size:10.5px">${(v/1000).toFixed(0)}k</b></div>`).join('') : '<p class="muted small">Tiada data.</p>'}
+    </div>
+  </div>`;
+};
+
+/* =========================================================
+   19. VIEW: DATA QUALITY
+   ========================================================= */
+VIEWS.quality = function(){
+  const q = qualityIssues();
+  const dups = findDuplicates();
+  const noDoi = (DB.publications||[]).filter(p=>!p.doi);
+  const noYear = (DB.publications||[]).filter(p=>!p.year);
+
+  $('#view').innerHTML = `
+  <div class="grid g4" style="margin-bottom:18px">
+    ${statCard('🔍', q.missingDOI, 'Missing DOI')}
+    ${statCard('📅', q.missingYear, 'Missing Year')}
+    ${statCard('🆔', q.noOrcid, 'Missing ORCID')}
+    ${statCard('⚠️', q.dup, 'Possible Duplicates')}
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">🔍 Missing Data</div>
+    ${noDoi.length? noDoi.map(p=>`<div style="padding:9px 0;border-bottom:1px solid #f1f5f9;display:flex;gap:10px;align-items:center">
+        <span class="small" style="flex:1">${esc(p.title)}</span>
+        <span class="pill amber">No DOI</span>
+        <button class="btn btn-sm" onclick="openForm('publications','${p.id}')">Lengkapkan</button>
+      </div>`).join('') : '<p class="muted small">Tiada isu DOI. 👍</p>'}
+    ${noYear.length? `<div style="margin-top:14px">${noYear.map(p=>`<div style="padding:9px 0;border-bottom:1px solid #f1f5f9;display:flex;gap:10px;align-items:center">
+        <span class="small" style="flex:1">${esc(p.title)}</span>
+        <span class="pill amber">No Year</span>
+        <button class="btn btn-sm" onclick="openForm('publications','${p.id}')">Lengkapkan</button>
+      </div>`).join('')}</div>`:''}
+    ${!DB.profile.orcid ? `<div class="hint warn" style="margin-top:14px">🆔 ORCID belum diisi pada profil. <button class="btn btn-sm" onclick="go('profile')">Tambah ORCID</button></div>`:''}
+  </div>
+
+  <div class="card card-pad">
+    <div class="section-title">⚠️ Possible Duplicate</div>
+    ${dups.length ? dups.map((group,gi)=>`
+      <div style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px">
+        <div class="pill red" style="margin-bottom:10px">Possible duplicate publication detected</div>
+        ${group.map(p=>`<div style="padding:7px 0;border-bottom:1px solid #f1f5f9">
+            <b class="small">${esc(p.title)}</b>
+            <div class="muted small">${esc(p.journal||'')} · ${esc(p.year||'')} · DOI: ${esc(p.doi||'—')}</div>
+          </div>`).join('')}
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-sm btn-primary" onclick="mergeDup(${gi})">Merge</button>
+          <button class="btn btn-sm" onclick="toast('Rekod dikekalkan berasingan')">Keep Separate</button>
+        </div>
+      </div>`).join('') : '<p class="muted small">Tiada pertindihan dikesan. 👍</p>'}
+  </div>`;
+};
+
+function mergeDup(gi){
+  const dups = findDuplicates();
+  const group = dups[gi];
+  if(!group || group.length<2) return;
+  const keep = group[0];
+  const dropIds = group.slice(1).map(g=>g.id);
+  DB.publications = DB.publications.filter(p=>!dropIds.includes(p.id));
+  log('Merged Duplicate', keep.title||'Publication', 'Data Quality');
+  save(); render(); toast('Rekod digabungkan ✔');
+}
+window.mergeDup = mergeDup;
+
+/* =========================================================
+   20. VIEW: NOTIFICATIONS
+   ========================================================= */
+VIEWS.notifications = function(){
+  const list = notifications();
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
+    <div class="section-title" style="margin:0">🔔 ${list.length} Notifikasi</div>
+    <button class="btn btn-sm" style="margin-left:auto" onclick="markAllRead()">Tanda semua dibaca</button>
+  </div>
+  ${list.map(n=>{
+    const read = DB.readNotifs.includes(n.id);
+    return `<div class="card card-pad" style="margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;${read?'opacity:.6':''}">
+      <div style="font-size:22px">${n.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:700">${esc(n.title)}</div>
+        <div class="muted small">${esc(n.desc)}</div>
+      </div>
+      <span class="pill ${n.tone}">${read?'Read':'New'}</span>
+    </div>`;
+  }).join('')}`;
+};
+
+function markAllRead(){
+  DB.readNotifs = notifications().map(n=>n.id);
+  save(); render(); toast('Semua notifikasi ditanda dibaca');
+}
+window.markAllRead = markAllRead;
+
+/* =========================================================
+   21. VIEW: ADMIN PANEL
+   ========================================================= */
+VIEWS.admin = function(){
+  $('#view').innerHTML = `
+  <div class="grid g4" style="margin-bottom:18px">
+    ${statCard('👥', 1, 'Lecturers')}
+    ${statCard('🏛️', 1, 'Faculty')}
+    ${statCard('🏢', 1, 'Department')}
+    ${statCard('🤖', DB.audit.filter(a=>a.source==='AI Scanner').length, 'AI Processed')}
+  </div>
+
+  <div class="grid g2">
+    <div class="card card-pad">
+      <div class="section-title">👨‍💼 Manage Lecturers</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="toast('Demo: tambah pensyarah baharu')">＋ Add Lecturer</button>
+        <button class="btn" onclick="go('profile')">✏️ Edit Lecturer</button>
+        <button class="btn btn-danger" onclick="toast('Demo: akaun dinyahaktifkan')">🚫 Disable Account</button>
+      </div>
+      <div style="height:1px;background:var(--line);margin:16px 0"></div>
+      <div class="section-title">🏛️ Manage Faculty &amp; Department</div>
+      <div class="btn-row">
+        <button class="btn" onclick="toast('Demo: urus fakulti')">Manage Faculty</button>
+        <button class="btn" onclick="toast('Demo: urus jabatan')">Manage Department</button>
+        <button class="btn" onclick="toast('Demo: urus kategori')">Manage Categories</button>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">🤖 AI Processing Monitor</div>
+      <dl class="kv">
+        <dt>AI Processed</dt><dd>${DB.audit.filter(a=>a.source==='AI Scanner').length}</dd>
+        <dt>Failed Scans</dt><dd>0</dd>
+        <dt>Low Confidence Records</dt><dd>${DB.audit.filter(a=>a.confidence && a.confidence<85).length}</dd>
+        <dt>Unverified Records</dt><dd>${DB.audit.filter(a=>a.verified===false).length}</dd>
+      </dl>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn" onclick="go('quality')">Review Low Confidence</button>
+        <button class="btn" onclick="go('quality')">Detect Duplicate</button>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">📤 Data &amp; Reports</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="exportData()">⬇ Export Data (JSON)</button>
+        <button class="btn" onclick="go('analytics')">📊 Generate Faculty Report</button>
+      </div>
+      <div class="hint" style="margin-top:14px">
+        Eksport data merangkumi semua modul: profil, penerbitan, geran, projek, anugerah, penyeliaan dan audit trail.
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">🔐 Roles &amp; Access</div>
+      <dl class="kv">
+        <dt>👨‍🏫 Lecturer</dt><dd>Edit profil, tambah data, scan dokumen, jana CV, lihat analitik sendiri</dd>
+        <dt>👨‍💼 Head / Coordinator</dt><dd>Lihat staf unit, statistik, jana laporan, sahkan rekod terpilih</dd>
+        <dt>🔐 Admin</dt><dd>Urus pengguna, sistem, data, kategori, AI monitoring, analitik fakulti</dd>
+      </dl>
+      <div style="height:1px;background:var(--line);margin:16px 0"></div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="resetAll()">🗑 Reset Data Saya (Demo)</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'academic_profile_' + (CURRENT_USER.id||'user') + '_export.json';
+  a.click();
+  toast('Data dieksport ✔');
+}
+window.exportData = exportData;
+
+function resetAll(){
+  if(!confirm('Reset data profil ANDA kepada keadaan asal? (Hanya data anda sahaja)')) return;
+  DB = seed();
+  save(); go('dashboard'); toast('Data direset');
+}
+window.resetAll = resetAll;
+
+/* =========================================================
+   22. VIEW: AUDIT TRAIL
+   ========================================================= */
+VIEWS.audit = function(){
+  $('#view').innerHTML = `
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title">📝 Audit Trail — Data Governance</div>
+    <p class="muted small">Setiap perubahan direkodkan: siapa, bila, sumber (Manual / AI Scanner / Cloud Sync) dan tahap keyakinan.</p>
+  </div>
+  <div class="card">
+    ${DB.audit.length===0 ? '<div class="empty"><div class="big">📝</div><p>Tiada aktiviti direkodkan lagi.</p></div>' :
+    `<div class="tbl-wrap"><table>
+      <thead><tr><th>Pengguna</th><th>Aktiviti</th><th>Sumber</th><th>Confidence</th><th>Tarikh</th></tr></thead>
+      <tbody>${DB.audit.map(a=>`
+        <tr>
+          <td><b>${esc(a.who)}</b></td>
+          <td>${esc(a.action)}<br><span class="muted small">${esc(a.target||'')}</span></td>
+          <td><span class="pill ${a.source==='AI Scanner'?'sky':a.source==='Data Quality'?'amber':a.source==='Cloud Sync'?'green':'gray'}">${esc(a.source)}</span></td>
+          <td>${a.confidence?`<span class="pill ${a.confidence>=90?'green':'amber'}">${a.confidence}%</span>`:'<span class="muted">—</span>'}</td>
+          <td class="muted small">${fmtDate(a.date)}</td>
+        </tr>`).join('')}
+      </tbody></table></div>`}
+  </div>`;
+};
+
+/* =========================================================
+   23. INIT — auth session is already validated above
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function(){
+  /* Log sign-in once per browser session */
+  if(!sessionStorage.getItem('apsSignedInLogged')){
+    sessionStorage.setItem('apsSignedInLogged','1');
+    log('Signed in to portal', CURRENT_USER.name, 'Auth');
+    save();
+  }
+  render();
+});
+
+/* Render immediately in case DOMContentLoaded already fired */
+if(document.readyState !== 'loading'){
+  if(!sessionStorage.getItem('apsSignedInLogged')){
+    sessionStorage.setItem('apsSignedInLogged','1');
+    log('Signed in to portal', CURRENT_USER.name, 'Auth');
+    save();
+  }
+  render();
+}
+</script>
+</body>
+</html>
