@@ -201,9 +201,7 @@
     border-radius:999px;padding:2px 9px;
     font-size:.62rem;font-weight:900;letter-spacing:0;
   }
-  .dd-item .dd-badge.alert{background:#FEF2F2;color:#DC2626}
   .dd-item.active .dd-badge{background:#002D62;color:#FDB913}
-  .dd-item.active .dd-badge.alert{background:#DC2626;color:#fff}
   .dd-item.danger{color:#DC2626}
   .dd-item.danger:hover{background:#FEF2F2;color:#DC2626}
 
@@ -519,26 +517,6 @@
     margin-right:8px;vertical-align:-2px;
   }
 
-  .btn-approve{
-    background:#DCFCE7;color:#15803D;
-    border:1px solid #BBF7D0;border-radius:10px;
-    padding:9px 16px;font-size:.68rem;font-weight:900;
-    letter-spacing:.08em;text-transform:uppercase;
-    cursor:pointer;font-family:inherit;transition:.15s;
-    display:inline-flex;align-items:center;gap:6px;
-  }
-  .btn-approve:hover{background:#15803D;color:#fff;border-color:#15803D}
-
-  .btn-reject{
-    background:#FEF2F2;color:#DC2626;
-    border:1px solid #FECACA;border-radius:10px;
-    padding:9px 16px;font-size:.68rem;font-weight:900;
-    letter-spacing:.08em;text-transform:uppercase;
-    cursor:pointer;font-family:inherit;transition:.15s;
-    display:inline-flex;align-items:center;gap:6px;
-  }
-  .btn-reject:hover{background:#DC2626;color:#fff;border-color:#DC2626}
-
   .btn-view{
     background:#E8EEF6;color:#002D62;
     border:1px solid #D4E0EF;border-radius:10px;
@@ -698,27 +676,6 @@
   .app-actions{
     display:flex;gap:10px;flex-wrap:wrap;
     margin-top:16px;justify-content:flex-end;
-  }
-
-  .approval-notes{
-    margin-top:14px;
-  }
-  .approval-notes label{
-    display:block;font-size:.62rem;font-weight:900;
-    letter-spacing:.14em;text-transform:uppercase;
-    color:#94A3B8;margin-bottom:7px;
-  }
-  .approval-notes textarea{
-    width:100%;padding:11px 13px;
-    border:1px solid #E2E8F0;border-radius:10px;
-    font-size:.85rem;font-weight:600;font-family:inherit;
-    background:#F8FAFC;color:var(--navy);transition:.2s;
-    resize:vertical;min-height:70px;
-  }
-  .approval-notes textarea:focus{
-    outline:none;border-color:#9B26B6;
-    box-shadow:0 0 0 4px rgba(155,38,182,.13);
-    background:#fff;
   }
 
   .empty-state{
@@ -1005,14 +962,6 @@
           <span data-i18n="navApps">Permohonan</span>
           <span class="dd-badge" id="ddAppsCount">0</span>
         </button>
-        <button type="button" class="dd-item" id="ddApproval" role="menuitem">
-          <span data-i18n="navApproval">Kelulusan</span>
-          <span class="dd-badge alert" id="ddApprovalCount">0</span>
-        </button>
-        <button type="button" class="dd-item" id="ddStatus" role="menuitem">
-          <span data-i18n="navStatus">Status Saya</span>
-          <span class="dd-badge" id="ddStatusCount">0</span>
-        </button>
         <button type="button" class="dd-item danger" id="ddLogout" role="menuitem">
           <span data-i18n="navLogout">Log Keluar</span>
         </button>
@@ -1100,31 +1049,6 @@
     <div id="appsContent"></div>
   </section>
 
-  <section class="view" data-view="approval">
-    <div class="form-header">
-      <button type="button" class="back-btn" onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
-      <div class="form-header-titles">
-        <div class="breadcrumb" data-i18n="approvalCrumb">Kelulusan Permohonan</div>
-        <h2 data-i18n="approvalTitle">Kelulusan Permohonan</h2>
-      </div>
-    </div>
-
-    <div class="stats-strip" id="approvalStats"></div>
-
-    <div id="approvalContent"></div>
-  </section>
-
-  <section class="view" data-view="status">
-    <div class="form-header">
-      <button type="button" class="back-btn" onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
-      <div class="form-header-titles">
-        <div class="breadcrumb" data-i18n="statusCrumb">Sejarah Permohonan</div>
-        <h2 data-i18n="statusTitle">Semak Status Permohonan</h2>
-      </div>
-    </div>
-    <div id="statusContent"></div>
-  </section>
-
   <p class="foot" data-i18n="footer">© Hak Cipta Terpelihara Fakulti Kejuruteraan Kimia UiTM Pasir Gudang</p>
 </main>
 
@@ -1146,7 +1070,7 @@
 <script>
 /* ============================================================
    SISTEM PERMOHONAN MAKMAL — PINJAMAN ALAT RADAS (BORANG B)
-   Dengan integrasi auth (FMSAuth) + Google Apps Script backend
+   Borang + Senarai Permohonan (status disatukan).
    ============================================================ */
 
 /* ============================================================
@@ -1300,7 +1224,6 @@
   function apiPost(body) {
     return fetch(API_URL, {
       method: "POST",
-      // text/plain → simple request, no CORS preflight (Apps Script friendly)
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(body),
       redirect: "follow"
@@ -1361,16 +1284,6 @@
     list.unshift(normalizeEntry(entry));
     setSubmitted(list.slice(0, 200));
   }
-  function updateSubmitted(ref, patch) {
-    var list = getSubmitted().slice();
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].ref === ref) {
-        for (var k in patch) if (patch.hasOwnProperty(k)) list[i][k] = patch[k];
-        break;
-      }
-    }
-    setSubmitted(list);
-  }
 
   /* ---------- Draft / shared (local only) ---------- */
   function getShared() { return safeParse(lsGet(SHARED_KEY), {}); }
@@ -1428,8 +1341,6 @@
       sessionSignedIn: "Sesi Aktif — Anda telah log masuk",
       sessionDetailTpl: "ID: {id} · {email} · {unit}",
       navApps: "Permohonan",
-      navApproval: "Kelulusan",
-      navStatus: "Status Saya",
       navLogout: "Log Keluar",
       back: "← Kembali",
       cardAMaklumat: "Maklumat Pemohon",
@@ -1515,19 +1426,14 @@
       btnKembaliUtama: "Kembali ke Borang",
       btnBorangBaharu: "Borang Baharu",
       toastBorangBaharu: "Borang baharu sedia diisi.",
-      statusCrumb: "Sejarah Permohonan",
-      statusTitle: "Semak Status Permohonan",
-      statusEmptyTitle: "Tiada Permohonan Dihantar",
-      statusEmptyDesc: "Permohonan yang dihantar akan dipaparkan di sini untuk semakan status.",
       toastRalatBuka: "Ralat membuka borang. Sila muat semula halaman.",
       toastDrafDipadam: "Draf borang telah dipadam.",
       toastDemo: 'Demo: "{0}" tidak disambungkan.',
       toastNoNotif: "Tiada notifikasi baharu.",
-      toastNotif: "{0} permohonan menunggu kelulusan.",
+      toastNotif: "{0} permohonan sedang menunggu semakan.",
       toastLogout: "Sedang log keluar…",
       toastSubmitFail: "Gagal menghantar permohonan. Sila cuba lagi.",
       toastSyncFail: "Ralat memuatkan data dari pelayan.",
-      toastReviewFail: "Ralat mengemas kini status permohonan.",
       confirmPadamDraf: "Padam draf borang ini? Maklumat pemohon yang dikongsi akan dikekalkan.",
       appsCrumb: "Senarai Permohonan",
       appsTitle: "Semua Permohonan",
@@ -1538,18 +1444,7 @@
       filterPending: "Menunggu",
       filterApproved: "Diluluskan",
       filterRejected: "Ditolak",
-      approvalCrumb: "Kelulusan Permohonan",
-      approvalTitle: "Kelulusan Permohonan",
-      approvalEmptyTitle: "Tiada Permohonan Menunggu",
-      approvalEmptyDesc: "Semua permohonan telah disemak. Tiada tindakan diperlukan.",
-      approvalBtnApprove: "Luluskan",
-      approvalBtnReject: "Tolak",
-      approvalBtnView: "Lihat Butiran",
-      approvalConfirmApprove: "Luluskan permohonan ini?",
-      approvalConfirmReject: "Tolak permohonan ini?",
-      approvalToastApproved: "Permohonan telah diluluskan.",
-      approvalToastRejected: "Permohonan telah ditolak.",
-      approvalNotesPh: "Catatan / ulasan (pilihan)",
+      btnView: "Lihat Butiran",
       approvalNotesLabel: "Catatan Penyemak",
       approvalReviewedAt: "Disemak pada",
       statusPending: "Menunggu",
@@ -1573,8 +1468,6 @@
       sessionSignedIn: "Active Session — You are signed in",
       sessionDetailTpl: "ID: {id} · {email} · {unit}",
       navApps: "Applications",
-      navApproval: "Approvals",
-      navStatus: "My Status",
       navLogout: "Log Out",
       back: "← Back",
       cardAMaklumat: "Applicant Information",
@@ -1660,19 +1553,14 @@
       btnKembaliUtama: "Back to Form",
       btnBorangBaharu: "New Form",
       toastBorangBaharu: "New form is ready to be filled.",
-      statusCrumb: "Application History",
-      statusTitle: "Check Application Status",
-      statusEmptyTitle: "No Applications Submitted",
-      statusEmptyDesc: "Submitted applications will be displayed here for status review.",
       toastRalatBuka: "Error opening form. Please reload the page.",
       toastDrafDipadam: "Form draft has been deleted.",
       toastDemo: 'Demo: "{0}" is not connected.',
       toastNoNotif: "No new notifications.",
-      toastNotif: "{0} application(s) awaiting approval.",
+      toastNotif: "{0} application(s) awaiting review.",
       toastLogout: "Logging out…",
       toastSubmitFail: "Failed to submit application. Please try again.",
       toastSyncFail: "Error loading data from server.",
-      toastReviewFail: "Error updating application status.",
       confirmPadamDraf: "Delete this form draft? Shared applicant information will be retained.",
       appsCrumb: "Application List",
       appsTitle: "All Applications",
@@ -1683,18 +1571,7 @@
       filterPending: "Pending",
       filterApproved: "Approved",
       filterRejected: "Rejected",
-      approvalCrumb: "Application Approval",
-      approvalTitle: "Application Approval",
-      approvalEmptyTitle: "No Pending Applications",
-      approvalEmptyDesc: "All applications have been reviewed. No action needed.",
-      approvalBtnApprove: "Approve",
-      approvalBtnReject: "Reject",
-      approvalBtnView: "View Details",
-      approvalConfirmApprove: "Approve this application?",
-      approvalConfirmReject: "Reject this application?",
-      approvalToastApproved: "Application has been approved.",
-      approvalToastRejected: "Application has been rejected.",
-      approvalNotesPh: "Notes / comments (optional)",
+      btnView: "View Details",
       approvalNotesLabel: "Reviewer Notes",
       approvalReviewedAt: "Reviewed at",
       statusPending: "Pending",
@@ -1775,13 +1652,9 @@
     return '<span class="status-badge ' + cls + '"><span class="dot"></span>' + esc(lbl) + '</span>';
   }
 
-  /* ---------- Role helpers ---------- */
-  function canApprove() {
-    return ["Lecturer", "Lab Staff", "Head", "Admin"].indexOf(USER.role) !== -1;
-  }
+  /* ---------- List visibility: setiap pengguna lihat permohonan sendiri sahaja ---------- */
   function visibleList() {
     var list = getSubmitted();
-    if (canApprove()) return list;
     return list.filter(function (e) {
       return !e.authUserId || e.authUserId === USER.id;
     });
@@ -2415,7 +2288,7 @@
       refreshNavCounts();
     }).catch(function (err) {
       try { console.error("[SUBMIT]", err); } catch (e) {}
-      buildConfirmFooter(); // restore buttons so user can retry
+      buildConfirmFooter();
       toast((err && err.message) ? err.message : t("toastSubmitFail"));
     });
   }
@@ -2500,12 +2373,8 @@
       else v.classList.remove("active");
     }
 
-    var ddApps = $("#ddApps"),
-        ddApproval = $("#ddApproval"),
-        ddStatus = $("#ddStatus");
+    var ddApps = $("#ddApps");
     if (ddApps) ddApps.classList.toggle("active", name === "apps");
-    if (ddApproval) ddApproval.classList.toggle("active", name === "approval");
-    if (ddStatus) ddStatus.classList.toggle("active", name === "status");
 
     closeUserMenu();
 
@@ -2514,18 +2383,15 @@
   }
 
   function refreshNavCounts() {
-    var list = getSubmitted();
     var mine = visibleList();
-    var pendingCount = 0;
-    for (var j = 0; j < list.length; j++) {
-      if (!list[j].status || list[j].status === "pending") pendingCount++;
-    }
-    setText("#ddStatusCount", mine.length);
     setText("#ddAppsCount", mine.length);
-    setText("#ddApprovalCount", pendingCount);
 
+    var pending = 0;
+    for (var j = 0; j < mine.length; j++) {
+      if (!mine[j].status || mine[j].status === "pending") pending++;
+    }
     var dot = $("#bellDot");
-    if (dot) dot.classList.toggle("show", pendingCount > 0);
+    if (dot) dot.classList.toggle("show", pending > 0);
   }
 
   /* ============================================================
@@ -2586,19 +2452,17 @@
   }
 
   /* ============================================================
-     APPS VIEW
+     APPS VIEW (senarai permohonan + status)
      ============================================================ */
   var currentAppsFilter = "all";
 
   function computeStats(list) {
-    var stats = { total: list.length, pending: 0, approved: 0, rejected: 0, today: 0 };
-    var todayStr = new Date().toISOString().slice(0, 10);
+    var stats = { total: list.length, pending: 0, approved: 0, rejected: 0 };
     for (var i = 0; i < list.length; i++) {
       var s = list[i].status || "pending";
       if (s === "approved") stats.approved++;
       else if (s === "rejected") stats.rejected++;
       else stats.pending++;
-      if (list[i].submittedAt && String(list[i].submittedAt).slice(0, 10) === todayStr) stats.today++;
     }
     return stats;
   }
@@ -2651,12 +2515,10 @@
     return html;
   }
 
-  function appCardHTML(entry, opts) {
-    opts = opts || {};
+  function appCardHTML(entry) {
     var status = entry.status || "pending";
-    var showApproval = !!opts.showApproval;
 
-    var html =
+    return (
       '<div class="app-card" data-type="' + esc(entry.type) + '" data-ref="' + esc(entry.ref) + '">' +
         '<div class="app-card-head">' +
           '<div class="ac-icon">' + BADGE + '</div>' +
@@ -2678,26 +2540,11 @@
             esc(t("approvalNotesLabel")) + '</strong>' + esc(entry.notes) + '</div>' : '') +
           '<div class="app-actions">' +
             '<button type="button" class="btn-view" data-action="view" data-ref="' +
-              esc(entry.ref) + '">' + esc(t("approvalBtnView")) + '</button>';
-
-    if (showApproval && status === "pending") {
-      html +=
-        '<div class="approval-notes" style="width:100%;margin-top:12px">' +
-          '<label for="note-' + esc(entry.ref) + '">' + esc(t("approvalNotesLabel")) + '</label>' +
-          '<textarea id="note-' + esc(entry.ref) + '" data-note-for="' + esc(entry.ref) +
-            '" placeholder="' + esc(t("approvalNotesPh")) + '"></textarea>' +
-        '</div>' +
-        '<button type="button" class="btn-reject" data-action="reject" data-ref="' +
-          esc(entry.ref) + '">✕ ' + esc(t("approvalBtnReject")) + '</button>' +
-        '<button type="button" class="btn-approve" data-action="approve" data-ref="' +
-          esc(entry.ref) + '">✓ ' + esc(t("approvalBtnApprove")) + '</button>';
-    }
-
-    html +=
+              esc(entry.ref) + '">' + esc(t("btnView")) + '</button>' +
           '</div>' +
         '</div>' +
-      '</div>';
-    return html;
+      '</div>'
+    );
   }
 
   function renderApps() {
@@ -2753,52 +2600,11 @@
     content.innerHTML = html;
   }
 
-  /* ============================================================
-     APPROVAL VIEW
-     ============================================================ */
-  function renderApproval() {
-    var list = getSubmitted();
-    var pending = list.filter(function (e) { return (e.status || "pending") === "pending"; });
-
-    var stats = computeStats(list);
-    renderStatsStrip("approvalStats", stats);
-
-    var content = $("#approvalContent");
-    if (!content) return;
-
-    if (!pending.length) {
-      content.innerHTML =
-        '<div class="empty-state">' +
-          '<div class="ico">✅</div>' +
-          '<h4>' + esc(t("approvalEmptyTitle")) + '</h4>' +
-          '<p>' + esc(t("approvalEmptyDesc")) + '</p>' +
-        '</div>';
-      return;
-    }
-
-    var html = '<div class="app-list">';
-    for (var i = 0; i < pending.length; i++) {
-      html += appCardHTML(pending[i], { showApproval: true });
-    }
-    html += '</div>';
-    content.innerHTML = html;
-  }
-
   function attachListActions() {
     var appsContent = $("#appsContent");
     if (appsContent && !appsContent.dataset.wired) {
       appsContent.dataset.wired = "1";
       appsContent.addEventListener("click", handleListClick);
-    }
-    var approvalContent = $("#approvalContent");
-    if (approvalContent && !approvalContent.dataset.wired) {
-      approvalContent.dataset.wired = "1";
-      approvalContent.addEventListener("click", handleListClick);
-    }
-    var statusContent = $("#statusContent");
-    if (statusContent && !statusContent.dataset.wired) {
-      statusContent.dataset.wired = "1";
-      statusContent.addEventListener("click", handleListClick);
     }
   }
 
@@ -2811,8 +2617,6 @@
     if (!ref) return;
 
     if (action === "view") openEntryDetail(ref);
-    else if (action === "approve") approveEntry(ref);
-    else if (action === "reject") rejectEntry(ref);
   }
 
   function findEntry(ref) {
@@ -2853,92 +2657,6 @@
     }
 
     openModal();
-  }
-
-  function approveEntry(ref) {
-    if (!confirm(t("approvalConfirmApprove"))) return;
-    var noteEl = document.querySelector('[data-note-for="' + ref + '"]');
-    var notes = noteEl ? (noteEl.value || "").trim() : "";
-
-    apiPost({
-      action: "approve",
-      ref: ref,
-      reviewedBy: USER.name,
-      reviewerId: USER.id,
-      notes: notes
-    }).then(function (res) {
-      if (!res || res.status !== "success") {
-        throw new Error((res && res.message) || t("toastReviewFail"));
-      }
-      updateSubmitted(ref, {
-        status: "approved",
-        reviewedAt: new Date().toISOString(),
-        reviewedBy: USER.name,
-        notes: notes
-      });
-      toast(t("approvalToastApproved"));
-      refreshNavCounts();
-      renderApproval();
-      renderApps();
-    }).catch(function (err) {
-      toast((err && err.message) ? err.message : t("toastReviewFail"));
-    });
-  }
-
-  function rejectEntry(ref) {
-    if (!confirm(t("approvalConfirmReject"))) return;
-    var noteEl = document.querySelector('[data-note-for="' + ref + '"]');
-    var notes = noteEl ? (noteEl.value || "").trim() : "";
-
-    apiPost({
-      action: "reject",
-      ref: ref,
-      reviewedBy: USER.name,
-      reviewerId: USER.id,
-      notes: notes
-    }).then(function (res) {
-      if (!res || res.status !== "success") {
-        throw new Error((res && res.message) || t("toastReviewFail"));
-      }
-      updateSubmitted(ref, {
-        status: "rejected",
-        reviewedAt: new Date().toISOString(),
-        reviewedBy: USER.name,
-        notes: notes
-      });
-      toast(t("approvalToastRejected"));
-      refreshNavCounts();
-      renderApproval();
-      renderApps();
-    }).catch(function (err) {
-      toast((err && err.message) ? err.message : t("toastReviewFail"));
-    });
-  }
-
-  /* ============================================================
-     STATUS VIEW
-     ============================================================ */
-  function renderStatus() {
-    var list = visibleList();
-    var content = $("#statusContent");
-    if (!content) return;
-
-    if (!list.length) {
-      content.innerHTML =
-        '<div class="empty-state">' +
-          '<div class="ico">📭</div>' +
-          '<h4>' + esc(t("statusEmptyTitle")) + '</h4>' +
-          '<p>' + esc(t("statusEmptyDesc")) + '</p>' +
-        '</div>';
-      return;
-    }
-
-    var html = '<div class="app-list">';
-    for (var i = 0; i < list.length; i++) {
-      html += appCardHTML(list[i]);
-    }
-    html += '</div>';
-    content.innerHTML = html;
   }
 
   /* ============================================================
@@ -2982,12 +2700,6 @@
     }
     var appsView = $('.view[data-view="apps"]');
     if (appsView && appsView.classList.contains("active")) renderApps();
-
-    var approvalView = $('.view[data-view="approval"]');
-    if (approvalView && approvalView.classList.contains("active")) renderApproval();
-
-    var statusView = $('.view[data-view="status"]');
-    if (statusView && statusView.classList.contains("active")) renderStatus();
   }
 
   /* ============================================================
@@ -3016,20 +2728,6 @@
         renderApps();
         showView("apps");
         syncFromServer({ silent: true }).then(renderApps);
-      } catch (err) { logError(err); }
-    },
-    goApproval: function () {
-      try {
-        renderApproval();
-        showView("approval");
-        syncFromServer({ silent: true }).then(renderApproval);
-      } catch (err) { logError(err); }
-    },
-    goStatus: function () {
-      try {
-        renderStatus();
-        showView("status");
-        syncFromServer({ silent: true }).then(renderStatus);
       } catch (err) { logError(err); }
     },
     logout: doLogout,
@@ -3086,12 +2784,6 @@
       var ddApps = $("#ddApps");
       if (ddApps) ddApps.addEventListener("click", APP.goApps);
 
-      var ddApproval = $("#ddApproval");
-      if (ddApproval) ddApproval.addEventListener("click", APP.goApproval);
-
-      var ddStatus = $("#ddStatus");
-      if (ddStatus) ddStatus.addEventListener("click", APP.goStatus);
-
       var ddLogout = $("#ddLogout");
       if (ddLogout) ddLogout.addEventListener("click", function (e) {
         e.preventDefault();
@@ -3102,14 +2794,14 @@
       var bellBtn = $("#bellBtn");
       if (bellBtn) {
         bellBtn.addEventListener("click", function () {
-          var list = getSubmitted();
+          var mine = visibleList();
           var pending = 0;
-          for (var i = 0; i < list.length; i++) {
-            if (!list[i].status || list[i].status === "pending") pending++;
+          for (var i = 0; i < mine.length; i++) {
+            if (!mine[i].status || mine[i].status === "pending") pending++;
           }
           if (pending > 0) {
             toast(t("toastNotif").replace("{0}", pending));
-            APP.goApproval();
+            APP.goApps();
           } else {
             toast(t("toastNoNotif"));
           }
@@ -3151,7 +2843,7 @@
       renderForm();
       showView("form");
 
-      // Pull latest from Google Sheet on load (quietly)
+      // Tarik senarai terbaru dari Google Sheet (senyap)
       syncFromServer({ silent: true });
 
       try {
