@@ -35,6 +35,7 @@
     .card { background:#fff; border:1px solid rgba(226,232,240,0.8); transition:all .3s; position:relative; overflow:hidden; }
     .btn-gold { background:#FDB913; color:#fff; transition:all .25s; box-shadow:0 10px 22px -8px rgba(253,185,19,.6); }
     .btn-gold:hover { transform:translateY(-2px); box-shadow:0 16px 30px -10px rgba(253,185,19,.7); }
+    .btn-gold:disabled { opacity:.6; cursor:not-allowed; transform:none; }
 
     .text-p655c { color:var(--navy); }
     .text-p254c { color:var(--purple); }
@@ -49,6 +50,8 @@
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
     .anim-up { animation:fadeUp .45s cubic-bezier(.4,0,.2,1) both; }
+    @keyframes contentIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+    .content-in { animation:contentIn .35s ease both; }
 
     .stat-card { position:relative; overflow:hidden; color:#fff; border:none!important; box-shadow:0 14px 30px -12px rgba(0,0,0,.25); }
     .stat-card::before { content:''; position:absolute; right:-30px; top:-30px; width:130px; height:130px; border-radius:50%; background:rgba(255,255,255,0.12); pointer-events:none; }
@@ -103,6 +106,8 @@
     .field-input:disabled { background:#F1F5F9; color:#64748B; cursor:not-allowed; }
     .field-input.is-invalid { border-color:#9B26B6; background:#FAF5FF; }
     select.field-input { appearance:none; cursor:pointer; }
+    select.field-input optgroup { font-weight:900; font-size:11px; color:#002D62; background:#F8FAFC; letter-spacing:.05em; text-transform:uppercase; }
+    select.field-input option { font-weight:600; font-size:12px; color:#334155; background:#fff; text-transform:none; letter-spacing:0; }
 
     .pwd-wrap { position:relative; }
     .pwd-wrap .field-input { padding-right:44px; }
@@ -166,6 +171,7 @@
     .mini-purple:hover { transform:translateY(-1px); box-shadow:0 8px 18px -8px rgba(155,38,182,.6); }
     .mini-ghost { background:#fff; color:#64748B; border-color:#E2E8F0; }
     .mini-ghost:hover { border-color:#9B26B6; color:#9B26B6; background:#FAF5FF; }
+    .mini-ghost:disabled { opacity:.5; cursor:not-allowed; }
 
     .preview-tbl { width:100%; border-collapse:separate; border-spacing:0; }
     .preview-tbl thead th { font-size:9px; font-weight:900; letter-spacing:.16em; text-transform:uppercase; color:#94A3B8; padding:10px 12px; text-align:left; border-bottom:1px solid #E2E8F0; white-space:nowrap; background:#F8FAFC; position:sticky; top:0; z-index:1; }
@@ -193,9 +199,80 @@
     .copy-btn { background:#002D62; color:#fff; padding:12px 16px; border-radius:10px; font-size:10px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; border:none; transition:all .2s; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
     .copy-btn:hover { background:#9B26B6; }
     .copy-btn:disabled { background:#CBD5E1; cursor:not-allowed; }
+
+    /* ===== ROLE BADGES ===== */
+    .role-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:9999px; font-size:9px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+    .role-badge-admin { background:#F3E8FF; color:#6B21A8; border:1px solid #D8B4FE; }
+    .role-badge-admin-obe { background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; }
+    .role-badge-admin-sumber { background:#ECFDF5; color:#047857; border:1px solid #A7F3D0; }
+    .role-badge-admin-lic { background:#FFF7ED; color:#C2410C; border:1px solid #FED7AA; }
+    .role-badge-admin-pa { background:#FDF2F8; color:#BE185D; border:1px solid #FBCFE8; }
+    .role-badge-staff { background:#F1F5F9; color:#334155; border:1px solid #CBD5E1; }
+    .role-badge-student { background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; }
+
+    .role-select-custom { appearance:none; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position:right 0.5rem center; background-repeat:no-repeat; background-size:1.2em 1.2em; padding-right:2.2rem; }
+    .info-box-purple { background:#F8F5FF; border:1px solid #E9E3FF; }
+    .identity-pill { display:inline-block; padding:4px 12px; border-radius:9999px; font-size:9px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+    .identity-lecturer { background:#F3E8FF; color:#6B21A8; }
+    .identity-lab { background:#E0E7FF; color:#3730A3; }
+    .identity-student { background:#F1F5F9; color:#475569; }
+    .identity-admin { background:#FEF3C7; color:#B45309; }
+
+    /* ===== CLASS CHIP (Penasihat Akademik) ===== */
+    .class-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:6px; font-size:9px; font-weight:900; letter-spacing:.05em; font-family:'Courier New',monospace; background:#FDF2F8; color:#BE185D; border:1px solid #FBCFE8; margin-top:4px; }
+    .quick-pick { padding:7px 12px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing:.05em; font-family:'Courier New',monospace; cursor:pointer; transition:all .15s; border:1px solid #E2E8F0; background:#fff; color:#64748B; }
+    .quick-pick:hover { border-color:#BE185D; color:#BE185D; background:#FDF2F8; transform:translateY(-1px); }
+    .quick-pick.active { background:#BE185D; color:#fff; border-color:#BE185D; }
+
+    /* ===== GLOBAL PROGRESS BAR ===== */
+    #globalProgress { position:fixed; top:0; left:0; right:0; height:3px; z-index:9999; background:transparent; pointer-events:none; opacity:0; transition:opacity .25s ease; }
+    #globalProgress.active { opacity:1; }
+    #globalProgress .bar { height:100%; width:0%; background:linear-gradient(90deg,#FDB913 0%,#9B26B6 50%,#002D62 100%); box-shadow:0 0 12px rgba(155,38,182,.7); transition:width .3s ease; border-radius:0 2px 2px 0; }
+    #globalProgress .bar.indeterminate { width:100%; background:linear-gradient(90deg, rgba(253,185,19,.2) 0%, #FDB913 25%, #9B26B6 50%, #002D62 75%, rgba(0,45,98,.2) 100%); background-size:200% 100%; animation:progressIndeterminate 1.2s linear infinite; }
+    @keyframes progressIndeterminate { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+
+    /* ===== LOADING OVERLAY ===== */
+    #loadingOverlay { position:fixed; inset:0; z-index:9998; pointer-events:none; background:rgba(248,250,252,.0); backdrop-filter:blur(0px); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:all .3s ease; }
+    #loadingOverlay.active { opacity:1; visibility:visible; background:rgba(248,250,252,.55); backdrop-filter:blur(2px); pointer-events:auto; }
+    .loading-spinner-card { background:#fff; padding:22px 30px; border-radius:16px; box-shadow:0 24px 60px -20px rgba(0,45,98,.45); display:flex; align-items:center; gap:14px; border:1px solid rgba(226,232,240,.9); transform:translateY(6px); transition:transform .3s ease; }
+    #loadingOverlay.active .loading-spinner-card { transform:translateY(0); }
+    .loading-ring { width:34px; height:34px; border-radius:50%; border:3px solid rgba(155,38,182,.15); border-top-color:#9B26B6; border-right-color:#FDB913; animation:spin 0.9s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin-icon { animation:spin 0.9s linear infinite; }
+
+    /* ===== SKELETONS ===== */
+    .skel { background:linear-gradient(90deg,#EEF2F7 0%,#F8FAFC 20%,#EEF2F7 40%,#EEF2F7 100%); background-size:200% 100%; animation:shimmer 1.3s linear infinite; border-radius:6px; display:inline-block; vertical-align:middle; }
+    @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+    .skel-avatar { width:34px; height:34px; border-radius:10px; }
+    .skel-line { height:10px; width:100%; }
+    .skel-line.sm { height:8px; }
+    .skel-line.w-60 { width:60%; }
+    .skel-line.w-40 { width:40%; }
+    .skel-line.w-80 { width:80%; }
+    .skel-line.w-30 { width:30%; }
+    .skel-chip { height:20px; width:70px; border-radius:9999px; }
+    .skel-badge { height:20px; width:80px; border-radius:6px; }
+    .skel-pill { height:18px; width:64px; border-radius:9999px; }
+    .skeleton-row td { padding:14px !important; }
+    .activity-skel { display:flex; gap:16px; padding:12px 0; position:relative; }
+    .activity-skel .icon-sk { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(90deg,#EEF2F7 0%,#F8FAFC 20%,#EEF2F7 40%,#EEF2F7 100%); background-size:200% 100%; animation:shimmer 1.3s linear infinite; }
 </style>
 </head>
 <body class="text-slate-900">
+
+<!-- ============================================================
+     GLOBAL PROGRESS BAR + LOADING OVERLAY
+============================================================= -->
+<div id="globalProgress"><div class="bar" id="globalProgressBar"></div></div>
+<div id="loadingOverlay">
+    <div class="loading-spinner-card">
+        <div class="loading-ring"></div>
+        <div>
+            <p id="loadingText" class="text-sm font-black text-p655c leading-none">Loading users…</p>
+            <p id="loadingSub" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">Fetching from server</p>
+        </div>
+    </div>
+</div>
 
 <nav class="glass-nav sticky top-0 z-50">
     <div class="px-4 sm:px-6 lg:px-8">
@@ -203,13 +280,13 @@
             <a href="admin portal.html" class="faculty-logo">
                 <div class="logo-bar"></div>
                 <div class="logo-text">
-                    <span class="line-small" data-i18n="nav_faculty">FAKULTI</span>
-                    <span class="line-large" data-i18n="nav_dept">KEJURUTERAAN KIMIA</span>
+                    <span class="line-small">FAKULTI</span>
+                    <span class="line-large">KEJURUTERAAN KIMIA</span>
                 </div>
             </a>
             <div class="flex items-center gap-3 sm:gap-4">
                 <a href="admin portal.html" class="hidden md:flex items-center gap-2 text-white/80 hover:text-white text-[11px] font-bold uppercase tracking-widest transition px-3 py-2 rounded-full hover:bg-white/10">
-                    <i class="fas fa-arrow-left"></i> <span data-i18n="nav_back">Back to Admin Portal</span>
+                    <i class="fas fa-arrow-left"></i> <span>Back to Admin Portal</span>
                 </a>
                 <div class="lang-toggle-wrapper">
                     <button class="lang-btn active" id="btn-en" onclick="switchLanguage('en')">
@@ -219,10 +296,6 @@
                         <img src="https://flagcdn.com/w20/my.png" class="w-3.5 h-auto rounded-[2px]" alt="BM"> BM
                     </button>
                 </div>
-                <button class="relative text-white/80 hover:text-white transition p-2 rounded-full hover:bg-white/10">
-                    <i class="fas fa-bell text-sm"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-300"></span>
-                </button>
                 <div class="relative flex items-center gap-2">
                     <button id="profileToggle" class="flex items-center gap-3 pl-3 sm:pl-4 border-l border-white/20">
                         <div class="hidden sm:block text-right leading-tight">
@@ -244,84 +317,111 @@
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
+    <!-- HERO -->
     <div class="hero-banner p-8 sm:p-10 mb-6 rounded-3xl anim-up">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
                 <span class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-yellow-300 mb-3">
                     <span class="w-2 h-2 rounded-full bg-yellow-300 animate-pulse"></span>
-                    <span data-i18n="hero_tag">User Directory</span>
+                    <span>User Directory</span>
                 </span>
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
-                    <span data-i18n="hero_title">User Management</span><br>
-                    <span class="text-yellow-300" data-i18n="hero_sub">Portal Accounts</span>
+                    User Management<br>
+                    <span class="text-yellow-300">Portal Accounts</span>
                 </h1>
                 <div class="mt-4 flex flex-wrap items-center gap-2">
-                    <span class="chip chip-gold"><i class="fas fa-users"></i> <span id="heroTotalUsers">0</span> <span data-i18n="hero_accounts">accounts</span></span>
-                    <span class="chip chip-purple"><i class="fas fa-user-shield"></i> <span data-i18n="role_admin">Administrator</span></span>
+                    <span class="chip chip-gold"><i class="fas fa-users"></i> <span id="heroTotalUsers">0</span> accounts</span>
+                    <span class="chip chip-purple"><i class="fas fa-user-shield"></i> <span id="heroTotalAdmins">0</span> admins</span>
                     <span class="chip chip-navy" id="serverStatusChip"><i class="fas fa-circle-notch fa-spin"></i> <span id="serverStatusText">Connecting…</span></span>
                 </div>
             </div>
             <div class="shrink-0">
                 <div class="bg-white/15 border border-white/25 p-5 min-w-[200px] rounded-2xl">
-                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="hero_today">Today</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1">Today</p>
                     <p id="todayDate" class="text-white font-bold text-sm">—</p>
                     <div class="h-px bg-white/25 my-3"></div>
-                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="hero_hint">Tip</p>
-                    <p class="text-white font-bold text-xs" data-i18n="hero_hint_val">Click any row to view password</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1">Tip</p>
+                    <p class="text-white font-bold text-xs">Click any row to view password</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- STATS -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6">
         <div class="stat-card stat-navy p-5 sm:p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-3 relative z-10"><div class="stat-icon-box"><i class="fas fa-users"></i></div></div>
             <p id="statTotal" class="text-2xl sm:text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stat_total">Total Accounts</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10">Total Accounts</p>
         </div>
         <div class="stat-card stat-purple p-5 sm:p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-3 relative z-10"><div class="stat-icon-box"><i class="fas fa-user-graduate"></i></div></div>
             <p id="statStudents" class="text-2xl sm:text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10" data-i18n="stat_students">Students</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10">Students</p>
         </div>
         <div class="stat-card stat-gold p-5 sm:p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-3 relative z-10"><div class="stat-icon-box"><i class="fas fa-user-tie"></i></div></div>
             <p id="statStaff" class="text-2xl sm:text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-yellow-100 relative z-10" data-i18n="stat_staff">Staff</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-yellow-100 relative z-10">Staff</p>
         </div>
         <div class="stat-card stat-deep p-5 sm:p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-3 relative z-10"><div class="stat-icon-box"><i class="fas fa-user-shield"></i></div></div>
             <p id="statAdmins" class="text-2xl sm:text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stat_admins">Administrators</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10">Administrators</p>
         </div>
     </div>
 
+    <!-- ============================================================
+         PORTAL ACCOUNTS  ←  THE SECTION YOU ASKED ABOUT
+    ============================================================= -->
     <section class="card p-5 sm:p-6 rounded-3xl mb-6 anim-up">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
             <div>
-                <span class="section-label" data-i18n="users_label">Directory</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="users_title">Portal Accounts</h3>
-                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="users_sub">Create, edit and manage access for all portal users</p>
+                <span class="section-label">Directory</span>
+                <h3 class="text-lg font-black text-p655c mt-1">Portal Accounts</h3>
+                <p class="text-xs text-slate-500 font-medium mt-1">Create, edit and manage access for all portal users</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl">
                     <i class="fas fa-magnifying-glass text-slate-400 text-[11px]"></i>
-                    <input id="userSearch" type="text" placeholder="Search name, email or ID..." data-i18n-ph="users_search_ph" class="bg-transparent border-none outline-none text-[11px] font-semibold text-p655c placeholder-slate-400 w-40 sm:w-44">
+                    <input id="userSearch" type="text" placeholder="Search name, email or ID..." class="bg-transparent border-none outline-none text-[11px] font-semibold text-p655c placeholder-slate-400 w-40 sm:w-44">
                 </div>
                 <select id="roleFilter" class="field-input" style="width:auto;padding:9px 12px;font-size:11px;">
-                    <option value="all" data-i18n="filter_all">All Roles</option>
-                    <option value="student" data-i18n="role_student">Student</option>
-                    <option value="academic_staff" data-i18n="role_academic">Academic Staff</option>
-                    <option value="lab_staff" data-i18n="role_lab">Lab Staff</option>
-                    <option value="coordinator" data-i18n="role_coordinator">Coordinator</option>
-                    <option value="admin" data-i18n="role_admin_short">Admin</option>
+                    <option value="all">All Roles</option>
+                    <option value="student">Student</option>
+                    <option value="__staff__">Staff (All)</option>
+                    <option value="__admin__">Administrators (All)</option>
+                    <optgroup label="Academic Positions">
+                        <option value="pensyarah">Lecturer</option>
+                        <option value="pensyarah_kanan">Senior Lecturer</option>
+                        <option value="profesor">Professor</option>
+                        <option value="profesor_madya">Associate Professor</option>
+                    </optgroup>
+                    <optgroup label="Science &amp; Laboratory Positions">
+                        <option value="pegawai_sains">Science Officer</option>
+                        <option value="penolong_pegawai_sains">Assistant Science Officer</option>
+                        <option value="pembantu_makmal">Laboratory Assistant</option>
+                        <option value="pembantu_makmal_kanan">Senior Laboratory Assistant</option>
+                    </optgroup>
+                    <optgroup label="Engineering Positions">
+                        <option value="jurutera">Engineer</option>
+                        <option value="penolong_jurutera">Assistant Engineer</option>
+                        <option value="penolong_jurutera_kanan">Senior Assistant Engineer</option>
+                    </optgroup>
+                    <optgroup label="Administrator">
+                        <option value="admin">AJK Safety</option>
+                        <option value="ajk_obe">AJK OBE</option>
+                        <option value="pensyarah_sumber">Pensyarah Sumber</option>
+                        <option value="lecturer_in_charge">Lecturer in Charge</option>
+                        <option value="penasihat_akademik">Penasihat Akademik</option>
+                    </optgroup>
                 </select>
                 <button id="refreshBtn" class="mini-btn mini-ghost" style="padding:9px 14px;" title="Refresh from server"><i class="fas fa-rotate"></i></button>
                 <button id="bulkImportBtn" class="mini-btn mini-ghost" style="padding:9px 14px;">
-                    <i class="fas fa-file-excel"></i> <span data-i18n="btn_import">Excel</span>
+                    <i class="fas fa-file-excel"></i> <span>Excel</span>
                 </button>
                 <button id="addUserBtn" class="btn-gold px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <i class="fas fa-user-plus"></i> <span data-i18n="btn_add">Add User</span>
+                    <i class="fas fa-user-plus"></i> <span>Add User</span>
                 </button>
             </div>
         </div>
@@ -330,13 +430,13 @@
             <table class="tbl">
                 <thead>
                     <tr>
-                        <th data-i18n="th_user">User</th>
-                        <th data-i18n="th_userid">User ID</th>
-                        <th data-i18n="th_role">Role</th>
-                        <th data-i18n="th_program">Program / Department</th>
-                        <th data-i18n="th_session">Session ID</th>
-                        <th data-i18n="th_status">Status</th>
-                        <th style="text-align:right;" data-i18n="th_actions">Actions</th>
+                        <th>User</th>
+                        <th>User ID</th>
+                        <th>Role</th>
+                        <th>Program / Department</th>
+                        <th>Session ID</th>
+                        <th>Status</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTbody"></tbody>
@@ -345,33 +445,105 @@
 
         <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                <span data-i18n="showing">Showing</span>
-                <span id="shownCount" class="text-p655c">0</span>
-                <span data-i18n="of">of</span>
-                <span id="totalCount" class="text-p655c">0</span>
-                <span data-i18n="accounts">accounts</span>
+                Showing <span id="shownCount" class="text-p655c">0</span> of <span id="totalCount" class="text-p655c">0</span> accounts
             </p>
             <p class="text-[10px] font-bold text-purple-500 uppercase tracking-widest">
-                <i class="fas fa-hand-pointer"></i> <span data-i18n="click_hint">Click row to view password</span>
+                <i class="fas fa-hand-pointer"></i> Click row to view password
             </p>
         </div>
     </section>
 
+    <!-- ============================================================
+         ROLE MANAGEMENT
+    ============================================================= -->
+    <section class="card p-5 sm:p-6 rounded-3xl mb-6 anim-up">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+            <div>
+                <h3 class="text-lg font-black text-p655c">Role Management</h3>
+                <p class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-wider">Manage system roles / jawatan · auth identity is set by the login system</p>
+            </div>
+            <span class="chip chip-purple" style="align-self:flex-start;">
+                <i class="fas fa-shield-halved"></i> Access Control
+            </span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">AJK Safety</p>
+                <p id="count-ajk" class="text-xl font-black text-p655c">0</p>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">AJK OBE</p>
+                <p id="count-obe" class="text-xl font-black text-p655c">0</p>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Pensyarah Sumber</p>
+                <p id="count-sumber" class="text-xl font-black text-p655c">0</p>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Lec. in Charge</p>
+                <p id="count-lic" class="text-xl font-black text-p655c">0</p>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Penasihat Akademik</p>
+                <p id="count-pa" class="text-xl font-black text-p655c">0</p>
+            </div>
+        </div>
+
+        <div class="info-box-purple rounded-xl p-5 mb-5">
+            <h4 class="text-sm font-black text-purple-900 mb-3 flex items-center gap-2">
+                <i class="fas fa-circle-info text-purple-600"></i> Two-Level Role System
+            </h4>
+            <ul class="space-y-1.5 text-[11px] font-semibold text-purple-800">
+                <li><strong>Level 1 — Auth Identity:</strong> Lecturer · Lab Staff · Student · Admin (set by login system)</li>
+                <li><strong>Level 2 — System Role / Jawatan:</strong> Student · staff positions · administrator positions</li>
+                <li><strong>Administrator roles:</strong> AJK Safety · AJK OBE · Pensyarah Sumber · Lecturer in Charge · Penasihat Akademik</li>
+                <li><strong>Penasihat Akademik</strong> requires a class assignment (e.g. DKA5A).</li>
+            </ul>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-base font-black text-p655c">Users &amp; Roles</h3>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Change any user's assigned system role / jawatan</p>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl w-full sm:w-auto">
+                <i class="fas fa-magnifying-glass text-slate-400 text-[11px]"></i>
+                <input type="text" id="roleSearch" placeholder="Search user by name or email..." class="bg-transparent border-none outline-none text-[11px] font-semibold text-p655c placeholder-slate-400 w-full sm:w-56">
+            </div>
+        </div>
+
+        <div class="tbl-scroll">
+            <table class="tbl" style="min-width: 900px;">
+                <thead>
+                    <tr>
+                        <th>USER</th>
+                        <th>AUTH IDENTITY</th>
+                        <th>SYSTEM ROLE / JAWATAN</th>
+                        <th style="text-align:right;">ACCESS LEVEL</th>
+                    </tr>
+                </thead>
+                <tbody id="rolesTbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ACTIVITY LOG -->
     <section class="card p-5 sm:p-6 rounded-3xl mb-10 anim-up">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
             <div>
-                <span class="section-label" data-i18n="audit_label">Jejak Audit</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="audit_title">Activity Log</h3>
-                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="audit_sub">All administrative actions recorded with actor information</p>
+                <span class="section-label">Jejak Audit</span>
+                <h3 class="text-lg font-black text-p655c mt-1">Activity Log</h3>
+                <p class="text-xs text-slate-500 font-medium mt-1">All administrative actions recorded with actor information</p>
             </div>
             <div class="flex items-center gap-2">
                 <span class="chip chip-purple">
                     <i class="fas fa-clock-rotate-left"></i>
                     <span id="activityCount">0</span>
-                    <span data-i18n="audit_records">records</span>
+                    <span>records</span>
                 </span>
                 <button id="clearActivityBtn" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-p254c transition px-3 py-2">
-                    <i class="fas fa-broom"></i> <span data-i18n="audit_clear">Clear</span>
+                    <i class="fas fa-broom"></i> Clear
                 </button>
             </div>
         </div>
@@ -388,32 +560,32 @@
                     <div class="logo-bar"></div>
                     <div class="logo-text"><span class="line-small">FAKULTI</span><span class="line-large">KEJURUTERAAN KIMIA</span></div>
                 </div>
-                <p class="footer-desc" data-i18n="footer_desc">Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.</p>
+                <p class="footer-desc">Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.</p>
             </div>
             <div>
-                <h4 class="footer-heading" data-i18n="footer_quick_links">Quick Links</h4>
+                <h4 class="footer-heading">Quick Links</h4>
                 <ul class="footer-links">
-                    <li><a href="admin portal.html" data-i18n="footer_dashboard">Admin Dashboard</a></li>
-                    <li><a href="#" data-i18n="footer_lab_dir">Lab Directory</a></li>
-                    <li><a href="#" data-i18n="footer_safety_manual">Safety Manual</a></li>
-                    <li><a href="#" data-i18n="footer_equipment_log">Equipment Log</a></li>
-                    <li><a href="#" data-i18n="footer_contact">Contact</a></li>
+                    <li><a href="admin portal.html">Admin Dashboard</a></li>
+                    <li><a href="#">Lab Directory</a></li>
+                    <li><a href="#">Safety Manual</a></li>
+                    <li><a href="#">Equipment Log</a></li>
+                    <li><a href="#">Contact</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="footer-heading" data-i18n="footer_contact_heading">UiTM Cawangan Johor</h4>
+                <h4 class="footer-heading">UiTM Cawangan Johor</h4>
                 <div class="footer-contact">
-                    <div class="footer-contact-item"><i class="fas fa-location-dot"></i><span data-i18n="footer_address">Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor</span></div>
+                    <div class="footer-contact-item"><i class="fas fa-location-dot"></i><span>Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor</span></div>
                     <div class="footer-contact-item"><i class="fas fa-phone"></i><a href="tel:+6073818000">+607-381 8000</a></div>
                     <div class="footer-contact-item"><i class="fas fa-envelope"></i><a href="mailto:korporat@uitm.edu.my">korporat@uitm.edu.my</a></div>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p class="footer-copy" data-i18n="footer_copyright">© 2026 FKK UiTM Johor. All Rights Reserved.</p>
+            <p class="footer-copy">© 2026 FKK UiTM Johor. All Rights Reserved.</p>
             <div class="footer-legal">
-                <a href="#" data-i18n="footer_privacy">Privacy Policy</a>
-                <a href="#" data-i18n="footer_terms">Terms of Use</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
             </div>
         </div>
     </div>
@@ -430,50 +602,44 @@
                     <i class="fas fa-key text-white text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-black leading-none" data-i18n="pwd_reveal_title">View Password</h3>
-                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1" data-i18n="pwd_reveal_sub">Plaintext password for this account</p>
+                    <h3 class="text-base font-black leading-none">View Password</h3>
+                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Plaintext password for this account</p>
                 </div>
             </div>
             <button id="pwdViewClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
         </div>
-
         <div class="p-6 space-y-4">
             <div id="pwdViewUser" class="bg-slate-50 p-4 rounded-xl border border-slate-200"></div>
-
             <div>
-                <label class="field-label" data-i18n="pwd_reveal_label">Password</label>
+                <label class="field-label">Password</label>
                 <div id="pwdDisplay" class="pwd-display">••••••••</div>
-
                 <div class="flex gap-2 mt-3">
                     <button id="pwdViewToggle" type="button" class="mini-btn mini-ghost flex-1" style="justify-content:center;">
-                        <i class="fas fa-eye"></i> <span data-i18n="pwd_reveal_show">Show</span>
+                        <i class="fas fa-eye"></i> <span>Show</span>
                     </button>
                     <button id="pwdViewCopy" type="button" class="copy-btn flex-1">
-                        <i class="fas fa-copy"></i> <span data-i18n="pwd_reveal_copy">Copy</span>
+                        <i class="fas fa-copy"></i> <span>Copy</span>
                     </button>
                 </div>
-
                 <div id="pwdViewWarn" class="warning-banner flex gap-3 p-3 mt-3 hidden">
                     <i class="fas fa-triangle-exclamation text-amber-600 mt-0.5"></i>
-                    <p class="text-[10px] font-semibold text-amber-800 leading-relaxed" data-i18n="pwd_reveal_unavailable">
+                    <p class="text-[10px] font-semibold text-amber-800 leading-relaxed">
                         Password not recoverable — use "Reset Password" to set a new one.
                     </p>
                 </div>
-
                 <button id="pwdViewResetBtn" type="button" class="mini-btn mini-purple w-full mt-2 hidden" style="justify-content:center;">
-                    <i class="fas fa-key"></i> <span data-i18n="pwd_reveal_reset">Reset Password Now</span>
+                    <i class="fas fa-key"></i> <span>Reset Password Now</span>
                 </button>
             </div>
         </div>
-
         <div class="flex gap-3 px-6 py-4 border-t border-slate-100 shrink-0 bg-slate-50">
-            <button id="pwdViewCloseBtn" type="button" class="flex-1 py-3 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-200 transition" data-i18n="btn_close">Close</button>
+            <button id="pwdViewCloseBtn" type="button" class="flex-1 py-3 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-200 transition">Close</button>
         </div>
     </div>
 </div>
 
 <!-- ============================================================
-     USER MODAL
+     USER MODAL (ADD / EDIT)
 ============================================================= -->
 <div id="userModal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4">
     <div class="modal-box bg-white w-full max-w-lg shadow-2xl max-h-[92vh] overflow-hidden flex flex-col">
@@ -482,7 +648,7 @@
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/20 border border-white/30"><i class="fas fa-user-gear text-white text-sm"></i></div>
                 <div>
                     <h3 id="userModalTitle" class="text-base font-black leading-none">Add New User</h3>
-                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1" data-i18n="modal_sub">Manage portal account details</p>
+                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Manage portal account details</p>
                 </div>
             </div>
             <button id="userModalClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
@@ -491,38 +657,39 @@
             <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50">
                 <div id="userModalAvatar" class="w-16 h-16 rounded-full flex items-center justify-center text-lg font-black border-4 border-white shadow-md shrink-0 text-white" style="background:#002D62;">--</div>
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-600" data-i18n="modal_avatar_hint">Avatar initials auto-generated</p>
-                    <p class="text-[9px] font-bold text-slate-500 mt-1" data-i18n="modal_avatar_sub">Preview updates as you type</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-600">Avatar initials auto-generated</p>
+                    <p class="text-[9px] font-bold text-slate-500 mt-1">Preview updates as you type</p>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <div><label class="field-label" data-i18n="field_userid">User ID</label><input id="uId" type="text" class="field-input" placeholder="Auto if empty" style="font-family:'Courier New',monospace;"></div>
-                <div><label class="field-label" data-i18n="field_session">Session ID (Auto)</label><input id="uSession" type="text" class="field-input" readonly style="font-family:'Courier New',monospace;color:#94A3B8;"></div>
+                <div><label class="field-label">User ID</label><input id="uId" type="text" class="field-input" placeholder="Auto if empty" style="font-family:'Courier New',monospace;"></div>
+                <div><label class="field-label">Session ID (Auto)</label><input id="uSession" type="text" class="field-input" readonly style="font-family:'Courier New',monospace;color:#94A3B8;"></div>
             </div>
-            <div><label class="field-label" data-i18n="field_name">Full Name</label><input id="uName" type="text" class="field-input" placeholder="Enter full name"></div>
-            <div><label class="field-label" data-i18n="field_email">Email</label><input id="uEmail" type="email" class="field-input" placeholder="name@uitm.edu.my"></div>
+            <div><label class="field-label">Full Name</label><input id="uName" type="text" class="field-input" placeholder="Enter full name"></div>
+            <div><label class="field-label">Email</label><input id="uEmail" type="email" class="field-input" placeholder="name@uitm.edu.my"></div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="field-label" data-i18n="field_role">Role</label>
-                    <select id="uRole" class="field-input">
-                        <option value="student" data-i18n="role_student">Student</option>
-                        <option value="academic_staff" data-i18n="role_academic">Academic Staff</option>
-                        <option value="lab_staff" data-i18n="role_lab">Lab Staff</option>
-                        <option value="coordinator" data-i18n="role_coordinator">Coordinator</option>
-                        <option value="admin" data-i18n="role_admin_short">Admin</option>
-                    </select>
+                    <label class="field-label">Role / Jawatan</label>
+                    <select id="uRole" class="field-input"></select>
                 </div>
                 <div>
-                    <label class="field-label" data-i18n="field_status">Status</label>
+                    <label class="field-label">Status</label>
                     <select id="uStatus" class="field-input">
-                        <option value="Aktif" data-i18n="status_active">Active</option>
-                        <option value="Tidak Aktif" data-i18n="status_inactive">Inactive</option>
+                        <option value="Aktif">Active</option>
+                        <option value="Tidak Aktif">Inactive</option>
                     </select>
                 </div>
             </div>
-            <div><label class="field-label" data-i18n="field_program">Program / Department</label><input id="uProgram" type="text" class="field-input" placeholder="e.g. Kejuruteraan Kimia"></div>
+            <div id="uClassWrap" class="hidden">
+                <label class="field-label">Assigned Class (Penasihat Akademik)</label>
+                <input id="uClass" type="text" class="field-input" placeholder="e.g. DKA5A" style="font-family:'Courier New',monospace;text-transform:uppercase;">
+                <p class="text-[10px] text-slate-400 font-semibold mt-2">
+                    <i class="fas fa-circle-info"></i> Separate multiple classes with commas (e.g. DKA5A, DKA5B)
+                </p>
+            </div>
+            <div><label class="field-label">Program / Department</label><input id="uProgram" type="text" class="field-input" placeholder="e.g. Kejuruteraan Kimia"></div>
             <div>
-                <label class="field-label" data-i18n="field_password">Password</label>
+                <label class="field-label">Password</label>
                 <div class="pwd-wrap">
                     <input id="uPwd" type="text" class="field-input" placeholder="Minimum 6 characters" style="font-family:'Courier New',monospace;">
                     <button type="button" class="pwd-toggle" data-target="uPwd"><i class="fas fa-eye-slash"></i></button>
@@ -531,9 +698,9 @@
             <div id="userError" class="error-box"></div>
         </div>
         <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
-            <button id="userCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition" data-i18n="btn_cancel">Cancel</button>
+            <button id="userCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition">Cancel</button>
             <button id="userSave" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
-                <i class="fas fa-check"></i> <span data-i18n="btn_save">Save User</span>
+                <i class="fas fa-check"></i> <span>Save User</span>
             </button>
         </div>
     </div>
@@ -548,8 +715,8 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/20 border border-white/30"><i class="fas fa-key text-white text-sm"></i></div>
                 <div>
-                    <h3 class="text-base font-black leading-none" data-i18n="pwd_modal_title">Reset Password</h3>
-                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1" data-i18n="pwd_modal_sub">Set a new password for this account</p>
+                    <h3 class="text-base font-black leading-none">Reset Password</h3>
+                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Set a new password for this account</p>
                 </div>
             </div>
             <button id="pwdModalClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
@@ -559,9 +726,9 @@
             <div class="warning-banner flex gap-3 p-4">
                 <i class="fas fa-user-shield text-amber-600 mt-0.5"></i>
                 <div>
-                    <p class="text-[11px] font-black uppercase tracking-wider text-amber-800 mb-1" data-i18n="pwd_actor_title">Action will be logged</p>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-amber-800 mb-1">Action will be logged</p>
                     <p class="text-[10px] font-medium text-amber-800 leading-relaxed">
-                        <span data-i18n="pwd_actor_sub">This password change will be recorded under:</span>
+                        This password change will be recorded under:
                         <span class="font-black text-amber-900 block mt-1" id="pwdActorName">—</span>
                     </p>
                 </div>
@@ -569,19 +736,19 @@
             <div class="info-banner flex gap-3 p-4">
                 <i class="fas fa-circle-info text-purple-600 mt-0.5"></i>
                 <div>
-                    <p class="text-[11px] font-black uppercase tracking-wider text-purple-800 mb-1" data-i18n="pwd_info_title">Set New Password</p>
-                    <p class="text-[10px] font-medium text-purple-700 leading-relaxed" data-i18n="pwd_info_sub">Minimum 8 characters · 1 uppercase · 1 lowercase · 1 number</p>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-purple-800 mb-1">Set New Password</p>
+                    <p class="text-[10px] font-medium text-purple-700 leading-relaxed">Minimum 8 characters · 1 uppercase · 1 lowercase · 1 number</p>
                 </div>
             </div>
             <div>
-                <label class="field-label" data-i18n="pwd_new">New Password</label>
+                <label class="field-label">New Password</label>
                 <div class="pwd-wrap">
                     <input id="newPwd" type="password" class="field-input" placeholder="Enter new password" autocomplete="new-password">
                     <button type="button" class="pwd-toggle" data-target="newPwd"><i class="fas fa-eye"></i></button>
                 </div>
                 <div class="mt-3">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-400" data-i18n="pwd_strength_label">Strength</span>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Strength</span>
                         <span id="pwdStrengthText" class="strength-text">—</span>
                     </div>
                     <div class="strength-bar">
@@ -593,7 +760,7 @@
                 </div>
             </div>
             <div>
-                <label class="field-label" data-i18n="pwd_confirm">Confirm New Password</label>
+                <label class="field-label">Confirm New Password</label>
                 <div class="pwd-wrap">
                     <input id="confirmPwd" type="password" class="field-input" placeholder="Re-enter password" autocomplete="new-password">
                     <button type="button" class="pwd-toggle" data-target="confirmPwd"><i class="fas fa-eye"></i></button>
@@ -602,9 +769,9 @@
             <div id="pwdError" class="error-box"></div>
         </div>
         <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
-            <button id="pwdCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition" data-i18n="btn_cancel">Cancel</button>
+            <button id="pwdCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition">Cancel</button>
             <button id="pwdSave" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
-                <i class="fas fa-rotate-right"></i> <span data-i18n="pwd_btn_reset">Reset Password</span>
+                <i class="fas fa-rotate-right"></i> <span>Reset Password</span>
             </button>
         </div>
     </div>
@@ -619,8 +786,8 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/20 border border-white/30"><i class="fas fa-file-excel text-white text-sm"></i></div>
                 <div>
-                    <h3 class="text-base font-black leading-none" data-i18n="bulk_title">Bulk Import Users</h3>
-                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1" data-i18n="bulk_sub">Import accounts from Excel file</p>
+                    <h3 class="text-base font-black leading-none">Bulk Import Users</h3>
+                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Import accounts from Excel file</p>
                 </div>
             </div>
             <button id="bulkModalClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
@@ -629,24 +796,24 @@
             <div class="info-banner flex gap-3 p-4">
                 <i class="fas fa-circle-info text-purple-600 mt-0.5"></i>
                 <div>
-                    <p class="text-[11px] font-black uppercase tracking-wider text-purple-800 mb-2" data-i18n="bulk_format_title">Excel Column Format</p>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-purple-800 mb-2">Excel Column Format</p>
                     <p class="text-[10px] font-mono font-bold text-purple-700">User ID | User Name | Role Detected | Password | Status | Email | Program</p>
-                    <p class="text-[10px] font-medium text-purple-700 mt-2" data-i18n="bulk_format_sub">Role Detected: STUDENT, ACADEMIC_STAFF, LAB_STAFF, COORDINATOR, ADMIN · Status: Aktif / Tidak Aktif · User ID &amp; Password auto-generate if empty · Session ID auto-generated by system</p>
+                    <p class="text-[10px] font-medium text-purple-700 mt-2">Role Detected: STUDENT, AJK SAFETY, AJK OBE, PENSYARAH SUMBER, LECTURER IN CHARGE, PENASIHAT AKADEMIK, PEGAWAI SAINS, PENOLONG PEGAWAI SAINS, PEMBANTU MAKMAL, PEMBANTU MAKMAL KANAN, PENOLONG JURUTERA, PENOLONG JURUTERA KANAN, JURUTERA, PENSYARAH, PENSYARAH KANAN, PROFESOR, PROFESOR MADYA</p>
                 </div>
             </div>
             <div class="flex flex-wrap gap-3">
-                <button onclick="downloadTemplate()" class="mini-btn mini-navy"><i class="fas fa-download"></i> <span data-i18n="bulk_download">Download Template</span></button>
-                <label class="mini-btn mini-purple cursor-pointer"><i class="fas fa-upload"></i> <span data-i18n="bulk_choose">Choose File</span>
+                <button onclick="downloadTemplate()" class="mini-btn mini-navy"><i class="fas fa-download"></i> <span>Download Template</span></button>
+                <label class="mini-btn mini-purple cursor-pointer"><i class="fas fa-upload"></i> <span>Choose File</span>
                     <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" class="hidden">
                 </label>
             </div>
             <div id="bulkPreviewArea" class="hidden">
                 <div class="flex justify-between items-center mb-3">
                     <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        <span data-i18n="bulk_preview">Preview</span> (<span id="bulkCount" class="text-p655c">0</span> <span data-i18n="bulk_rows">rows</span>)
+                        Preview (<span id="bulkCount" class="text-p655c">0</span> rows)
                     </span>
                     <button onclick="clearBulkPreview()" class="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700">
-                        <i class="fas fa-times-circle"></i> <span data-i18n="bulk_clear">Clear</span>
+                        <i class="fas fa-times-circle"></i> Clear
                     </button>
                 </div>
                 <div class="overflow-auto max-h-72 border border-slate-200 rounded-xl">
@@ -654,13 +821,13 @@
                         <thead>
                             <tr>
                                 <th>User ID</th>
-                                <th data-i18n="th_name_short">Name</th>
-                                <th data-i18n="th_role">Role</th>
-                                <th data-i18n="th_session">Session ID</th>
-                                <th data-i18n="th_password">Password</th>
-                                <th data-i18n="th_status">Status</th>
-                                <th data-i18n="th_email">Email</th>
-                                <th data-i18n="th_program">Program</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Session ID</th>
+                                <th>Password</th>
+                                <th>Status</th>
+                                <th>Email</th>
+                                <th>Program</th>
                             </tr>
                         </thead>
                         <tbody id="bulkPreviewBody"></tbody>
@@ -669,9 +836,67 @@
             </div>
         </div>
         <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
-            <button id="bulkCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition" data-i18n="btn_cancel">Cancel</button>
+            <button id="bulkCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition">Cancel</button>
             <button id="bulkConfirm" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2" disabled style="opacity:.5;cursor:not-allowed;">
-                <i class="fas fa-check"></i> <span data-i18n="bulk_confirm">Import</span> <span id="bulkImportCount">0</span>
+                <i class="fas fa-check"></i> <span>Import</span> <span id="bulkImportCount">0</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     CLASS ASSIGNMENT MODAL (for Penasihat Akademik)
+============================================================= -->
+<div id="classModal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-box bg-white w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+        <div class="modal-header-gradient flex items-center justify-between px-6 py-5 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/20 border border-white/30">
+                    <i class="fas fa-chalkboard-user text-white text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black leading-none">Assign Class</h3>
+                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Penasihat Akademik Setup</p>
+                </div>
+            </div>
+            <button id="classModalClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="p-6 space-y-5">
+            <div id="classUserCard" class="bg-slate-50 p-4 rounded-xl border border-slate-200"></div>
+            <div class="warning-banner flex gap-3 p-4">
+                <i class="fas fa-triangle-exclamation text-amber-600 mt-0.5"></i>
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-amber-800 mb-1">Class Required</p>
+                    <p class="text-[10px] font-medium text-amber-800 leading-relaxed">
+                        Penasihat Akademik must be assigned to at least one class. Students in this class will see them as their academic advisor.
+                    </p>
+                </div>
+            </div>
+            <div>
+                <label class="field-label">Class Code / Kelas</label>
+                <input id="classInput" type="text" class="field-input" list="classSuggestions" placeholder="e.g. DKA5A" style="font-family:'Courier New',monospace;text-transform:uppercase;">
+                <datalist id="classSuggestions">
+                    <option value="DKA1A"><option value="DKA1B">
+                    <option value="DKA2A"><option value="DKA2B">
+                    <option value="DKA3A"><option value="DKA3B">
+                    <option value="DKA4A"><option value="DKA4B">
+                    <option value="DKA5A"><option value="DKA5B">
+                    <option value="DKA6A"><option value="DKA6B">
+                </datalist>
+                <p class="text-[10px] text-slate-400 font-semibold mt-2">
+                    <i class="fas fa-circle-info"></i> Separate multiple classes with commas (e.g. <span class="font-mono text-p254c">DKA5A, DKA5B</span>)
+                </p>
+            </div>
+            <div>
+                <label class="field-label">Quick Select</label>
+                <div class="flex flex-wrap gap-2" id="classQuickPicks"></div>
+            </div>
+            <div id="classError" class="error-box"></div>
+        </div>
+        <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
+            <button id="classCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition">Cancel</button>
+            <button id="classSave" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                <i class="fas fa-check"></i> <span>Assign Class</span>
             </button>
         </div>
     </div>
@@ -681,25 +906,85 @@
 
 <script>
 (function () {
+    'use strict';
 
     /* =========================================================
        API CONFIG
     ========================================================== */
     const API_URL = "https://script.google.com/macros/s/AKfycbwTf6R87uxIhon3uB5ZW4E2M3o37J58UMRDu494bBQESo1YmaAT0gPDTnmYgmd4gh2IKg/exec";
     const ACTIVITY_LIMIT = 60;
+    const REQUEST_TIMEOUT = 15000;
+    const CACHE_KEY_USERS = 'fms_users_cache_v2';
+    const CACHE_KEY_LOGS  = 'fms_logs_cache_v2';
+    const CACHE_TTL = 60000;
 
+    /* =========================================================
+       GLOBAL PROGRESS + LOADING
+    ========================================================== */
+    const globalProgress = document.getElementById('globalProgress');
+    const globalProgressBar = document.getElementById('globalProgressBar');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const loadingSub = document.getElementById('loadingSub');
+    let progressTimer = null;
+    let activeRequests = 0;
+
+    function progressStart(indeterminate) {
+        globalProgress.classList.add('active');
+        if (indeterminate !== false) {
+            globalProgressBar.classList.add('indeterminate');
+            globalProgressBar.style.width = '100%';
+        } else {
+            globalProgressBar.classList.remove('indeterminate');
+            globalProgressBar.style.width = '0%';
+            requestAnimationFrame(function(){ globalProgressBar.style.width = '25%'; });
+        }
+    }
+    function progressDone() {
+        if (activeRequests > 0) return;
+        globalProgressBar.classList.remove('indeterminate');
+        globalProgressBar.style.width = '100%';
+        clearTimeout(progressTimer);
+        progressTimer = setTimeout(function(){
+            globalProgress.classList.remove('active');
+            setTimeout(function(){ globalProgressBar.style.width = '0%'; }, 250);
+        }, 300);
+    }
+    function showLoadingOverlay(title, sub) {
+        if (title) loadingText.textContent = title;
+        if (sub) loadingSub.textContent = sub;
+        loadingOverlay.classList.add('active');
+    }
+    function hideLoadingOverlay() { loadingOverlay.classList.remove('active'); }
+    function beginRequest() { activeRequests++; progressStart(activeRequests === 1); }
+    function endRequest() {
+        activeRequests = Math.max(0, activeRequests - 1);
+        if (activeRequests === 0) progressDone();
+    }
+
+    /* =========================================================
+       FETCH + TIMEOUT
+    ========================================================== */
+    async function fetchWithTimeout(url, options, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(function(){ controller.abort(); }, timeoutMs || REQUEST_TIMEOUT);
+        try {
+            return await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+        } finally {
+            clearTimeout(timer);
+        }
+    }
     async function apiGet(action, params) {
         params = params || {};
         const url = new URL(API_URL);
         url.searchParams.set('action', action);
         Object.keys(params).forEach(function(k){ url.searchParams.set(k, params[k]); });
-        const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
+        const res = await fetchWithTimeout(url.toString(), { method: 'GET', redirect: 'follow' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
     }
-
     async function apiPost(payload) {
-        const res = await fetch(API_URL, {
+        const res = await fetchWithTimeout(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload),
@@ -710,11 +995,35 @@
     }
 
     /* =========================================================
+       CACHE
+    ========================================================== */
+    function cacheWrite(key, data) {
+        try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), d: data })); } catch(e){}
+    }
+    function cacheRead(key) {
+        try {
+            const raw = sessionStorage.getItem(key);
+            if (!raw) return null;
+            const obj = JSON.parse(raw);
+            if (!obj || !obj.d) return null;
+            if (Date.now() - obj.t > CACHE_TTL) return null;
+            return obj.d;
+        } catch(e) { return null; }
+    }
+    function cacheReadStale(key) {
+        try {
+            const raw = sessionStorage.getItem(key);
+            if (!raw) return null;
+            const obj = JSON.parse(raw);
+            return (obj && obj.d) ? obj.d : null;
+        } catch(e) { return null; }
+    }
+
+    /* =========================================================
        CURRENT ADMIN
     ========================================================== */
     const session = window.__FMS_SESSION__;
     const sessionUser = (session && session.user) || {};
-
     function makeAdminInitials(name) {
         if (!name) return 'AD';
         const parts = String(name).trim().split(/\s+/).filter(function(w){
@@ -724,7 +1033,6 @@
         if (parts.length === 1) return parts[0].substring(0,2).toUpperCase();
         return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
     }
-
     const currentAdmin = {
         id: sessionUser.id || sessionUser.userId || sessionUser.email || 'ADMIN',
         name: sessionUser.name || sessionUser.email || 'Administrator',
@@ -740,23 +1048,120 @@
     let resetPwdUserId = null;
     let bulkUserData = [];
     let appState = { users: [], auditLogs: [] };
+    let pendingRoleChange = null;
+    let pendingUserModalClass = null;
 
+    /* =========================================================
+       ROLE DEFINITIONS
+    ========================================================== */
     const ROLE_META = {
-        student:        { i18n:'role_student',     bg:'#002D62', chip:'chip-navy',   prefix:'STU' },
-        academic_staff: { i18n:'role_academic',    bg:'#9B26B6', chip:'chip-purple', prefix:'ACA' },
-        lab_staff:      { i18n:'role_lab',         bg:'#FDB913', chip:'chip-gold',   prefix:'LAB' },
-        coordinator:    { i18n:'role_coordinator', bg:'#9B26B6', chip:'chip-purple', prefix:'CRD' },
-        admin:          { i18n:'role_admin_short', bg:'#002D62', chip:'chip-navy',   prefix:'ADM' }
+        // Student
+        student: { i18n:'role_student', bg:'#002D62', chip:'chip-navy', prefix:'STU', system:'Student', identity:'student' },
+
+        // Academic
+        pensyarah: { i18n:'role_pensyarah', bg:'#9B26B6', chip:'chip-purple', prefix:'PSY', system:'Staff', identity:'lecturer' },
+        pensyarah_kanan: { i18n:'role_pensyarah_kanan', bg:'#9B26B6', chip:'chip-purple', prefix:'PSY', system:'Staff', identity:'lecturer' },
+        profesor: { i18n:'role_profesor', bg:'#002D62', chip:'chip-navy', prefix:'PRO', system:'Staff', identity:'lecturer' },
+        profesor_madya: { i18n:'role_profesor_madya', bg:'#002D62', chip:'chip-navy', prefix:'PRO', system:'Staff', identity:'lecturer' },
+
+        // Science & Lab
+        pegawai_sains: { i18n:'role_pegawai_sains', bg:'#9B26B6', chip:'chip-purple', prefix:'PSN', system:'Staff', identity:'lab' },
+        penolong_pegawai_sains: { i18n:'role_penolong_pegawai_sains', bg:'#9B26B6', chip:'chip-purple', prefix:'PPS', system:'Staff', identity:'lab' },
+        pembantu_makmal: { i18n:'role_pembantu_makmal', bg:'#FDB913', chip:'chip-gold', prefix:'PMK', system:'Staff', identity:'lab' },
+        pembantu_makmal_kanan: { i18n:'role_pembantu_makmal_kanan', bg:'#FDB913', chip:'chip-gold', prefix:'PMK', system:'Staff', identity:'lab' },
+
+        // Engineering
+        jurutera: { i18n:'role_jurutera', bg:'#002D62', chip:'chip-navy', prefix:'JTR', system:'Staff', identity:'lab' },
+        penolong_jurutera: { i18n:'role_penolong_jurutera', bg:'#002D62', chip:'chip-navy', prefix:'PJT', system:'Staff', identity:'lab' },
+        penolong_jurutera_kanan: { i18n:'role_penolong_jurutera_kanan', bg:'#002D62', chip:'chip-navy', prefix:'PJT', system:'Staff', identity:'lab' },
+
+        // Administrator
+        admin: { i18n:'role_admin', bg:'#002D62', chip:'chip-navy', prefix:'ADM', system:'AJK Safety', identity:'admin' },
+        ajk_obe: { i18n:'role_ajk_obe', bg:'#1E40AF', chip:'chip-navy', prefix:'OBE', system:'AJK OBE', identity:'admin' },
+        pensyarah_sumber: { i18n:'role_pensyarah_sumber', bg:'#047857', chip:'chip-gold', prefix:'PSM', system:'Pensyarah Sumber', identity:'admin' },
+        lecturer_in_charge: { i18n:'role_lecturer_in_charge', bg:'#C2410C', chip:'chip-gold', prefix:'LIC', system:'Lecturer in Charge', identity:'admin' },
+        penasihat_akademik: { i18n:'role_penasihat_akademik', bg:'#BE185D', chip:'chip-purple', prefix:'PA', system:'Penasihat Akademik', identity:'admin' },
+
+        // Legacy
+        academic_staff: { i18n:'role_academic', bg:'#9B26B6', chip:'chip-purple', prefix:'ACA', system:'Staff', identity:'lecturer' },
+        lab_staff: { i18n:'role_lab', bg:'#FDB913', chip:'chip-gold', prefix:'LAB', system:'Staff', identity:'lab' },
+        coordinator: { i18n:'role_coordinator', bg:'#9B26B6', chip:'chip-purple', prefix:'CRD', system:'Staff', identity:'lecturer' }
     };
 
+    const STAFF_ROLES = [
+        'pensyarah','pensyarah_kanan','profesor','profesor_madya',
+        'pegawai_sains','penolong_pegawai_sains','pembantu_makmal','pembantu_makmal_kanan',
+        'jurutera','penolong_jurutera','penolong_jurutera_kanan',
+        'academic_staff','lab_staff','coordinator'
+    ];
+    const ADMIN_ROLES = ['admin','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'];
+    const LEGACY_ROLES = ['academic_staff','lab_staff','coordinator'];
+
+    const ROLE_GROUPS = [
+        { labelKey:'group_student', roles:['student'] },
+        { labelKey:'group_academic', roles:['pensyarah','pensyarah_kanan','profesor','profesor_madya'] },
+        { labelKey:'group_science', roles:['pegawai_sains','penolong_pegawai_sains','pembantu_makmal','pembantu_makmal_kanan'] },
+        { labelKey:'group_engineering', roles:['jurutera','penolong_jurutera','penolong_jurutera_kanan'] },
+        { labelKey:'group_admin', roles:['admin','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'] }
+    ];
+
+    function isStaffRole(role) { return STAFF_ROLES.indexOf(role) !== -1; }
+    function isAdminRole(role) { return ADMIN_ROLES.indexOf(role) !== -1; }
+    function roleMeta(role) { return ROLE_META[role] || ROLE_META.student; }
+
+    function buildRoleOptions(currentRole) {
+        let html = '';
+        ROLE_GROUPS.forEach(function(g){
+            html += '<optgroup label="' + escapeHtml(t(g.labelKey)) + '">';
+            g.roles.forEach(function(r){
+                html += '<option value="' + r + '"' + (r === currentRole ? ' selected' : '') + '>'
+                     +  escapeHtml(roleLabel(r)) + '</option>';
+            });
+            html += '</optgroup>';
+        });
+        if (currentRole && LEGACY_ROLES.indexOf(currentRole) !== -1) {
+            html += '<optgroup label="' + escapeHtml(t('group_legacy')) + '">'
+                 +  '<option value="' + currentRole + '" selected>' + escapeHtml(roleLabel(currentRole)) + '</option>'
+                 +  '</optgroup>';
+        }
+        return html;
+    }
+
+    function detectRole(raw) {
+        const r = String(raw == null ? '' : raw).toLowerCase().replace(/[_\-.]+/g, ' ').trim();
+        if (!r) return 'student';
+        if (r.indexOf('ajk obe') !== -1 || r.indexOf('obe') !== -1) return 'ajk_obe';
+        if (r.indexOf('pensyarah sumber') !== -1) return 'pensyarah_sumber';
+        if (r.indexOf('lecturer in charge') !== -1 || r.indexOf('lic') !== -1) return 'lecturer_in_charge';
+        if (r.indexOf('penasihat akademik') !== -1 || r.indexOf('academic advisor') !== -1) return 'penasihat_akademik';
+        if (r.indexOf('admin') !== -1 || r.indexOf('ajk safety') !== -1) return 'admin';
+        if (r.indexOf('penolong pegawai sains') !== -1) return 'penolong_pegawai_sains';
+        if (r.indexOf('pegawai sains') !== -1) return 'pegawai_sains';
+        if (r.indexOf('pembantu makmal kanan') !== -1) return 'pembantu_makmal_kanan';
+        if (r.indexOf('pembantu makmal') !== -1) return 'pembantu_makmal';
+        if (r.indexOf('penolong jurutera kanan') !== -1) return 'penolong_jurutera_kanan';
+        if (r.indexOf('penolong jurutera') !== -1) return 'penolong_jurutera';
+        if (r.indexOf('jurutera') !== -1) return 'jurutera';
+        if (r.indexOf('profesor madya') !== -1 || r.indexOf('associate professor') !== -1) return 'profesor_madya';
+        if (r.indexOf('profesor') !== -1 || r.indexOf('professor') !== -1) return 'profesor';
+        if (r.indexOf('pensyarah kanan') !== -1 || r.indexOf('senior lecturer') !== -1) return 'pensyarah_kanan';
+        if (r.indexOf('pensyarah') !== -1 || r.indexOf('lecturer') !== -1) return 'pensyarah';
+        if (r.indexOf('coordinator') !== -1) return 'coordinator';
+        if (r.indexOf('lab') !== -1) return 'lab_staff';
+        if (r.indexOf('academic') !== -1) return 'academic_staff';
+        if (r.indexOf('student') !== -1 || r.indexOf('pelajar') !== -1) return 'student';
+        return 'student';
+    }
+
     const ACTIVITY_TYPES = {
-        user_add:       { icon:'fa-user-plus',  bg:'#002D62', en:'Created user account',      ms:'Cipta akaun pengguna' },
-        user_edit:      { icon:'fa-user-pen',   bg:'#9B26B6', en:'Updated user account',      ms:'Kemas kini akaun pengguna' },
-        user_delete:    { icon:'fa-user-minus', bg:'#9B26B6', en:'Deleted user account',      ms:'Padam akaun pengguna' },
-        password_reset: { icon:'fa-key',        bg:'#FDB913', en:'Reset user password',       ms:'Set semula kata laluan pengguna' },
-        password_view:  { icon:'fa-eye',        bg:'#9B26B6', en:'Viewed user password',      ms:'Lihat kata laluan pengguna' },
-        bulk_import:    { icon:'fa-file-excel', bg:'#002D62', en:'Imported users from Excel', ms:'Import pengguna dari Excel' },
-        activity_clear: { icon:'fa-broom',      bg:'#002D62', en:'Cleared activity log',      ms:'Kosongkan log aktiviti' }
+        user_add: { icon:'fa-user-plus', bg:'#002D62', en:'Created user account', ms:'Cipta akaun pengguna' },
+        user_edit: { icon:'fa-user-pen', bg:'#9B26B6', en:'Updated user account', ms:'Kemas kini akaun pengguna' },
+        user_delete: { icon:'fa-user-minus', bg:'#9B26B6', en:'Deleted user account', ms:'Padam akaun pengguna' },
+        password_reset: { icon:'fa-key', bg:'#FDB913', en:'Reset user password', ms:'Set semula kata laluan pengguna' },
+        password_view: { icon:'fa-eye', bg:'#9B26B6', en:'Viewed user password', ms:'Lihat kata laluan pengguna' },
+        bulk_import: { icon:'fa-file-excel', bg:'#002D62', en:'Imported users from Excel', ms:'Import pengguna dari Excel' },
+        activity_clear: { icon:'fa-broom', bg:'#002D62', en:'Cleared activity log', ms:'Kosongkan log aktiviti' },
+        role_change: { icon:'fa-user-shield', bg:'#9B26B6', en:'Changed system role', ms:'Tukar peranan sistem' }
     };
 
     /* =========================================================
@@ -764,157 +1169,46 @@
     ========================================================== */
     const i18n = {
         en: {
-            nav_faculty:"FAKULTI", nav_dept:"KEJURUTERAAN KIMIA", nav_back:"Back to Admin Portal",
-            hero_tag:"User Directory", hero_title:"User Management", hero_sub:"Portal Accounts",
-            hero_accounts:"accounts", hero_today:"Today", hero_hint:"Tip",
-            hero_hint_val:"Click any row to view password",
-            stat_total:"Total Accounts", stat_students:"Students", stat_staff:"Staff", stat_admins:"Administrators",
-            users_label:"Directory", users_title:"Portal Accounts",
-            users_sub:"Create, edit and manage access for all portal users",
-            users_search_ph:"Search name, email or ID...", filter_all:"All Roles",
-            role_student:"Student", role_academic:"Academic Staff", role_lab:"Lab Staff",
-            role_coordinator:"Coordinator", role_admin:"Administrator", role_admin_short:"Admin",
-            status_active:"Active", status_inactive:"Inactive",
-            btn_add:"Add User", btn_import:"Excel", btn_cancel:"Cancel", btn_save:"Save User", btn_close:"Close",
-            th_user:"User", th_userid:"User ID", th_role:"Role", th_program:"Program / Department",
-            th_session:"Session ID", th_status:"Status", th_actions:"Actions",
-            th_name_short:"Name", th_password:"Password", th_email:"Email",
-            showing:"Showing", of:"of", accounts:"accounts",
-            click_hint:"Click row to view password",
-            no_results:"No accounts match your filters",
-            confirm_delete:"Delete this user account permanently?",
-            modal_sub:"Manage portal account details",
-            modal_add:"Add New User", modal_edit:"Edit User",
-            modal_avatar_hint:"Avatar initials auto-generated", modal_avatar_sub:"Preview updates as you type",
-            field_userid:"User ID", field_session:"Session ID (Auto)",
-            field_name:"Full Name", field_email:"Email", field_role:"Role", field_status:"Status",
-            field_program:"Program / Department", field_password:"Password",
-            err_name:"Please enter the user's full name.", err_email:"Please enter a valid email address.",
-            pwd_modal_title:"Reset Password", pwd_modal_sub:"Set a new password for this account",
-            pwd_actor_title:"Action will be logged", pwd_actor_sub:"This password change will be recorded under:",
-            pwd_info_title:"Set New Password",
-            pwd_info_sub:"Minimum 8 characters · 1 uppercase · 1 lowercase · 1 number",
-            pwd_new:"New Password", pwd_confirm:"Confirm New Password", pwd_strength_label:"Strength",
-            pwd_strength_weak:"Weak", pwd_strength_medium:"Medium", pwd_strength_strong:"Strong",
-            pwd_btn_reset:"Reset Password",
-            pwd_err_empty:"Please fill in both password fields.",
-            pwd_err_short:"Password must be at least 8 characters.",
-            pwd_err_upper:"Password must contain an uppercase letter.",
-            pwd_err_lower:"Password must contain a lowercase letter.",
-            pwd_err_number:"Password must contain a number.",
-            pwd_err_match:"Passwords do not match.",
-            pwd_reveal_title:"View Password",
-            pwd_reveal_sub:"Plaintext password for this account",
-            pwd_reveal_label:"Password",
-            pwd_reveal_show:"Show",
-            pwd_reveal_hide:"Hide",
-            pwd_reveal_copy:"Copy",
-            pwd_reveal_copied:"Password copied",
-            pwd_reveal_unavailable:"Password not recoverable — use \"Reset Password\" to set a new one.",
-            pwd_reveal_reset:"Reset Password Now",
-            pwd_reveal_loading:"Loading…",
-            pwd_reveal_error:"Could not reach server. Try again.",
-            bulk_title:"Bulk Import Users", bulk_sub:"Import accounts from Excel file",
-            bulk_format_title:"Excel Column Format",
-            bulk_format_sub:"Role Detected: STUDENT, ACADEMIC_STAFF, LAB_STAFF, COORDINATOR, ADMIN · Status: Aktif / Tidak Aktif · User ID & Password auto-generate if empty · Session ID auto-generated by system",
-            bulk_download:"Download Template", bulk_choose:"Choose File",
-            bulk_preview:"Preview", bulk_rows:"rows", bulk_clear:"Clear", bulk_confirm:"Import",
-            bulk_no_data:"No valid data to import.",
-            toast_added:"User Created", toast_updated:"User Updated",
-            toast_deleted:"User Deleted", toast_pwd_reset:"Password Reset",
-            toast_imported:"Users Imported", toast_template:"Template Downloaded",
-            toast_by:"by",
-            audit_label:"Audit Trail", audit_title:"Activity Log",
-            audit_sub:"All administrative actions recorded with actor information",
-            audit_records:"records", audit_clear:"Clear", audit_empty:"No activity recorded yet",
-            audit_confirm_clear:"Clear the entire activity log?",
-            audit_actor:"Performed by", audit_cleared:"Activity Log Cleared",
-            footer_desc:"Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.",
-            footer_quick_links:"Quick Links", footer_dashboard:"Admin Dashboard",
-            footer_lab_dir:"Lab Directory", footer_safety_manual:"Safety Manual",
-            footer_equipment_log:"Equipment Log", footer_contact:"Contact",
-            footer_contact_heading:"UiTM Cawangan Johor",
-            footer_address:"Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
-            footer_copyright:"© 2026 FKK UiTM Johor. All Rights Reserved.",
-            footer_privacy:"Privacy Policy", footer_terms:"Terms of Use"
+            role_student:"Student",
+            role_pensyarah:"Lecturer", role_pensyarah_kanan:"Senior Lecturer",
+            role_profesor:"Professor", role_profesor_madya:"Associate Professor",
+            role_pegawai_sains:"Science Officer", role_penolong_pegawai_sains:"Assistant Science Officer",
+            role_pembantu_makmal:"Laboratory Assistant", role_pembantu_makmal_kanan:"Senior Laboratory Assistant",
+            role_jurutera:"Engineer", role_penolong_jurutera:"Assistant Engineer",
+            role_penolong_jurutera_kanan:"Senior Assistant Engineer",
+            role_admin:"AJK Safety", role_ajk_obe:"AJK OBE",
+            role_pensyarah_sumber:"Pensyarah Sumber",
+            role_lecturer_in_charge:"Lecturer in Charge",
+            role_penasihat_akademik:"Penasihat Akademik",
+            role_academic:"Academic Staff", role_lab:"Lab Staff", role_coordinator:"Coordinator",
+            group_student:"Student", group_academic:"Academic Positions",
+            group_science:"Science & Laboratory Positions", group_engineering:"Engineering Positions",
+            group_admin:"Administrator", group_legacy:"Legacy Role",
+            sysrole_student:"Student", sysrole_staff:"Staff", sysrole_ajk:"AJK Safety",
+            audit_actor:"Performed by"
         },
         ms: {
-            nav_faculty:"FAKULTI", nav_dept:"KEJURUTERAAN KIMIA", nav_back:"Kembali ke Portal Admin",
-            hero_tag:"Direktori Pengguna", hero_title:"Pengurusan Pengguna", hero_sub:"Akaun Portal",
-            hero_accounts:"akaun", hero_today:"Hari Ini", hero_hint:"Petua",
-            hero_hint_val:"Klik mana-mana baris untuk lihat kata laluan",
-            stat_total:"Jumlah Akaun", stat_students:"Pelajar", stat_staff:"Staf", stat_admins:"Pentadbir",
-            users_label:"Direktori", users_title:"Akaun Portal",
-            users_sub:"Cipta, sunting dan urus akses semua pengguna portal",
-            users_search_ph:"Cari nama, e-mel atau ID...", filter_all:"Semua Peranan",
-            role_student:"Pelajar", role_academic:"Staf Akademik", role_lab:"Staf Makmal",
-            role_coordinator:"Penyelaras", role_admin:"Pentadbir", role_admin_short:"Admin",
-            status_active:"Aktif", status_inactive:"Tidak Aktif",
-            btn_add:"Tambah Pengguna", btn_import:"Excel", btn_cancel:"Batal", btn_save:"Simpan Pengguna", btn_close:"Tutup",
-            th_user:"Pengguna", th_userid:"ID Pengguna", th_role:"Peranan", th_program:"Program / Jabatan",
-            th_session:"ID Sesi", th_status:"Status", th_actions:"Tindakan",
-            th_name_short:"Nama", th_password:"Kata Laluan", th_email:"E-mel",
-            showing:"Memaparkan", of:"daripada", accounts:"akaun",
-            click_hint:"Klik baris untuk lihat kata laluan",
-            no_results:"Tiada akaun sepadan dengan penapis anda",
-            confirm_delete:"Padam akaun pengguna ini secara kekal?",
-            modal_sub:"Urus butiran akaun portal",
-            modal_add:"Tambah Pengguna Baharu", modal_edit:"Sunting Pengguna",
-            modal_avatar_hint:"Inisial avatar dijana automatik", modal_avatar_sub:"Pratonton dikemas kini semasa anda menaip",
-            field_userid:"ID Pengguna", field_session:"ID Sesi (Auto)",
-            field_name:"Nama Penuh", field_email:"E-mel", field_role:"Peranan", field_status:"Status",
-            field_program:"Program / Jabatan", field_password:"Kata Laluan",
-            err_name:"Sila masukkan nama penuh pengguna.", err_email:"Sila masukkan alamat e-mel yang sah.",
-            pwd_modal_title:"Set Semula Kata Laluan", pwd_modal_sub:"Tetapkan kata laluan baharu untuk akaun ini",
-            pwd_actor_title:"Tindakan akan direkodkan", pwd_actor_sub:"Perubahan kata laluan ini akan direkodkan di bawah:",
-            pwd_info_title:"Tetapkan Kata Laluan Baharu",
-            pwd_info_sub:"Minimum 8 aksara · 1 huruf besar · 1 huruf kecil · 1 nombor",
-            pwd_new:"Kata Laluan Baharu", pwd_confirm:"Sahkan Kata Laluan", pwd_strength_label:"Kekuatan",
-            pwd_strength_weak:"Lemah", pwd_strength_medium:"Sederhana", pwd_strength_strong:"Kukuh",
-            pwd_btn_reset:"Set Semula Kata Laluan",
-            pwd_err_empty:"Sila isi kedua-dua medan kata laluan.",
-            pwd_err_short:"Kata laluan mestilah sekurang-kurangnya 8 aksara.",
-            pwd_err_upper:"Kata laluan mesti mengandungi huruf besar.",
-            pwd_err_lower:"Kata laluan mesti mengandungi huruf kecil.",
-            pwd_err_number:"Kata laluan mesti mengandungi nombor.",
-            pwd_err_match:"Kata laluan tidak sepadan.",
-            pwd_reveal_title:"Lihat Kata Laluan",
-            pwd_reveal_sub:"Kata laluan teks biasa untuk akaun ini",
-            pwd_reveal_label:"Kata Laluan",
-            pwd_reveal_show:"Tunjuk",
-            pwd_reveal_hide:"Sembunyi",
-            pwd_reveal_copy:"Salin",
-            pwd_reveal_copied:"Kata laluan disalin",
-            pwd_reveal_unavailable:"Kata laluan tidak boleh dipulihkan — guna \"Set Semula Kata Laluan\" untuk yang baharu.",
-            pwd_reveal_reset:"Set Semula Kata Laluan Sekarang",
-            pwd_reveal_loading:"Memuatkan…",
-            pwd_reveal_error:"Tidak dapat hubungi pelayan. Cuba lagi.",
-            bulk_title:"Import Pengguna Pukal", bulk_sub:"Import akaun dari fail Excel",
-            bulk_format_title:"Format Lajur Excel",
-            bulk_format_sub:"Role Detected: STUDENT, ACADEMIC_STAFF, LAB_STAFF, COORDINATOR, ADMIN · Status: Aktif / Tidak Aktif · User ID & Password dijana automatik jika kosong · ID Sesi dijana automatik oleh sistem",
-            bulk_download:"Muat Turun Template", bulk_choose:"Pilih Fail",
-            bulk_preview:"Pratonton", bulk_rows:"baris", bulk_clear:"Kosongkan", bulk_confirm:"Import",
-            bulk_no_data:"Tiada data sah untuk diimport.",
-            toast_added:"Pengguna Dicipta", toast_updated:"Pengguna Dikemas Kini",
-            toast_deleted:"Pengguna Dipadam", toast_pwd_reset:"Kata Laluan Ditetapkan Semula",
-            toast_imported:"Pengguna Diimport", toast_template:"Template Dimuat Turun", toast_by:"oleh",
-            audit_label:"Jejak Audit", audit_title:"Log Aktiviti",
-            audit_sub:"Semua tindakan pentadbiran direkodkan bersama maklumat pelaku",
-            audit_records:"rekod", audit_clear:"Kosongkan", audit_empty:"Tiada aktiviti direkodkan lagi",
-            audit_confirm_clear:"Kosongkan keseluruhan log aktiviti?",
-            audit_actor:"Dilakukan oleh", audit_cleared:"Log Aktiviti Dikosongkan",
-            footer_desc:"Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Berdedikasi untuk kecemerlangan akademik dan inovasi industri.",
-            footer_quick_links:"Pautan Pantas", footer_dashboard:"Dashboard Admin",
-            footer_lab_dir:"Direktori Makmal", footer_safety_manual:"Manual Keselamatan",
-            footer_equipment_log:"Log Peralatan", footer_contact:"Hubungi",
-            footer_contact_heading:"UiTM Cawangan Johor",
-            footer_address:"Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
-            footer_copyright:"© 2026 FKK UiTM Johor. Hak Cipta Terpelihara.",
-            footer_privacy:"Dasar Privasi", footer_terms:"Terma Penggunaan"
+            role_student:"Pelajar",
+            role_pensyarah:"Pensyarah", role_pensyarah_kanan:"Pensyarah Kanan",
+            role_profesor:"Profesor", role_profesor_madya:"Profesor Madya",
+            role_pegawai_sains:"Pegawai Sains", role_penolong_pegawai_sains:"Penolong Pegawai Sains",
+            role_pembantu_makmal:"Pembantu Makmal", role_pembantu_makmal_kanan:"Pembantu Makmal Kanan",
+            role_jurutera:"Jurutera", role_penolong_jurutera:"Penolong Jurutera",
+            role_penolong_jurutera_kanan:"Penolong Jurutera Kanan",
+            role_admin:"AJK Keselamatan", role_ajk_obe:"AJK OBE",
+            role_pensyarah_sumber:"Pensyarah Sumber",
+            role_lecturer_in_charge:"Pensyarah Bertanggungjawab",
+            role_penasihat_akademik:"Penasihat Akademik",
+            role_academic:"Staf Akademik", role_lab:"Staf Makmal", role_coordinator:"Penyelaras",
+            group_student:"Pelajar", group_academic:"Jawatan Akademik",
+            group_science:"Jawatan Sains & Makmal", group_engineering:"Jawatan Kejuruteraan",
+            group_admin:"Pentadbir", group_legacy:"Peranan Lama",
+            sysrole_student:"Pelajar", sysrole_staff:"Staf", sysrole_ajk:"AJK Keselamatan",
+            audit_actor:"Dilakukan oleh"
         }
     };
-
-    function t(key) { return (i18n[currentLang] && i18n[currentLang][key]) || key; }
+    function t(key) { return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.en && i18n.en[key]) || key; }
+    function roleLabel(role) { return t(roleMeta(role).i18n); }
 
     /* =========================================================
        UTILITIES
@@ -939,9 +1233,8 @@
         const base = clean.length >= 4 ? clean : clean.padEnd(4, 'x');
         return base + '123';
     }
-    function getSessionPrefix(role) { return (ROLE_META[role] || ROLE_META.student).prefix; }
     function autoGenerateSessionIdHint(role) {
-        const prefix = getSessionPrefix(role);
+        const prefix = roleMeta(role).prefix;
         let maxNum = 0;
         appState.users.forEach(function(u){
             if (!u.sessionId) return;
@@ -953,29 +1246,154 @@
         });
         return prefix + '-' + String(maxNum + 1).padStart(4, '0') + ' (auto)';
     }
-    function roleLabel(role) { return t((ROLE_META[role] || ROLE_META.student).i18n); }
+    function debounce(fn, wait) {
+        let timer = null;
+        return function() {
+            const args = arguments, ctx = this;
+            clearTimeout(timer);
+            timer = setTimeout(function(){ fn.apply(ctx, args); }, wait);
+        };
+    }
 
     /* =========================================================
-       LOAD STATE
+       SKELETONS
     ========================================================== */
-    async function loadStateFromApi() {
-        setServerStatus('loading', 'Loading…');
-        try {
-            const results = await Promise.all([ apiGet('getUsers'), apiGet('getActivity', { limit: ACTIVITY_LIMIT }) ]);
-            const usersRes = results[0], logsRes = results[1];
-            appState.users = (usersRes && usersRes.success && Array.isArray(usersRes.users)) ? usersRes.users : [];
-            appState.auditLogs = (logsRes && logsRes.success && Array.isArray(logsRes.logs)) ? logsRes.logs.slice(0, ACTIVITY_LIMIT) : [];
-            setServerStatus('ok', 'Online');
-            renderUsers();
-            renderActivity();
-        } catch (err) {
-            console.error('loadStateFromApi', err);
-            setServerStatus('err', 'Offline');
-            showToast('Failed to reach server', true);
-            renderUsers();
-            renderActivity();
+    function skeletonUsersRows(count) {
+        count = count || 5;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += '<tr class="skeleton-row">'
+                + '<td><div class="tbl-user"><span class="skel skel-avatar"></span><div style="flex:1;min-width:0;">'
+                +   '<div class="skel skel-line w-60" style="margin-bottom:6px;"></div>'
+                +   '<div class="skel skel-line sm w-80"></div>'
+                + '</div></div></td>'
+                + '<td><span class="skel skel-badge"></span></td>'
+                + '<td><span class="skel skel-chip"></span></td>'
+                + '<td><div class="skel skel-line w-60"></div></td>'
+                + '<td><span class="skel skel-badge"></span></td>'
+                + '<td><span class="skel skel-pill"></span></td>'
+                + '<td style="text-align:right;"><span class="skel skel-line w-30" style="display:inline-block;"></span></td>'
+                + '</tr>';
         }
+        return html;
     }
+    function skeletonRolesRows(count) {
+        count = count || 4;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += '<tr class="skeleton-row">'
+                + '<td><div class="tbl-user"><span class="skel skel-avatar"></span><div style="flex:1;min-width:0;">'
+                +   '<div class="skel skel-line w-60" style="margin-bottom:6px;"></div>'
+                +   '<div class="skel skel-line sm w-80"></div>'
+                + '</div></div></td>'
+                + '<td><span class="skel skel-pill"></span></td>'
+                + '<td><span class="skel skel-badge" style="width:160px;height:34px;"></span></td>'
+                + '<td style="text-align:right;"><span class="skel skel-badge"></span></td>'
+                + '</tr>';
+        }
+        return html;
+    }
+    function skeletonActivity(count) {
+        count = count || 4;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += '<div class="activity-skel">'
+                + '<div class="icon-sk"></div>'
+                + '<div style="flex:1;min-width:0;padding-top:4px;">'
+                +   '<div class="skel skel-line w-60" style="margin-bottom:8px;"></div>'
+                +   '<div class="skel skel-line sm w-40" style="margin-bottom:6px;"></div>'
+                +   '<div class="skel skel-line sm w-30"></div>'
+                + '</div>'
+                + '</div>';
+        }
+        return html;
+    }
+    function showSkeletons() {
+        const usersTbody = document.getElementById('usersTbody');
+        const rolesTbody = document.getElementById('rolesTbody');
+        const activityTl = document.getElementById('activityTimeline');
+        if (usersTbody) usersTbody.innerHTML = skeletonUsersRows(6);
+        if (rolesTbody) rolesTbody.innerHTML = skeletonRolesRows(5);
+        if (activityTl) activityTl.innerHTML = skeletonActivity(4);
+    }
+
+    /* =========================================================
+       LOAD STATE FROM API
+    ========================================================== */
+    let inFlightLoad = null;
+    async function loadStateFromApi(opts) {
+        opts = opts || {};
+        const force = !!opts.force;
+        if (inFlightLoad) return inFlightLoad;
+
+        if (!force) {
+            const cachedUsers = cacheRead(CACHE_KEY_USERS);
+            const cachedLogs  = cacheRead(CACHE_KEY_LOGS);
+            if (cachedUsers || cachedLogs) {
+                if (cachedUsers) appState.users = cachedUsers;
+                if (cachedLogs)  appState.auditLogs = cachedLogs;
+                setServerStatus('loading', 'Refreshing…');
+                renderUsers();
+                renderActivity();
+                renderRoleManagement();
+            } else {
+                showSkeletons();
+                showLoadingOverlay('Loading users…', 'Fetching from server');
+                setServerStatus('loading', 'Loading…');
+            }
+            const freshUsers = cacheRead(CACHE_KEY_USERS);
+            const freshLogs  = cacheRead(CACHE_KEY_LOGS);
+            if (freshUsers && freshLogs) {
+                setServerStatus('ok', 'Online (cached)');
+                hideLoadingOverlay();
+                return;
+            }
+        } else {
+            setServerStatus('loading', 'Loading…');
+        }
+
+        beginRequest();
+        const slowTimer = setTimeout(function(){
+            if (activeRequests > 0) loadingSub.textContent = 'Still loading… server is slow';
+        }, 4000);
+
+        inFlightLoad = (async function(){
+            const settled = await Promise.allSettled([
+                apiGet('getUsers'),
+                apiGet('getActivity', { limit: ACTIVITY_LIMIT })
+            ]);
+            let usersOk = false, logsOk = false;
+            if (settled[0].status === 'fulfilled' && settled[0].value && settled[0].value.success && Array.isArray(settled[0].value.users)) {
+                appState.users = settled[0].value.users;
+                cacheWrite(CACHE_KEY_USERS, appState.users);
+                usersOk = true;
+            }
+            if (settled[1].status === 'fulfilled' && settled[1].value && settled[1].value.success && Array.isArray(settled[1].value.logs)) {
+                appState.auditLogs = settled[1].value.logs.slice(0, ACTIVITY_LIMIT);
+                cacheWrite(CACHE_KEY_LOGS, appState.auditLogs);
+                logsOk = true;
+            }
+            if (usersOk && logsOk) setServerStatus('ok', 'Online');
+            else if (usersOk || logsOk) setServerStatus('ok', 'Partial');
+            else {
+                setServerStatus('err', 'Offline');
+                const staleUsers = cacheReadStale(CACHE_KEY_USERS);
+                const staleLogs  = cacheReadStale(CACHE_KEY_LOGS);
+                if (staleUsers) appState.users = staleUsers;
+                if (staleLogs)  appState.auditLogs = staleLogs;
+                showToast('Failed to reach server', true);
+            }
+            renderUsers();
+            renderActivity();
+            renderRoleManagement();
+            hideLoadingOverlay();
+            clearTimeout(slowTimer);
+            endRequest();
+            inFlightLoad = null;
+        })();
+        return inFlightLoad;
+    }
+
     function setServerStatus(state, label) {
         const chip = document.getElementById('serverStatusChip');
         const text = document.getElementById('serverStatusText');
@@ -990,75 +1408,7 @@
     }
 
     /* =========================================================
-       ACTIVITY
-    ========================================================== */
-    function relativeTime(iso) {
-        if (!iso) return '';
-        const diff = Date.now() - new Date(iso).getTime();
-        const sec = Math.max(0, Math.floor(diff / 1000));
-        if (sec < 45) return currentLang === 'ms' ? 'Baru sahaja' : 'Just now';
-        const min = Math.floor(sec / 60);
-        if (min < 60) return min + (currentLang === 'ms' ? ' min lalu' : 'm ago');
-        const hr = Math.floor(min / 60);
-        if (hr < 24) return hr + (currentLang === 'ms' ? ' jam lalu' : 'h ago');
-        const day = Math.floor(hr / 24);
-        if (day < 7) return day + (currentLang === 'ms' ? ' hari lalu' : 'd ago');
-        return new Date(iso).toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB', { day:'2-digit', month:'short', year:'numeric' });
-    }
-
-    function renderActivity() {
-        const tl = document.getElementById('activityTimeline');
-        const countEl = document.getElementById('activityCount');
-        const logs = appState.auditLogs || [];
-        if (countEl) countEl.textContent = logs.length;
-        if (!tl) return;
-        if (!logs.length) {
-            tl.innerHTML = '<div class="activity-empty"><i class="fas fa-clock-rotate-left"></i><p class="text-xs font-bold uppercase tracking-widest">' + escapeHtml(t('audit_empty')) + '</p></div>';
-            return;
-        }
-        tl.innerHTML = logs.map(function(a){
-            const meta = ACTIVITY_TYPES[a.type] || ACTIVITY_TYPES.user_add;
-            const label = currentLang === 'ms' ? meta.ms : meta.en;
-            const entityHtml = a.entity ? ' <span class="activity-entity">· ' + escapeHtml(a.entity) + '</span>' : '';
-            const detailHtml = a.detail ? '<p class="activity-detail">' + escapeHtml(a.detail) + '</p>' : '';
-            const actorHtml = a.actor ? '<div class="activity-actor"><i class="fas fa-user-shield"></i> ' + escapeHtml(t('audit_actor')) + ': ' + escapeHtml(a.actor) + '</div>' : '';
-            return '<div class="activity-item"><div class="activity-icon" style="background:' + meta.bg + ';"><i class="fas ' + meta.icon + '"></i></div><div class="activity-content"><p class="activity-title">' + escapeHtml(label) + entityHtml + '</p>' + detailHtml + actorHtml + '<p class="activity-time"><i class="far fa-clock"></i> ' + escapeHtml(relativeTime(a.timestamp)) + '</p></div></div>';
-        }).join('');
-    }
-
-    document.getElementById('clearActivityBtn').addEventListener('click', async function () {
-        if (!(appState.auditLogs && appState.auditLogs.length)) return;
-        if (!confirm(t('audit_confirm_clear'))) return;
-        try {
-            const res = await apiPost({ action: 'clearActivity', actor: currentAdmin.name, actorId: currentAdmin.id, actorRole: currentAdmin.role });
-            if (!res || !res.success) { showToast((res && res.message) || 'Clear failed', true); return; }
-            await loadStateFromApi();
-            showToast(t('audit_cleared'), true);
-        } catch (e) { console.error(e); showToast('Network error', true); }
-    });
-
-    /* =========================================================
-       LANGUAGE
-    ========================================================== */
-    window.switchLanguage = function (lang) {
-        currentLang = lang;
-        document.querySelectorAll('[data-i18n]').forEach(function(el){
-            const key = el.getAttribute('data-i18n');
-            if (i18n[lang] && i18n[lang][key] !== undefined) el.innerHTML = i18n[lang][key];
-        });
-        document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
-            const key = el.getAttribute('data-i18n-ph');
-            if (i18n[lang] && i18n[lang][key]) el.setAttribute('placeholder', i18n[lang][key]);
-        });
-        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-        document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
-        renderUsers();
-        renderActivity();
-        updateStrength('newPwd', 'pwdStrengthText', ['pseg1','pseg2','pseg3','pseg4']);
-    };
-
-    /* =========================================================
-       RENDER USERS
+       RENDER USERS (Portal Accounts)
     ========================================================== */
     function renderUsers() {
         const tbody = document.getElementById('usersTbody');
@@ -1073,7 +1423,10 @@
                 String(u.email || '').toLowerCase().indexOf(q) !== -1 ||
                 String(u.id + '').toLowerCase().indexOf(q) !== -1 ||
                 String(u.sessionId || '').toLowerCase().indexOf(q) !== -1;
-            const matchR = roleF === 'all' || u.role === roleF;
+            let matchR = true;
+            if (roleF === '__staff__') matchR = isStaffRole(u.role);
+            else if (roleF === '__admin__') matchR = isAdminRole(u.role);
+            else if (roleF !== 'all') matchR = (u.role === roleF);
             return matchQ && matchR;
         });
 
@@ -1083,28 +1436,30 @@
 
         document.getElementById('statTotal').textContent = appState.users.length;
         document.getElementById('statStudents').textContent = appState.users.filter(function(u){ return u.role === 'student'; }).length;
-        document.getElementById('statStaff').textContent = appState.users.filter(function(u){
-            return u.role === 'academic_staff' || u.role === 'lab_staff' || u.role === 'coordinator';
-        }).length;
-        document.getElementById('statAdmins').textContent = appState.users.filter(function(u){ return u.role === 'admin'; }).length;
+        document.getElementById('statStaff').textContent = appState.users.filter(function(u){ return isStaffRole(u.role); }).length;
+        document.getElementById('statAdmins').textContent = appState.users.filter(function(u){ return isAdminRole(u.role); }).length;
+        document.getElementById('heroTotalAdmins').textContent = appState.users.filter(function(u){ return isAdminRole(u.role); }).length;
 
         if (!filtered.length) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:34px;color:#94A3B8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;">'
-                + '<i class="fas fa-user-slash" style="display:block;font-size:22px;margin-bottom:10px;opacity:.4;"></i>' + escapeHtml(t('no_results')) + '</td></tr>';
+                + '<i class="fas fa-user-slash" style="display:block;font-size:22px;margin-bottom:10px;opacity:.4;"></i>No accounts match your filters</td></tr>';
             return;
         }
 
         tbody.innerHTML = filtered.map(function(u){
-            const rm = ROLE_META[u.role] || ROLE_META.student;
+            const rm = roleMeta(u.role);
             const initials = makeInitials(u.name);
             const statusCls = u.status === 'Aktif' ? 'status-ok' : 'status-warn';
-            return '<tr class="row-clickable" data-user-id="' + escapeHtml(String(u.id)) + '" title="' + escapeHtml(t('click_hint')) + '">'
+            const classChip = (u.role === 'penasihat_akademik' && u.assignedClass)
+                ? '<div><span class="class-chip"><i class="fas fa-chalkboard"></i> ' + escapeHtml(u.assignedClass) + '</span></div>'
+                : '';
+            return '<tr class="row-clickable content-in" data-user-id="' + escapeHtml(String(u.id)) + '" title="Click row to view password">'
                 + '<td><div class="tbl-user"><div class="tbl-avatar" style="background:' + rm.bg + ';">' + escapeHtml(initials) + '</div><div class="min-w-0">'
                 + '<p class="tbl-user-name">' + escapeHtml(u.name) + '<i class="fas fa-key key-hint"></i></p>'
                 + '<p class="tbl-user-mail">' + escapeHtml(u.email) + '</p>'
                 + '</div></div></td>'
                 + '<td><span class="badge-id">' + escapeHtml(String(u.id)) + '</span></td>'
-                + '<td><span class="chip ' + rm.chip + '">' + escapeHtml(roleLabel(u.role)) + '</span></td>'
+                + '<td><span class="chip ' + rm.chip + '">' + escapeHtml(roleLabel(u.role)) + '</span>' + classChip + '</td>'
                 + '<td style="color:#475569;font-size:11px;font-weight:700;">' + escapeHtml(u.program || '—') + '</td>'
                 + '<td><span class="badge-session">' + escapeHtml(u.sessionId || '—') + '</span></td>'
                 + '<td><span class="status-badge ' + statusCls + '">' + escapeHtml(u.status || 'Aktif') + '</span></td>'
@@ -1122,12 +1477,10 @@
                 openPasswordView(tr.dataset.userId);
             });
         });
-
         tbody.querySelectorAll('button[data-act]').forEach(function(btn){
             btn.addEventListener('click', function(e){
                 e.stopPropagation();
-                const act = btn.dataset.act;
-                const id = btn.dataset.id;
+                const act = btn.dataset.act, id = btn.dataset.id;
                 if (act === 'edit') openUserModal(id);
                 else if (act === 'pwd') openPwdModal(id);
                 else if (act === 'viewpwd') openPasswordView(id);
@@ -1136,15 +1489,301 @@
         });
     }
 
-    document.getElementById('userSearch').addEventListener('input', renderUsers);
+    document.getElementById('userSearch').addEventListener('input', debounce(renderUsers, 150));
     document.getElementById('roleFilter').addEventListener('change', renderUsers);
-    document.getElementById('refreshBtn').addEventListener('click', function(){
-        loadStateFromApi();
-        showToast('Refreshed from server', false);
+
+    document.getElementById('refreshBtn').addEventListener('click', async function(){
+        const btn = this;
+        const icon = btn.querySelector('i');
+        btn.disabled = true;
+        icon.classList.add('spin-icon');
+        try {
+            await loadStateFromApi({ force: true });
+            showToast('Refreshed from server', false);
+        } finally {
+            btn.disabled = false;
+            icon.classList.remove('spin-icon');
+        }
     });
 
     /* =========================================================
-       PASSWORD REVEAL MODAL — DEDICATED ENDPOINT
+       RENDER ROLE MANAGEMENT
+    ========================================================== */
+    function mapAuthIdentity(role) {
+        const identity = roleMeta(role).identity;
+        if (identity === 'lecturer') return { label: 'LECTURER', cls: 'identity-lecturer' };
+        if (identity === 'lab')      return { label: 'LAB STAFF', cls: 'identity-lab' };
+        if (identity === 'admin')    return { label: 'ADMIN', cls: 'identity-admin' };
+        return { label: 'STUDENT', cls: 'identity-student' };
+    }
+    function mapSystemRole(role) {
+        const sys = roleMeta(role).system;
+        if (sys === 'AJK Safety') return { label: sys, cls: 'role-badge-admin' };
+        if (sys === 'AJK OBE') return { label: sys, cls: 'role-badge-admin-obe' };
+        if (sys === 'Pensyarah Sumber') return { label: sys, cls: 'role-badge-admin-sumber' };
+        if (sys === 'Lecturer in Charge') return { label: sys, cls: 'role-badge-admin-lic' };
+        if (sys === 'Penasihat Akademik') return { label: sys, cls: 'role-badge-admin-pa' };
+        if (sys === 'Staff') return { label: sys, cls: 'role-badge-staff' };
+        return { label: sys, cls: 'role-badge-student' };
+    }
+
+    function renderRoleManagement() {
+        const tbody = document.getElementById('rolesTbody');
+        if (!tbody) return;
+
+        const users = appState.users || [];
+
+        const counts = {
+            ajk: users.filter(function(u){ return u.role === 'admin'; }).length,
+            obe: users.filter(function(u){ return u.role === 'ajk_obe'; }).length,
+            sumber: users.filter(function(u){ return u.role === 'pensyarah_sumber'; }).length,
+            lic: users.filter(function(u){ return u.role === 'lecturer_in_charge'; }).length,
+            pa: users.filter(function(u){ return u.role === 'penasihat_akademik'; }).length
+        };
+        const cAjk = document.getElementById('count-ajk'); if (cAjk) cAjk.textContent = counts.ajk;
+        const cObe = document.getElementById('count-obe'); if (cObe) cObe.textContent = counts.obe;
+        const cSumber = document.getElementById('count-sumber'); if (cSumber) cSumber.textContent = counts.sumber;
+        const cLic = document.getElementById('count-lic'); if (cLic) cLic.textContent = counts.lic;
+        const cPa = document.getElementById('count-pa'); if (cPa) cPa.textContent = counts.pa;
+
+        const searchInput = document.getElementById('roleSearch');
+        const searchQ = (searchInput ? searchInput.value : '').trim().toLowerCase();
+        const filtered = users.filter(function(u){
+            return !searchQ ||
+                String(u.name || '').toLowerCase().indexOf(searchQ) !== -1 ||
+                String(u.email || '').toLowerCase().indexOf(searchQ) !== -1;
+        });
+
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:26px;color:#94A3B8;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;">'
+                + '<i class="fas fa-user-slash" style="display:block;font-size:20px;margin-bottom:8px;opacity:.4;"></i>No users to display</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(function(u){
+            const auth = mapAuthIdentity(u.role);
+            const sys = mapSystemRole(u.role);
+            const meta = roleMeta(u.role);
+            const initials = makeInitials(u.name);
+            const classChip = (u.role === 'penasihat_akademik' && u.assignedClass)
+                ? '<div><span class="class-chip"><i class="fas fa-chalkboard"></i> ' + escapeHtml(u.assignedClass) + '</span></div>'
+                : '';
+            return '<tr class="content-in">'
+                + '<td>'
+                +   '<div class="flex items-center gap-3">'
+                +     '<div class="tbl-avatar" style="background:' + meta.bg + ';">' + escapeHtml(initials) + '</div>'
+                +     '<div class="min-w-0">'
+                +       '<p class="text-xs font-black text-p655c">' + escapeHtml(u.name) + '</p>'
+                +       '<p class="text-[10px] font-semibold text-slate-400 truncate">' + escapeHtml(u.email || '') + '</p>'
+                +     '</div>'
+                +   '</div>'
+                + '</td>'
+                + '<td><span class="identity-pill ' + auth.cls + '">' + auth.label + '</span></td>'
+                + '<td>'
+                +   '<select class="field-input role-select-custom" style="padding:7px 30px 7px 12px;font-size:11px;width:100%;max-width:260px;min-width:180px;" '
+                +           'data-user-id="' + escapeHtml(String(u.id)) + '">'
+                +     buildRoleOptions(u.role)
+                +   '</select>'
+                +   classChip
+                + '</td>'
+                + '<td style="text-align:right;">'
+                +   '<span class="role-badge ' + sys.cls + '">' + sys.label + '</span>'
+                + '</td>'
+                + '</tr>';
+        }).join('');
+
+        tbody.querySelectorAll('select[data-user-id]').forEach(function(sel){
+            sel.addEventListener('change', function(){
+                const userId = sel.getAttribute('data-user-id');
+                const newRole = sel.value;
+                handleSystemRoleChange(userId, newRole, sel);
+            });
+        });
+    }
+
+    const roleSearchEl = document.getElementById('roleSearch');
+    if (roleSearchEl) roleSearchEl.addEventListener('input', debounce(renderRoleManagement, 180));
+
+    /* =========================================================
+       ROLE CHANGE FLOW (Role Management table)
+    ========================================================== */
+    function handleSystemRoleChange(userId, newRole, selectEl) {
+        const user = appState.users.find(function(u){ return String(u.id) === String(userId); });
+        if (!user) return;
+        const previousRole = user.role;
+        if (newRole === previousRole) return;
+
+        // ⭐ Penasihat Akademik needs class assignment
+        if (newRole === 'penasihat_akademik') {
+            pendingRoleChange = { userId: userId, newRole: newRole, previousRole: previousRole, selectEl: selectEl };
+            openClassModal(user, function(assignedClass) {
+                performRoleChange(userId, newRole, previousRole, selectEl, assignedClass);
+            });
+            return;
+        }
+        performRoleChange(userId, newRole, previousRole, selectEl, null);
+    }
+
+    async function performRoleChange(userId, newRole, previousRole, selectEl, assignedClass) {
+        const user = appState.users.find(function(u){ return String(u.id) === String(userId); });
+        if (!user) return;
+
+        user.role = newRole;
+        if (assignedClass !== null && assignedClass !== undefined) {
+            user.assignedClass = assignedClass;
+        } else if (newRole !== 'penasihat_akademik') {
+            delete user.assignedClass;
+        }
+        cacheWrite(CACHE_KEY_USERS, appState.users);
+
+        if (selectEl) selectEl.disabled = true;
+        setServerStatus('loading', 'Saving…');
+        beginRequest();
+
+        try {
+            const payload = {
+                action: 'editUser',
+                id: user.id, name: user.name, email: user.email,
+                role: newRole, program: user.program || '',
+                status: user.status || 'Aktif', password: ''
+            };
+            if (newRole === 'penasihat_akademik') {
+                payload.assignedClass = assignedClass || user.assignedClass || '';
+            } else {
+                payload.assignedClass = '';
+            }
+            const res = await apiPost(payload);
+            if (!res || !res.success) {
+                user.role = previousRole;
+                if (newRole === 'penasihat_akademik' && previousRole !== 'penasihat_akademik') delete user.assignedClass;
+                cacheWrite(CACHE_KEY_USERS, appState.users);
+                if (selectEl) selectEl.value = previousRole;
+                showToast((res && res.message) || 'Failed to update role', true);
+                setServerStatus('err', 'Error');
+            } else {
+                showToast('Role updated to ' + roleLabel(newRole), false);
+                setServerStatus('ok', 'Online');
+                logActivity('role_change', user.name, 'System role → ' + roleLabel(newRole));
+            }
+        } catch (err) {
+            console.error('performRoleChange error:', err);
+            user.role = previousRole;
+            if (newRole === 'penasihat_akademik' && previousRole !== 'penasihat_akademik') delete user.assignedClass;
+            cacheWrite(CACHE_KEY_USERS, appState.users);
+            if (selectEl) selectEl.value = previousRole;
+            showToast('Network error. Change reverted.', true);
+            setServerStatus('err', 'Error');
+        } finally {
+            if (selectEl) selectEl.disabled = false;
+            endRequest();
+            renderUsers();
+            renderRoleManagement();
+        }
+    }
+
+    /* =========================================================
+       CLASS ASSIGNMENT MODAL
+    ========================================================== */
+    const classModal = document.getElementById('classModal');
+    const classUserCard = document.getElementById('classUserCard');
+    const classInput = document.getElementById('classInput');
+    const classError = document.getElementById('classError');
+    const classQuickPicks = document.getElementById('classQuickPicks');
+    const classSaveBtn = document.getElementById('classSave');
+    const classCancelBtn = document.getElementById('classCancel');
+    const classModalClose = document.getElementById('classModalClose');
+    const QUICK_CLASSES = ['DKA1A','DKA1B','DKA2A','DKA2B','DKA3A','DKA3B','DKA4A','DKA4B','DKA5A','DKA5B'];
+    let classModalCallback = null;
+
+    function buildQuickPicks() {
+        classQuickPicks.innerHTML = QUICK_CLASSES.map(function(c){
+            return '<button type="button" class="quick-pick" data-class="' + c + '">' + c + '</button>';
+        }).join('');
+        classQuickPicks.querySelectorAll('.quick-pick').forEach(function(btn){
+            btn.addEventListener('click', function(){
+                const val = this.getAttribute('data-class');
+                const current = classInput.value.trim();
+                let parts = current ? current.split(',').map(function(s){ return s.trim().toUpperCase(); }).filter(Boolean) : [];
+                if (parts.indexOf(val) === -1) parts.push(val);
+                classInput.value = parts.join(', ');
+                this.classList.add('active');
+                hideClassError();
+            });
+        });
+    }
+
+    function openClassModal(user, callback) {
+        classModalCallback = callback;
+        classUserCard.innerHTML = ''
+            + '<div class="flex items-center gap-3">'
+            +   '<div class="tbl-avatar" style="background:#BE185D;width:44px;height:44px;border-radius:12px;font-size:13px;">' + escapeHtml(makeInitials(user.name)) + '</div>'
+            +   '<div class="min-w-0">'
+            +     '<div class="font-bold text-p655c text-sm">' + escapeHtml(user.name) + '</div>'
+            +     '<div class="text-slate-500 text-xs truncate">' + escapeHtml(user.email || '') + '</div>'
+            +   '</div>'
+            + '</div>';
+        classInput.value = user.assignedClass || '';
+        classInput.classList.remove('is-invalid');
+        hideClassError();
+        classQuickPicks.querySelectorAll('.quick-pick').forEach(function(b){ b.classList.remove('active'); });
+        if (classInput.value) {
+            const parts = classInput.value.split(',').map(function(s){ return s.trim().toUpperCase(); });
+            classQuickPicks.querySelectorAll('.quick-pick').forEach(function(b){
+                if (parts.indexOf(b.getAttribute('data-class')) !== -1) b.classList.add('active');
+            });
+        }
+        classModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(function(){ classInput.focus(); }, 120);
+    }
+    function closeClassModal() {
+        classModal.classList.remove('open');
+        document.body.style.overflow = '';
+        classModalCallback = null;
+        pendingRoleChange = null;
+    }
+    function showClassError(msg) {
+        classError.innerHTML = '<ul><li>' + escapeHtml(msg) + '</li></ul>';
+        classError.classList.add('show');
+    }
+    function hideClassError() { classError.classList.remove('show'); }
+
+    classModalClose.addEventListener('click', function(){
+        if (pendingRoleChange && pendingRoleChange.selectEl) pendingRoleChange.selectEl.value = pendingRoleChange.previousRole;
+        closeClassModal();
+    });
+    classCancelBtn.addEventListener('click', function(){
+        if (pendingRoleChange && pendingRoleChange.selectEl) pendingRoleChange.selectEl.value = pendingRoleChange.previousRole;
+        closeClassModal();
+    });
+    classModal.addEventListener('click', function(e){
+        if (e.target === classModal) {
+            if (pendingRoleChange && pendingRoleChange.selectEl) pendingRoleChange.selectEl.value = pendingRoleChange.previousRole;
+            closeClassModal();
+        }
+    });
+    classInput.addEventListener('input', function(){
+        this.classList.remove('is-invalid');
+        hideClassError();
+    });
+    classSaveBtn.addEventListener('click', function(){
+        const raw = classInput.value.trim().toUpperCase();
+        if (!raw) {
+            classInput.classList.add('is-invalid');
+            showClassError('Please assign at least one class for Penasihat Akademik.');
+            return;
+        }
+        const parts = raw.split(',').map(function(s){ return s.trim().toUpperCase(); }).filter(Boolean);
+        const unique = [];
+        parts.forEach(function(p){ if (unique.indexOf(p) === -1) unique.push(p); });
+        const normalized = unique.join(', ');
+        const cb = classModalCallback;
+        closeClassModal();
+        if (cb) cb(normalized);
+    });
+
+    /* =========================================================
+       PASSWORD VIEW MODAL
     ========================================================== */
     const pwdViewModal = document.getElementById('pwdViewModal');
     const pwdDisplay = document.getElementById('pwdDisplay');
@@ -1152,156 +1791,98 @@
     const pwdViewCopy = document.getElementById('pwdViewCopy');
     const pwdViewWarn = document.getElementById('pwdViewWarn');
     const pwdViewResetBtn = document.getElementById('pwdViewResetBtn');
-
     let pwdViewState = { revealed: false, value: '', userId: null };
 
     async function openPasswordView(userId) {
         const u = appState.users.find(function(x){ return String(x.id) === String(userId); });
         if (!u) return;
-
-        pwdViewState.userId = userId;
-        pwdViewState.revealed = false;
-        pwdViewState.value = '';
-
+        pwdViewState = { revealed: false, value: '', userId: userId };
         document.getElementById('pwdViewUser').innerHTML = ''
             + '<div class="flex items-center gap-3">'
-            +   '<div class="tbl-avatar" style="background:' + (ROLE_META[u.role] || ROLE_META.student).bg + ';width:44px;height:44px;border-radius:12px;font-size:13px;">'
-            +     escapeHtml(makeInitials(u.name))
-            +   '</div>'
-            +   '<div class="min-w-0">'
-            +     '<div class="font-bold text-p655c text-sm">' + escapeHtml(u.name) + '</div>'
-            +     '<div class="text-slate-500 text-xs truncate">' + escapeHtml(u.email) + ' · <span class="font-mono text-[10px]">' + escapeHtml(u.sessionId || '') + '</span></div>'
-            +   '</div>'
+            +   '<div class="tbl-avatar" style="background:' + roleMeta(u.role).bg + ';width:44px;height:44px;border-radius:12px;font-size:13px;">' + escapeHtml(makeInitials(u.name)) + '</div>'
+            +   '<div class="min-w-0"><div class="font-bold text-p655c text-sm">' + escapeHtml(u.name) + '</div>'
+            +   '<div class="text-slate-500 text-xs truncate">' + escapeHtml(u.email) + ' · <span class="font-mono text-[10px]">' + escapeHtml(u.sessionId || '') + '</span></div></div>'
             + '</div>';
-
-        pwdDisplay.textContent = t('pwd_reveal_loading');
+        pwdDisplay.textContent = 'Loading…';
         pwdDisplay.className = 'pwd-display';
         pwdViewWarn.classList.add('hidden');
         pwdViewResetBtn.classList.add('hidden');
         pwdViewToggle.disabled = true;
         pwdViewCopy.disabled = true;
-        pwdViewToggle.style.opacity = '.4';
-        pwdViewCopy.style.opacity = '.4';
         setToggleLabel(false);
-
         pwdViewModal.classList.add('open');
         document.body.style.overflow = 'hidden';
-
-        // === DEDICATED SERVER CALL ===
+        beginRequest();
         try {
-            const res = await apiPost({
-                action: 'getUserPassword',
-                id: u.id,
-                actor: currentAdmin.name,
-                actorId: currentAdmin.id,
-                actorRole: currentAdmin.role
-            });
-
+            const res = await apiPost({ action:'getUserPassword', id: u.id, actor: currentAdmin.name, actorId: currentAdmin.id, actorRole: currentAdmin.role });
             if (!res || !res.success) {
-                pwdDisplay.textContent = (res && res.message) || t('pwd_reveal_error');
+                pwdDisplay.textContent = (res && res.message) || 'Could not fetch password';
                 pwdDisplay.className = 'pwd-display unavailable';
                 pwdViewWarn.classList.remove('hidden');
                 pwdViewResetBtn.classList.remove('hidden');
                 return;
             }
-
             const plain = String(res.password || '').trim();
             if (!plain) {
-                pwdDisplay.textContent = t('pwd_reveal_unavailable');
+                pwdDisplay.textContent = 'Password not recoverable — use "Reset Password" to set a new one.';
                 pwdDisplay.className = 'pwd-display unavailable';
                 pwdViewWarn.classList.remove('hidden');
                 pwdViewResetBtn.classList.remove('hidden');
                 return;
             }
-
-            // Got plaintext — render hidden by default
             pwdViewState.value = plain;
             pwdDisplay.textContent = '••••••••••••';
             pwdDisplay.className = 'pwd-display';
             pwdViewToggle.disabled = false;
             pwdViewCopy.disabled = false;
-            pwdViewToggle.style.opacity = '';
-            pwdViewCopy.style.opacity = '';
             setToggleLabel(false);
-
-            // Refresh activity log silently (view was logged server-side)
-            setTimeout(function(){
-                apiGet('getActivity', { limit: ACTIVITY_LIMIT }).then(function(r){
-                    if (r && r.success) { appState.auditLogs = (r.logs || []).slice(0, ACTIVITY_LIMIT); renderActivity(); }
-                }).catch(function(){});
-            }, 500);
-
+            setTimeout(refreshActivityOnly, 400);
         } catch (err) {
             console.error('password reveal', err);
-            pwdDisplay.textContent = t('pwd_reveal_error');
+            pwdDisplay.textContent = 'Could not reach server. Try again.';
             pwdDisplay.className = 'pwd-display unavailable';
             pwdViewWarn.classList.remove('hidden');
-        }
+        } finally { endRequest(); }
     }
 
     function setToggleLabel(revealed) {
         const icon = pwdViewToggle.querySelector('i');
         const label = pwdViewToggle.querySelector('span');
-        if (revealed) {
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-            label.textContent = t('pwd_reveal_hide');
-        } else {
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-            label.textContent = t('pwd_reveal_show');
-        }
+        if (revealed) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); label.textContent = 'Hide'; }
+        else { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); label.textContent = 'Show'; }
     }
-
     function closePwdViewModal() {
         pwdViewModal.classList.remove('open');
         document.body.style.overflow = '';
         pwdViewState = { revealed: false, value: '', userId: null };
     }
-
     pwdViewToggle.addEventListener('click', function(){
         if (!pwdViewState.value) return;
         pwdViewState.revealed = !pwdViewState.revealed;
-        if (pwdViewState.revealed) {
-            pwdDisplay.textContent = pwdViewState.value;
-            pwdDisplay.className = 'pwd-display revealed';
-        } else {
-            pwdDisplay.textContent = '••••••••••••';
-            pwdDisplay.className = 'pwd-display';
-        }
+        if (pwdViewState.revealed) { pwdDisplay.textContent = pwdViewState.value; pwdDisplay.className = 'pwd-display revealed'; }
+        else { pwdDisplay.textContent = '••••••••••••'; pwdDisplay.className = 'pwd-display'; }
         setToggleLabel(pwdViewState.revealed);
     });
-
     pwdViewCopy.addEventListener('click', function(){
         if (!pwdViewState.value) return;
-        const done = function(){ showToast(t('pwd_reveal_copied'), false); };
+        const done = function(){ showToast('Password copied', false); };
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(pwdViewState.value).then(done).catch(function(){
-                fallbackCopy(pwdViewState.value); done();
-            });
-        } else {
-            fallbackCopy(pwdViewState.value); done();
-        }
+            navigator.clipboard.writeText(pwdViewState.value).then(done).catch(function(){ fallbackCopy(pwdViewState.value); done(); });
+        } else { fallbackCopy(pwdViewState.value); done(); }
     });
-
     pwdViewResetBtn.addEventListener('click', function(){
         if (!pwdViewState.userId) return;
         const uid = pwdViewState.userId;
         closePwdViewModal();
         setTimeout(function(){ openPwdModal(uid); }, 200);
     });
-
     function fallbackCopy(text) {
         const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
         try { document.execCommand('copy'); } catch (e) {}
         document.body.removeChild(ta);
     }
-
     document.getElementById('pwdViewClose').addEventListener('click', closePwdViewModal);
     document.getElementById('pwdViewCloseBtn').addEventListener('click', closePwdViewModal);
     pwdViewModal.addEventListener('click', function(e){ if (e.target === pwdViewModal) closePwdViewModal(); });
@@ -1318,9 +1899,12 @@
     const uStatus = document.getElementById('uStatus');
     const uProgram = document.getElementById('uProgram');
     const uPwd = document.getElementById('uPwd');
+    const uClassWrap = document.getElementById('uClassWrap');
+    const uClass = document.getElementById('uClass');
     const userError = document.getElementById('userError');
     const userModalAvatar = document.getElementById('userModalAvatar');
     const userModalTitle = document.getElementById('userModalTitle');
+    let pendingUserFormClass = null;
 
     function nextUserId() {
         const nums = appState.users.map(function(u){
@@ -1330,42 +1914,50 @@
         return (nums.length ? Math.max.apply(null, nums) : 1000) + 1;
     }
 
+    function toggleClassField() {
+        const isPA = (uRole.value === 'penasihat_akademik');
+        uClassWrap.classList.toggle('hidden', !isPA);
+    }
+
     function openUserModal(id) {
         editingUserId = id || null;
+        pendingUserFormClass = null;
         hideUserError();
         [uId, uName, uEmail, uProgram, uPwd].forEach(function(f){ if (f) f.classList.remove('is-invalid'); });
 
         if (id) {
             const u = appState.users.find(function(x){ return String(x.id) === String(id); });
             if (!u) return;
-            userModalTitle.textContent = t('modal_edit');
-            uId.value = u.id;
-            uId.readOnly = true;
+            userModalTitle.textContent = 'Edit User';
+            uRole.innerHTML = buildRoleOptions(u.role);
+            uId.value = u.id; uId.readOnly = true;
             uSession.value = u.sessionId || '';
             uName.value = u.name;
             uEmail.value = u.email;
             uRole.value = u.role;
             uStatus.value = u.status || 'Aktif';
             uProgram.value = u.program || '';
+            uClass.value = u.assignedClass || '';
             uPwd.value = '';
             uPwd.placeholder = 'Leave empty to keep current';
-            userModalAvatar.style.background = (ROLE_META[u.role] || ROLE_META.student).bg;
+            userModalAvatar.style.background = roleMeta(u.role).bg;
             userModalAvatar.textContent = makeInitials(u.name);
         } else {
-            userModalTitle.textContent = t('modal_add');
+            userModalTitle.textContent = 'Add New User';
+            uRole.innerHTML = buildRoleOptions('student');
             uId.readOnly = false;
             uId.value = nextUserId();
             uRole.value = 'student';
             uSession.value = autoGenerateSessionIdHint('student');
-            uName.value = '';
-            uEmail.value = '';
-            uStatus.value = 'Aktif';
-            uProgram.value = '';
+            uName.value = ''; uEmail.value = '';
+            uStatus.value = 'Aktif'; uProgram.value = '';
+            uClass.value = '';
             uPwd.value = 'password123';
             uPwd.placeholder = 'Minimum 6 characters';
             userModalAvatar.style.background = ROLE_META.student.bg;
             userModalAvatar.textContent = '--';
         }
+        toggleClassField();
         userModal.classList.add('open');
         document.body.style.overflow = 'hidden';
         setTimeout(function(){ uName.focus(); }, 120);
@@ -1374,6 +1966,7 @@
         userModal.classList.remove('open');
         document.body.style.overflow = '';
         editingUserId = null;
+        pendingUserFormClass = null;
     }
     function showUserError(msg) { userError.innerHTML = '<ul><li>' + escapeHtml(msg) + '</li></ul>'; userError.classList.add('show'); }
     function hideUserError() { userError.classList.remove('show'); }
@@ -1384,8 +1977,9 @@
     });
     uEmail.addEventListener('input', function(){ this.classList.remove('is-invalid'); hideUserError(); });
     uRole.addEventListener('change', function(){
-        userModalAvatar.style.background = (ROLE_META[this.value] || ROLE_META.student).bg;
+        userModalAvatar.style.background = roleMeta(this.value).bg;
         if (!editingUserId) uSession.value = autoGenerateSessionIdHint(this.value);
+        toggleClassField();
     });
 
     document.getElementById('addUserBtn').addEventListener('click', function(){ openUserModal(null); });
@@ -1399,55 +1993,103 @@
         const email = uEmail.value.trim();
         const role = uRole.value;
         let bad = false;
-        if (!name) { uName.classList.add('is-invalid'); showUserError(t('err_name')); bad = true; }
+        if (!name) { uName.classList.add('is-invalid'); showUserError('Please enter the full name.'); bad = true; }
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             uEmail.classList.add('is-invalid');
-            if (!bad) showUserError(t('err_email'));
+            if (!bad) showUserError('Please enter a valid email address.');
             bad = true;
         }
         if (bad) return;
 
+        // If role is PA, ensure class is provided
+        let assignedClass = '';
+        if (role === 'penasihat_akademik') {
+            assignedClass = (uClass.value || '').trim().toUpperCase();
+            if (!assignedClass) {
+                // Open class modal in "attach to form" mode
+                const draftUser = { name: name, email: email, assignedClass: '' };
+                pendingUserFormClass = true;
+                openClassModal(draftUser, function(cls){
+                    uClass.value = cls;
+                    pendingUserFormClass = null;
+                    // Re-trigger save
+                    document.getElementById('userSave').click();
+                });
+                return;
+            }
+        }
+
         const btn = this;
         btn.disabled = true; btn.style.opacity = '.7';
-
+        beginRequest();
         try {
             if (editingUserId) {
                 const res = await apiPost({
                     action:'editUser', id: editingUserId, name: name, email: email, role: role,
-                    program: uProgram.value.trim(), status: uStatus.value, password: uPwd.value.trim()
+                    program: uProgram.value.trim(), status: uStatus.value,
+                    password: uPwd.value.trim(),
+                    assignedClass: role === 'penasihat_akademik' ? assignedClass : ''
                 });
                 if (!res || !res.success) { showUserError((res && res.message) || 'Update failed'); return; }
+                const idx = appState.users.findIndex(function(x){ return String(x.id) === String(editingUserId); });
+                if (idx !== -1) {
+                    appState.users[idx].name = name;
+                    appState.users[idx].email = email;
+                    appState.users[idx].role = role;
+                    appState.users[idx].program = uProgram.value.trim();
+                    appState.users[idx].status = uStatus.value;
+                    if (role === 'penasihat_akademik') appState.users[idx].assignedClass = assignedClass;
+                    else delete appState.users[idx].assignedClass;
+                    cacheWrite(CACHE_KEY_USERS, appState.users);
+                }
                 logActivity('user_edit', name, 'Role: ' + roleLabel(role));
                 closeUserModal();
-                await loadStateFromApi();
-                showToast(t('toast_updated'), false);
+                renderUsers(); renderRoleManagement();
+                showToast('User Updated', false);
             } else {
                 const res = await apiPost({
                     action:'addUser', id: uId.value.trim(), name: name, email: email, role: role,
                     program: uProgram.value.trim(), status: uStatus.value,
-                    password: uPwd.value.trim() || generateDefaultPassword(email), sessionId: ''
+                    password: uPwd.value.trim() || generateDefaultPassword(email),
+                    sessionId: '',
+                    assignedClass: role === 'penasihat_akademik' ? assignedClass : ''
                 });
                 if (!res || !res.success) { showUserError((res && res.message) || 'Create failed'); return; }
-                logActivity('user_add', name, 'Role: ' + roleLabel(role) + (res.user && res.user.sessionId ? ' · Session: ' + res.user.sessionId : ''));
+                if (res.user) {
+                    appState.users.push(res.user);
+                    cacheWrite(CACHE_KEY_USERS, appState.users);
+                }
+                logActivity('user_add', name, 'Role: ' + roleLabel(role));
                 closeUserModal();
-                await loadStateFromApi();
-                showToast(t('toast_added') + (res.user && res.user.sessionId ? ' · ' + res.user.sessionId : ''), false);
+                renderUsers(); renderRoleManagement();
+                showToast('User Created', false);
             }
-        } catch (err) { console.error(err); showUserError('Network error: ' + err.message); }
-        finally { btn.disabled = false; btn.style.opacity = ''; }
+        } catch (err) {
+            console.error(err);
+            showUserError('Network error: ' + err.message);
+        } finally {
+            btn.disabled = false; btn.style.opacity = '';
+            endRequest();
+        }
     });
 
     async function deleteUser(id) {
         const u = appState.users.find(function(x){ return String(x.id) === String(id); });
         if (!u) return;
-        if (!confirm(t('confirm_delete'))) return;
+        if (!confirm('Delete this user account permanently?')) return;
+        beginRequest();
         try {
             const res = await apiPost({ action: 'deleteUser', id: u.id });
             if (!res || !res.success) { showToast((res && res.message) || 'Delete failed', true); return; }
+            appState.users = appState.users.filter(function(x){ return String(x.id) !== String(id); });
+            cacheWrite(CACHE_KEY_USERS, appState.users);
             logActivity('user_delete', u.name, u.email || '');
-            await loadStateFromApi();
-            showToast(t('toast_deleted'), true);
-        } catch (e) { console.error(e); showToast('Network error', true); }
+            renderUsers(); renderRoleManagement();
+            showToast('User Deleted', true);
+        } catch (e) {
+            console.error(e);
+            showToast('Network error', true);
+        } finally { endRequest(); }
     }
 
     /* =========================================================
@@ -1465,15 +2107,15 @@
         if (!u) return;
         document.getElementById('pwdUserCard').innerHTML = ''
             + '<div class="flex items-center gap-3">'
-            +   '<div class="tbl-avatar" style="background:' + (ROLE_META[u.role] || ROLE_META.student).bg + ';width:44px;height:44px;border-radius:12px;font-size:13px;">' + escapeHtml(makeInitials(u.name)) + '</div>'
+            +   '<div class="tbl-avatar" style="background:' + roleMeta(u.role).bg + ';width:44px;height:44px;border-radius:12px;font-size:13px;">' + escapeHtml(makeInitials(u.name)) + '</div>'
             +   '<div class="min-w-0"><div class="font-bold text-p655c text-sm">' + escapeHtml(u.name) + '</div>'
-            +   '<div class="text-slate-500 text-xs truncate">' + escapeHtml(u.email) + ' · <span class="font-mono text-[10px]">' + escapeHtml(u.sessionId || '') + '</span></div></div></div>';
+            +   '<div class="text-slate-500 text-xs truncate">' + escapeHtml(u.email) + '</div></div></div>';
         pwdActorName.textContent = currentAdmin.name + ' (' + currentAdmin.id + ')';
         newPwd.value = ''; confirmPwd.value = '';
         [newPwd, confirmPwd].forEach(function(f){ f.classList.remove('is-invalid'); f.type = 'password'; });
         document.querySelectorAll('#pwdModal .pwd-toggle i').forEach(function(ic){ ic.classList.remove('fa-eye-slash'); ic.classList.add('fa-eye'); });
         hidePwdError();
-        updateStrength('newPwd', 'pwdStrengthText', ['pseg1','pseg2','pseg3','pseg4']);
+        updateStrength();
         pwdModal.classList.add('open');
         document.body.style.overflow = 'hidden';
         setTimeout(function(){ newPwd.focus(); }, 120);
@@ -1508,23 +2150,22 @@
         if (/[^A-Za-z0-9]/.test(pwd)) s++;
         return Math.min(s, 4);
     }
-    function updateStrength(inputId, textId, segIds) {
-        const input = document.getElementById(inputId);
-        const textEl = document.getElementById(textId);
-        const segs = segIds.map(function(id){ return document.getElementById(id); });
-        if (!input || !textEl) return;
-        const pwd = input.value, score = scorePassword(pwd);
+    function updateStrength() {
+        const textEl = document.getElementById('pwdStrengthText');
+        const segs = ['pseg1','pseg2','pseg3','pseg4'].map(function(id){ return document.getElementById(id); });
+        const pwd = newPwd.value;
+        const score = scorePassword(pwd);
         segs.forEach(function(s){ if (s) s.className = 'strength-seg'; });
         if (!pwd) { textEl.className = 'strength-text'; textEl.textContent = '—'; return; }
         let level, label;
-        if (score <= 1) { level = 'weak'; label = t('pwd_strength_weak'); }
-        else if (score <= 3) { level = 'medium'; label = t('pwd_strength_medium'); }
-        else { level = 'strong'; label = t('pwd_strength_strong'); }
-        for (let i = 0; i < score; i++) { if (segs[i]) segs[i].classList.add('on-' + level); }
+        if (score <= 1) { level = 'weak'; label = 'Weak'; }
+        else if (score <= 3) { level = 'medium'; label = 'Medium'; }
+        else { level = 'strong'; label = 'Strong'; }
+        for (let i = 0; i < score; i++) if (segs[i]) segs[i].classList.add('on-' + level);
         textEl.className = 'strength-text ' + level; textEl.textContent = label;
     }
     newPwd.addEventListener('input', function(){
-        updateStrength('newPwd', 'pwdStrengthText', ['pseg1','pseg2','pseg3','pseg4']);
+        updateStrength();
         hidePwdError();
         [newPwd, confirmPwd].forEach(function(f){ f.classList.remove('is-invalid'); });
     });
@@ -1535,49 +2176,109 @@
         const np = newPwd.value, cp = confirmPwd.value;
         [newPwd, confirmPwd].forEach(function(f){ f.classList.remove('is-invalid'); });
         if (!np || !cp) {
-            showPwdError([t('pwd_err_empty')]);
+            showPwdError(['Please fill in both password fields.']);
             if (!np) newPwd.classList.add('is-invalid');
             if (!cp) confirmPwd.classList.add('is-invalid');
             return;
         }
         const errors = [];
-        if (np.length < 8) { errors.push(t('pwd_err_short')); newPwd.classList.add('is-invalid'); }
-        if (!/[A-Z]/.test(np)) { errors.push(t('pwd_err_upper')); newPwd.classList.add('is-invalid'); }
-        if (!/[a-z]/.test(np)) { errors.push(t('pwd_err_lower')); newPwd.classList.add('is-invalid'); }
-        if (!/[0-9]/.test(np)) { errors.push(t('pwd_err_number')); newPwd.classList.add('is-invalid'); }
-        if (np !== cp) { errors.push(t('pwd_err_match')); confirmPwd.classList.add('is-invalid'); }
+        if (np.length < 8) { errors.push('Password must be at least 8 characters.'); newPwd.classList.add('is-invalid'); }
+        if (!/[A-Z]/.test(np)) { errors.push('Password must contain an uppercase letter.'); newPwd.classList.add('is-invalid'); }
+        if (!/[a-z]/.test(np)) { errors.push('Password must contain a lowercase letter.'); newPwd.classList.add('is-invalid'); }
+        if (!/[0-9]/.test(np)) { errors.push('Password must contain a number.'); newPwd.classList.add('is-invalid'); }
+        if (np !== cp) { errors.push('Passwords do not match.'); confirmPwd.classList.add('is-invalid'); }
         if (errors.length) { showPwdError(errors); return; }
 
         const u = appState.users.find(function(x){ return String(x.id) === String(resetPwdUserId); });
         if (!u) return;
         const btn = this;
         btn.disabled = true; btn.style.opacity = '.7';
+        beginRequest();
         try {
             const res = await apiPost({ action: 'adminResetPassword', id: u.id, password: np, newPassword: np });
             if (!res || !res.success) { showPwdError([(res && res.message) || 'Reset failed']); return; }
             logActivity('password_reset', u.name, 'Password changed for ' + u.email);
             closePwdModal();
-            await loadStateFromApi();
-            showToast(t('toast_pwd_reset') + ' — ' + u.name + ' ' + t('toast_by') + ' ' + currentAdmin.name, false);
-        } catch (err) { console.error(err); showPwdError(['Network error: ' + err.message]); }
-        finally { btn.disabled = false; btn.style.opacity = ''; }
+            showToast('Password Reset — ' + u.name + ' by ' + currentAdmin.name, false);
+            refreshActivityOnly();
+        } catch (err) {
+            console.error(err);
+            showPwdError(['Network error: ' + err.message]);
+        } finally { btn.disabled = false; btn.style.opacity = ''; endRequest(); }
     });
 
     /* =========================================================
-       ACTIVITY LOG TO SERVER
+       ACTIVITY LOG
     ========================================================== */
+    function relativeTime(iso) {
+        if (!iso) return '';
+        const diff = Date.now() - new Date(iso).getTime();
+        const sec = Math.max(0, Math.floor(diff / 1000));
+        if (sec < 45) return 'Just now';
+        const min = Math.floor(sec / 60);
+        if (min < 60) return min + 'm ago';
+        const hr = Math.floor(min / 60);
+        if (hr < 24) return hr + 'h ago';
+        const day = Math.floor(hr / 24);
+        if (day < 7) return day + 'd ago';
+        return new Date(iso).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function renderActivity() {
+        const tl = document.getElementById('activityTimeline');
+        const countEl = document.getElementById('activityCount');
+        const logs = appState.auditLogs || [];
+        if (countEl) countEl.textContent = logs.length;
+        if (!tl) return;
+        if (!logs.length) {
+            tl.innerHTML = '<div class="activity-empty"><i class="fas fa-clock-rotate-left"></i><p class="text-xs font-bold uppercase tracking-widest">No activity recorded yet</p></div>';
+            return;
+        }
+        tl.innerHTML = logs.map(function(a){
+            const meta = ACTIVITY_TYPES[a.type] || ACTIVITY_TYPES.user_add;
+            const entityHtml = a.entity ? ' <span class="activity-entity">· ' + escapeHtml(a.entity) + '</span>' : '';
+            const detailHtml = a.detail ? '<p class="activity-detail">' + escapeHtml(a.detail) + '</p>' : '';
+            const actorHtml = a.actor ? '<div class="activity-actor"><i class="fas fa-user-shield"></i> ' + escapeHtml(t('audit_actor')) + ': ' + escapeHtml(a.actor) + '</div>' : '';
+            return '<div class="activity-item content-in"><div class="activity-icon" style="background:' + meta.bg + ';"><i class="fas ' + meta.icon + '"></i></div><div class="activity-content"><p class="activity-title">' + escapeHtml(meta.en) + entityHtml + '</p>' + detailHtml + actorHtml + '<p class="activity-time"><i class="far fa-clock"></i> ' + escapeHtml(relativeTime(a.timestamp)) + '</p></div></div>';
+        }).join('');
+    }
+
+    document.getElementById('clearActivityBtn').addEventListener('click', async function () {
+        if (!(appState.auditLogs && appState.auditLogs.length)) return;
+        if (!confirm('Clear the entire activity log?')) return;
+        beginRequest();
+        try {
+            const res = await apiPost({ action: 'clearActivity', actor: currentAdmin.name, actorId: currentAdmin.id, actorRole: currentAdmin.role });
+            if (!res || !res.success) { showToast((res && res.message) || 'Clear failed', true); return; }
+            appState.auditLogs = [];
+            cacheWrite(CACHE_KEY_LOGS, appState.auditLogs);
+            renderActivity();
+            showToast('Activity Log Cleared', true);
+            refreshActivityOnly();
+        } catch (e) { console.error(e); showToast('Network error', true); }
+        finally { endRequest(); }
+    });
+
     function logActivity(type, entity, detail) {
-        apiPost({
-            action: 'logActivity', type: type, entity: entity || '', detail: detail || '',
-            actor: currentAdmin.name, actorId: currentAdmin.id, actorRole: currentAdmin.role,
-            timestamp: new Date().toISOString()
-        }).then(function(){
-            setTimeout(function(){
-                apiGet('getActivity', { limit: ACTIVITY_LIMIT }).then(function(r){
-                    if (r && r.success) { appState.auditLogs = (r.logs || []).slice(0, ACTIVITY_LIMIT); renderActivity(); }
-                }).catch(function(){});
-            }, 400);
-        }).catch(function(err){ console.error('logActivity', err); });
+        const optimistic = { type: type, entity: entity || '', detail: detail || '', actor: currentAdmin.name, actorId: currentAdmin.id, actorRole: currentAdmin.role, timestamp: new Date().toISOString() };
+        appState.auditLogs.unshift(optimistic);
+        appState.auditLogs = appState.auditLogs.slice(0, ACTIVITY_LIMIT);
+        cacheWrite(CACHE_KEY_LOGS, appState.auditLogs);
+        renderActivity();
+        apiPost(Object.assign({ action: 'logActivity' }, optimistic))
+            .then(refreshActivityOnly)
+            .catch(function(err){ console.error('logActivity', err); });
+    }
+
+    async function refreshActivityOnly() {
+        try {
+            const r = await apiGet('getActivity', { limit: ACTIVITY_LIMIT });
+            if (r && r.success) {
+                appState.auditLogs = (r.logs || []).slice(0, ACTIVITY_LIMIT);
+                cacheWrite(CACHE_KEY_LOGS, appState.auditLogs);
+                renderActivity();
+            }
+        } catch (e) {}
     }
 
     /* =========================================================
@@ -1603,15 +2304,15 @@
 
     window.downloadTemplate = function () {
         const templateData = [{
-            'User ID': '', 'User Name': 'Contoh Nama', 'Role Detected': 'ACADEMIC_STAFF',
+            'User ID': '', 'User Name': 'Contoh Nama', 'Role Detected': 'PENSYARAH',
             'Password': '', 'Status': 'Aktif', 'Email': 'contoh@uitm.edu.my', 'Program': 'Kejuruteraan Kimia'
         }];
         const ws = XLSX.utils.json_to_sheet(templateData);
-        ws['!cols'] = [{wch:12},{wch:30},{wch:18},{wch:20},{wch:12},{wch:30},{wch:25}];
+        ws['!cols'] = [{wch:12},{wch:30},{wch:24},{wch:20},{wch:12},{wch:30},{wch:25}];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Template Pengguna');
         XLSX.writeFile(wb, 'Template_Tambah_Pengguna.xlsx');
-        showToast(t('toast_template'), false);
+        showToast('Template Downloaded', false);
     };
 
     document.getElementById('excelInput').addEventListener('change', function (e) {
@@ -1629,7 +2330,7 @@
                 const colMap = {
                     user_id: headers.findIndex(function(h){ return h.indexOf('user id') !== -1 || h.indexOf('userid') !== -1 || h === 'id'; }),
                     user_name: headers.findIndex(function(h){ return h.indexOf('user name') !== -1 || h.indexOf('nama') !== -1 || h.indexOf('name') !== -1; }),
-                    role: headers.findIndex(function(h){ return h.indexOf('role') !== -1 || h.indexOf('peranan') !== -1; }),
+                    role: headers.findIndex(function(h){ return h.indexOf('role') !== -1 || h.indexOf('peranan') !== -1 || h.indexOf('jawatan') !== -1; }),
                     password: headers.findIndex(function(h){ return h.indexOf('password') !== -1 || h.indexOf('kata laluan') !== -1; }),
                     status: headers.findIndex(function(h){ return h.indexOf('status') !== -1; }),
                     email: headers.findIndex(function(h){ return h.indexOf('email') !== -1 || h.indexOf('emel') !== -1; }),
@@ -1648,21 +2349,16 @@
                     const email = String(row[colMap.email] || '').trim();
                     if (!name && !email) continue;
                     const userIdRaw = colMap.user_id !== -1 ? String(row[colMap.user_id] || '').trim() : '';
-                    const roleRaw = colMap.role !== -1 ? String(row[colMap.role] || '').trim().toLowerCase() : '';
+                    const roleRaw = colMap.role !== -1 ? String(row[colMap.role] || '').trim() : '';
                     const passwordRaw = colMap.password !== -1 ? String(row[colMap.password] || '').trim() : '';
                     const statusRaw = colMap.status !== -1 ? String(row[colMap.status] || '').trim() : 'Aktif';
                     const program = colMap.program !== -1 ? String(row[colMap.program] || '').trim() : '';
-                    let role = 'student';
-                    if (roleRaw.indexOf('admin') !== -1) role = 'admin';
-                    else if (roleRaw.indexOf('academic') !== -1) role = 'academic_staff';
-                    else if (roleRaw.indexOf('lab') !== -1) role = 'lab_staff';
-                    else if (roleRaw.indexOf('coordinator') !== -1) role = 'coordinator';
-                    else if (roleRaw.indexOf('student') !== -1 || roleRaw.indexOf('pelajar') !== -1) role = 'student';
+                    const role = detectRole(roleRaw);
                     let status = 'Aktif';
                     if (statusRaw.toLowerCase().indexOf('tidak') !== -1 || statusRaw.toLowerCase() === 'inactive') status = 'Tidak Aktif';
                     rows.push({ id: userIdRaw, name: name, role: role, password: passwordRaw, status: status, email: email, program: program });
                 }
-                if (!rows.length) { showToast(t('bulk_no_data'), true); return; }
+                if (!rows.length) { showToast('No valid data to import.', true); return; }
                 bulkUserData = rows;
                 renderBulkPreview();
             } catch (err) { console.error(err); showToast('Failed to read file', true); }
@@ -1687,7 +2383,7 @@
         importCountEl.textContent = bulkUserData.length;
         confirmBtn.disabled = false; confirmBtn.style.opacity = ''; confirmBtn.style.cursor = '';
         tbody.innerHTML = bulkUserData.map(function(r){
-            const rm = ROLE_META[r.role] || ROLE_META.student;
+            const rm = roleMeta(r.role);
             const idDisplay = r.id || '(auto)';
             const pwdDisplay = r.password ? r.password : '(auto)';
             return '<tr>'
@@ -1717,6 +2413,7 @@
         if (!bulkUserData.length) return;
         const btn = this;
         btn.disabled = true; btn.style.opacity = '.7';
+        beginRequest();
         try {
             const res = await apiPost({ action: 'bulkImport', users: bulkUserData });
             if (!res || !res.success) { showToast((res && res.message) || 'Import failed', true); return; }
@@ -1724,15 +2421,29 @@
             const skipped = res.skipped || 0;
             bulkModal.classList.remove('open');
             document.body.style.overflow = '';
-            await loadStateFromApi();
             if (added > 0) {
                 logActivity('bulk_import', added + ' users', 'Imported from Excel');
-                showToast(t('toast_imported') + ' · ' + added, false);
+                showToast('Users Imported · ' + added, false);
             }
             if (skipped > 0) showToast(skipped + ' rows skipped (duplicate or incomplete)', true);
+            loadStateFromApi({ force: true });
         } catch (err) { console.error(err); showToast('Network error', true); }
-        finally { btn.disabled = false; btn.style.opacity = ''; }
+        finally { btn.disabled = false; btn.style.opacity = ''; endRequest(); }
     });
+
+    /* =========================================================
+       LANGUAGE
+    ========================================================== */
+    window.switchLanguage = function (lang) {
+        currentLang = lang;
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
+        const uRoleEl = document.getElementById('uRole');
+        if (uRoleEl) uRoleEl.innerHTML = buildRoleOptions(uRoleEl.value || 'student');
+        renderUsers();
+        renderActivity();
+        renderRoleManagement();
+    };
 
     /* =========================================================
        TOAST
@@ -1740,9 +2451,9 @@
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
     let toastTimer = null;
-    function showToast(message, purple) {
+    function showToast(message, isBlue) {
         toastMsg.textContent = message;
-        toast.classList.toggle('toast-blue', !!purple);
+        toast.classList.toggle('toast-blue', !!isBlue);
         toast.classList.add('show');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 3200);
@@ -1759,11 +2470,14 @@
         if (navRole) navRole.textContent = String(currentAdmin.role).toUpperCase();
         if (navAvatar) navAvatar.textContent = currentAdmin.initials;
 
+        if (uRole) uRole.innerHTML = buildRoleOptions('student');
+
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function () {
                 if (!confirm('Log out from admin portal?')) return;
-                FMSAuth.clearSession();
+                try { sessionStorage.removeItem(CACHE_KEY_USERS); sessionStorage.removeItem(CACHE_KEY_LOGS); } catch(e){}
+                try { FMSAuth.clearSession(); } catch(e){}
                 location.replace('login.html');
             });
         }
@@ -1777,6 +2491,7 @@
             todayEl.textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
         }
 
+        buildQuickPicks();
         await loadStateFromApi();
     });
 
