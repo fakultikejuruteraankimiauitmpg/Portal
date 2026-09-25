@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lab Staff Portal | Fakulti Kejuruteraan Kimia | UiTM Cawangan Johor</title>
+<title>Pinjaman Alat Radas | Lab Staff Portal | FKK UiTM Johor</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -14,9 +13,6 @@
         --navy:   #002D62;
         --purple: #9B26B6;
         --gold:   #FDB913;
-        --p655c: #002D62;
-        --p254c: #9B26B6;
-        --p130c: #FDB913;
     }
 
     * { -webkit-tap-highlight-color: transparent; }
@@ -28,12 +24,9 @@
         background-attachment: fixed;
     }
 
+    /* ---------- NAV / LOGO ---------- */
     .faculty-logo { display: flex; align-items: center; gap: 14px; }
-    .logo-bar {
-        width: 3px; height: 42px;
-        background: #FDB913;
-        border-radius: 2px;
-    }
+    .logo-bar { width: 3px; height: 42px; background: #FDB913; border-radius: 2px; }
     .logo-text { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; text-transform: uppercase; letter-spacing: -0.01em; }
     .logo-text .line-small { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 2px; }
     .logo-text .line-large { font-size: 0.95rem; color: #fff; }
@@ -59,12 +52,11 @@
     }
     .lang-btn:hover { opacity: 1; background: rgba(255,255,255,.1); }
     .lang-btn.active {
-        opacity: 1;
-        background: #FDB913;
-        color: #002D62;
+        opacity: 1; background: #FDB913; color: #002D62;
         box-shadow: 0 4px 14px rgba(253,185,19,.5);
     }
 
+    /* ---------- CARDS ---------- */
     .card {
         background: #fff;
         border: 1px solid rgba(226, 232, 240, 0.8);
@@ -92,7 +84,7 @@
     .stat-navy   { background: #002D62; }
     .stat-purple { background: #9B26B6; }
     .stat-gold   { background: #FDB913; }
-    .stat-deep   { background: #002D62; }
+    .stat-slate  { background: #334155; }
 
     .stat-card .stat-icon-box {
         width: 44px; height: 44px; border-radius: 12px;
@@ -103,21 +95,23 @@
     .stat-card .stat-icon-box i { color: #fff; font-size: 16px; }
 
     .btn-gold {
-        background: #FDB913;
-        color: #fff;
+        background: #FDB913; color: #fff;
         transition: all .25s cubic-bezier(.4,0,.2,1);
         box-shadow: 0 10px 22px -8px rgba(253,185,19,.6);
     }
     .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -10px rgba(253, 185, 19, .7); }
+    .btn-gold:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .text-p655c { color: var(--navy); }
-    .text-p254c { color: var(--purple); }
-    .text-p130c { color: var(--gold); }
+    .btn-outline {
+        background: #fff; color: #64748B;
+        border: 1px solid #E2E8F0;
+        transition: all .25s cubic-bezier(.4,0,.2,1);
+    }
+    .btn-outline:hover { color: #002D62; border-color: #CBD5E1; }
 
     .section-label {
         font-size: 10px; font-weight: 800; letter-spacing: .2em;
-        text-transform: uppercase;
-        color: #9B26B6;
+        text-transform: uppercase; color: #9B26B6;
     }
 
     .chip {
@@ -150,236 +144,103 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    .activity-timeline { position: relative; }
-    .activity-timeline::before {
-        content: ''; position: absolute;
-        left: 19px; top: 22px; bottom: 22px;
-        width: 2px;
-        background: #E2E8F0;
+    /* ---------- FORM ---------- */
+    .field-label {
+        display: block; font-size: 9px; font-weight: 800;
+        letter-spacing: .18em; text-transform: uppercase;
+        color: #94A3B8; margin-bottom: 6px;
     }
-    .activity-item {
-        display: flex; gap: 16px; padding: 12px 0;
-        position: relative;
-    }
-    .activity-icon {
-        width: 40px; height: 40px; border-radius: 12px;
-        display: flex; align-items: center; justify-content: center;
-        color: #fff; flex-shrink: 0; z-index: 1;
-        box-shadow: 0 6px 16px -6px rgba(0,0,0,.35);
-        border: 2px solid #fff;
-    }
-    .activity-icon i { font-size: 14px; }
-    .activity-content { flex: 1; min-width: 0; padding-top: 2px; }
-    .activity-title {
-        font-size: 12px; font-weight: 800;
-        color: var(--navy); line-height: 1.4;
-    }
-    .activity-entity {
-        color: var(--purple); font-weight: 900;
-    }
-    .activity-detail {
-        font-size: 11px; font-weight: 500;
-        color: #64748B; margin-top: 3px;
-        line-height: 1.5;
-        word-break: break-word;
-    }
-    .activity-time {
-        font-size: 9px; font-weight: 800;
-        letter-spacing: .12em; text-transform: uppercase;
-        color: #94A3B8; margin-top: 5px;
-        display: inline-flex; align-items: center; gap: 5px;
-    }
-    .activity-empty {
-        text-align: center; padding: 36px 20px;
-        color: #94A3B8;
-    }
-    .activity-empty i { font-size: 30px; margin-bottom: 12px; display: block; opacity: .4; }
-
-    .ach-card {
-        background: #fff;
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 18px 40px -20px rgba(0,45,98,.25);
-        border: 1px solid rgba(226,232,240,.7);
-        transition: all .3s cubic-bezier(.4,0,.2,1);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-    }
-    .ach-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 28px 50px -22px rgba(0,45,98,.35);
-    }
-
-    .ach-header {
-        padding: 22px 24px 20px;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-    }
-    .ach-header::before {
-        content: '';
-        position: absolute;
-        top: -40px; right: -40px;
-        width: 160px; height: 160px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.10);
-        pointer-events: none;
-    }
-
-    .ach-header-pub  { background: #002D62; }
-    .ach-header-inv  { background: #9B26B6; }
-    .ach-header-grt  { background: #FDB913; }
-
-    .ach-icon-box {
-        width: 46px; height: 46px;
-        border-radius: 14px;
-        background: rgba(255,255,255,0.20);
-        border: 1px solid rgba(255,255,255,0.3);
-        display: flex; align-items: center; justify-content: center;
-    }
-    .ach-icon-box i { color: #fff; font-size: 18px; }
-
-    .ach-badge {
-        font-size: 10px; font-weight: 900;
-        padding: 4px 10px; border-radius: 9999px;
-        background: rgba(255,255,255,0.25);
-        border: 1px solid rgba(255,255,255,0.3);
-        color: #fff;
-        letter-spacing: .06em;
-        display: inline-flex; align-items: center; gap: 4px;
-    }
-
-    .ach-big-number {
-        font-size: 2.6rem;
-        font-weight: 900;
-        line-height: 1;
-        color: #fff;
-        letter-spacing: -0.02em;
-    }
-    .ach-big-number small {
-        font-size: 0.95rem;
-        font-weight: 800;
-        opacity: .85;
-        margin-right: 4px;
-    }
-    .ach-sub {
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: .16em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,.8);
-        margin-top: 6px;
-    }
-
-    .ach-body {
-        padding: 18px 22px 22px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .ach-chart-wrap {
-        position: relative;
-        height: 150px;
-        margin-bottom: 16px;
-    }
-
-    .ach-legend-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px dashed #E2E8F0;
-        font-size: 11px;
-        font-weight: 700;
-    }
-    .ach-legend-row:last-child { border-bottom: none; }
-    .ach-legend-label {
-        display: flex; align-items: center; gap: 8px;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        font-weight: 800;
-        font-size: 10px;
-    }
-    .ach-dot {
-        width: 10px; height: 10px; border-radius: 3px;
-        display: inline-block;
-        flex-shrink: 0;
-    }
-    .ach-legend-value {
-        font-weight: 900;
+    .field-input {
+        width: 100%; padding: 12px 14px;
+        font-size: 13px; font-weight: 600;
         color: var(--navy);
-        font-size: 13px;
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px; outline: none;
+        transition: all .2s ease;
     }
+    .field-input::placeholder { color: #94A3B8; font-weight: 500; }
+    .field-input:focus { background: #fff; border-color: #9B26B6; box-shadow: 0 0 0 4px rgba(155, 38, 182, .12); }
+    .field-input:disabled { background: #F1F5F9; color: #64748B; cursor: not-allowed; }
+    .field-input.is-invalid { border-color: #9B26B6; background: #FAF5FF; }
+    select.field-input { appearance: none; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 40px; }
+    textarea.field-input { resize: vertical; min-height: 92px; line-height: 1.6; }
 
-    .ach-progress-wrap {
-        margin-top: 14px;
-        padding-top: 14px;
-        border-top: 1px dashed #E2E8F0;
+    .error-box {
+        display: none; padding: 12px 14px;
+        background: #FAF5FF;
+        border-left: 4px solid #9B26B6;
+        border-radius: 8px;
+        font-size: 11px; color: #6B21A8;
+        font-weight: 600; line-height: 1.5;
     }
-    .ach-progress-track {
-        height: 8px;
-        background: #F1F5F9;
-        border-radius: 9999px;
-        overflow: hidden;
-        margin-top: 6px;
-    }
-    .ach-progress-fill {
-        height: 100%;
-        border-radius: 9999px;
-        transition: width 1.2s cubic-bezier(.4,0,.2,1);
-    }
-    .fill-navy   { background: #002D62; }
-    .fill-purple { background: #9B26B6; }
-    .fill-gold   { background: #FDB913; }
+    .error-box.show { display: block; animation: fadeUp .25s cubic-bezier(.4,0,.2,1) both; }
+    .error-box ul { list-style: disc; padding-left: 16px; }
 
-    .trend-wrap {
+    .info-banner { background: #EFF6FF; border-left: 4px solid #9B26B6; border-radius: 10px; }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap { overflow-x: auto; padding-bottom: 4px; }
+    .loan-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; min-width: 860px; }
+    .loan-table th {
+        font-size: 9px; font-weight: 900; letter-spacing: .16em;
+        text-transform: uppercase; color: #94A3B8;
+        padding: 0 14px 6px; text-align: left; white-space: nowrap;
+    }
+    .loan-table td {
+        background: #F8FAFC; padding: 14px;
+        font-size: 12px; font-weight: 700; color: #334155;
+        vertical-align: middle;
+    }
+    .loan-table tbody tr { transition: all .2s ease; }
+    .loan-table tbody tr:hover td {
         background: #fff;
-        border-radius: 24px;
-        padding: 24px;
-        border: 1px solid rgba(226,232,240,.7);
-        box-shadow: 0 18px 40px -22px rgba(0,45,98,.25);
-        position: relative;
-        overflow: hidden;
+        box-shadow: 0 10px 24px -16px rgba(0,45,98,.3);
     }
-    .trend-wrap::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: #9B26B6;
-    }
+    .loan-table td:first-child { border-radius: 12px 0 0 12px; border-left: 4px solid #CBD5E1; }
+    .loan-table td:last-child  { border-radius: 0 12px 12px 0; }
+    tr.row-pending  td:first-child { border-left-color: #FDB913; }
+    tr.row-approved td:first-child { border-left-color: #002D62; }
+    tr.row-rejected td:first-child { border-left-color: #9B26B6; }
+    tr.row-returned td:first-child { border-left-color: #94A3B8; }
 
-    .news-card {
-        background: #fff;
-        border: 1px solid rgba(226,232,240,.8);
-        transition: all .3s cubic-bezier(.4,0,.2,1);
-        cursor: pointer; overflow: hidden;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px -14px rgba(0,45,98,.15);
-    }
-    .news-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 26px 40px -18px rgba(155, 38, 182, .35);
-        border-color: rgba(155, 38, 182, .3);
-    }
-    .news-card .news-img { height: 180px; overflow: hidden; position: relative; }
-    .news-card .news-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
-    .news-card:hover .news-img img { transform: scale(1.08); }
-    .news-badge {
-        position: absolute; top: 12px; left: 12px;
-        padding: 5px 14px;
+    .mono { font-variant-numeric: tabular-nums; letter-spacing: .04em; font-weight: 900; color: #002D62; font-size: 11px; }
+
+    .status-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px; border-radius: 9999px;
         font-size: 9px; font-weight: 900;
-        text-transform: uppercase; letter-spacing: .1em;
-        color: #fff; border-radius: 9999px;
-        box-shadow: 0 4px 12px rgba(0,0,0,.2);
+        letter-spacing: .08em; text-transform: uppercase;
+        white-space: nowrap;
     }
-    .badge-safety   { background: #002D62; }
-    .badge-equipment { background: #9B26B6; }
-    .badge-training { background: #FDB913; }
+    .status-ok    { background: rgba(0,45,98,.10); color: #002D62; border: 1px solid rgba(0,45,98,.25); }
+    .status-warn  { background: rgba(253,185,19,.18); color: #B45309; border: 1px solid rgba(253,185,19,.4); }
+    .status-alert { background: rgba(155,38,182,.12); color: #9B26B6; border: 1px solid rgba(155,38,182,.3); }
+    .status-mute  { background: rgba(100,116,139,.12); color: #475569; border: 1px solid rgba(100,116,139,.3); }
 
+    .icon-btn {
+        width: 32px; height: 32px; border-radius: 9px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border: 1px solid #E2E8F0; background: #fff; color: #64748B;
+        cursor: pointer; transition: all .2s ease; font-size: 11px;
+    }
+    .icon-btn:hover { color: #9B26B6; border-color: #9B26B6; background: #FAF5FF; }
+
+    .filter-tab {
+        padding: 7px 14px; border-radius: 9999px;
+        font-size: 10px; font-weight: 800;
+        letter-spacing: .1em; text-transform: uppercase;
+        color: #64748B; background: #F1F5F9;
+        border: 1px solid #E2E8F0; cursor: pointer;
+        transition: all .2s ease; white-space: nowrap;
+    }
+    .filter-tab:hover { color: #002D62; }
+    .filter-tab.active { background: #002D62; color: #fff; border-color: #002D62; box-shadow: 0 8px 18px -10px rgba(0,45,98,.6); }
+
+    .empty-state { text-align: center; padding: 54px 20px; color: #94A3B8; }
+    .empty-state i { font-size: 34px; margin-bottom: 14px; display: block; opacity: .35; }
+
+    /* ---------- MODALS ---------- */
     .modal-backdrop {
         background: rgba(15, 23, 42, 0.55);
         backdrop-filter: blur(6px);
@@ -407,62 +268,20 @@
     .tab-pane { display: none; }
     .tab-pane.active { display: block; animation: fadeUp .3s cubic-bezier(.4,0,.2,1) both; }
 
-    .field-label {
-        display: block; font-size: 9px; font-weight: 800;
-        letter-spacing: .18em; text-transform: uppercase;
-        color: #94A3B8; margin-bottom: 6px;
+    .detail-row {
+        display: flex; justify-content: space-between; gap: 16px;
+        padding: 11px 0; border-bottom: 1px dashed #E2E8F0;
+        font-size: 12px;
     }
-    .field-input {
-        width: 100%; padding: 12px 14px;
-        font-size: 13px; font-weight: 600;
-        color: var(--navy);
-        background: #F8FAFC;
-        border: 1px solid #E2E8F0;
-        border-radius: 10px; outline: none;
-        transition: all .2s ease;
-    }
-    .field-input::placeholder { color: #94A3B8; font-weight: 500; }
-    .field-input:focus { background: #fff; border-color: #9B26B6; box-shadow: 0 0 0 4px rgba(155, 38, 182, .12); }
-    .field-input:disabled { background: #F1F5F9; color: #64748B; cursor: not-allowed; }
-    .field-input.is-invalid { border-color: #9B26B6; background: #FAF5FF; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key { font-weight: 800; color: #94A3B8; text-transform: uppercase; font-size: 9px; letter-spacing: .14em; padding-top: 3px; }
+    .detail-val { font-weight: 700; color: #002D62; text-align: right; word-break: break-word; }
 
-    .pwd-wrap { position: relative; }
-    .pwd-wrap .field-input { padding-right: 44px; }
-    .pwd-toggle {
-        position: absolute; right: 14px; top: 50%;
-        transform: translateY(-50%);
-        color: #94A3B8; font-size: 12px; cursor: pointer;
-        transition: color .2s;
-        background: none; border: none; padding: 0;
-    }
-    .pwd-toggle:hover { color: #9B26B6; }
-
-    .strength-bar { height: 5px; display: flex; gap: 4px; }
-    .strength-seg { flex: 1; background: #E2E8F0; border-radius: 3px; transition: background .3s ease; }
-    .strength-seg.on-weak   { background: #FDB913; }
-    .strength-seg.on-medium { background: #9B26B6; }
-    .strength-seg.on-strong { background: #002D62; }
-    .strength-text { font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
-    .strength-text.weak   { color: #B45309; }
-    .strength-text.medium { color: #9B26B6; }
-    .strength-text.strong { color: #002D62; }
-
-    .error-box {
-        display: none; padding: 12px 14px;
-        background: #FAF5FF;
-        border-left: 4px solid #9B26B6;
-        border-radius: 8px;
-        font-size: 11px; color: #6B21A8;
-        font-weight: 600; line-height: 1.5;
-    }
-    .error-box.show { display: block; animation: fadeUp .25s cubic-bezier(.4,0,.2,1) both; }
-    .error-box ul { list-style: disc; padding-left: 16px; }
-
+    /* ---------- TOAST ---------- */
     .toast {
         position: fixed; bottom: 24px; left: 50%;
         transform: translateX(-50%) translateY(80px);
-        background: #FDB913;
-        color: #fff;
+        background: #FDB913; color: #fff;
         padding: 14px 22px; border-radius: 9999px;
         font-size: 11px; font-weight: 800;
         letter-spacing: .1em; text-transform: uppercase;
@@ -470,204 +289,60 @@
         display: flex; align-items: center; gap: 10px;
         z-index: 200; opacity: 0;
         transition: all .35s cubic-bezier(.4,0,.2,1);
+        max-width: calc(100vw - 32px);
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.toast-blue { background: #002D62; box-shadow: 0 18px 40px -12px rgba(0,45,98,.6); }
 
-    .info-banner { background: #EFF6FF; border-left: 4px solid #9B26B6; border-radius: 10px; }
-
-    .sched-item { border-radius: 12px; transition: all .25s cubic-bezier(.4,0,.2,1); border-left: 4px solid; background: #F8FAFC; }
-    .sched-item:hover { background: #fff; box-shadow: 0 12px 26px -14px rgba(0,45,98,.2); transform: translateX(2px); }
-    .sched-gold   { border-left-color: #FDB913; }
-    .sched-purple { border-left-color: #9B26B6; }
-    .sched-navy   { border-left-color: #002D62; }
-
-    .dot-gold   { background: #FDB913; }
-    .dot-purple { background: #9B26B6; }
-    .dot-navy   { background: #002D62; }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
-        border-radius: 9999px;
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-    }
-    .status-ok      { background: rgba(0,45,98,.10); color: #002D62; border: 1px solid rgba(0,45,98,.25); }
-    .status-warn    { background: rgba(253,185,19,.18); color: #B45309; border: 1px solid rgba(253,185,19,.4); }
-    .status-alert   { background: rgba(155,38,182,.12); color: #9B26B6; border: 1px solid rgba(155,38,182,.3); }
-
-    .task-row {
-        display: flex; align-items: center; gap: 14px;
-        padding: 14px 16px;
-        background: #F8FAFC;
-        border-radius: 12px;
-        border-left: 4px solid;
-        transition: all .25s cubic-bezier(.4,0,.2,1);
-    }
-    .task-row:hover { background: #fff; box-shadow: 0 12px 26px -14px rgba(0,45,98,.2); transform: translateX(2px); }
-    .task-time {
-        text-align: center;
-        flex-shrink: 0;
-        width: 56px;
-        padding: 6px 0;
-        border-radius: 10px;
-        color: #fff;
-    }
-    .task-time .hour { font-size: 15px; font-weight: 900; line-height: 1; }
-    .task-time .suffix { font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
-
-    .site-footer {
-        background: #002D62;
-        color: #fff;
-        margin-top: 40px;
-        position: relative;
-    }
+    /* ---------- FOOTER ---------- */
+    .site-footer { background: #002D62; color: #fff; margin-top: 40px; position: relative; }
     .site-footer::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: #FDB913;
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 4px; background: #FDB913;
     }
-
-    .footer-inner {
-        max-width: 80rem;
-        margin: 0 auto;
-        padding: 56px 24px 0;
-    }
-
+    .footer-inner { max-width: 80rem; margin: 0 auto; padding: 56px 24px 0; }
     .footer-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 40px;
-        padding-bottom: 40px;
-        border-bottom: 1px solid rgba(255,255,255,0.12);
+        display: grid; grid-template-columns: 1fr; gap: 40px;
+        padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.12);
     }
-    @media (min-width: 768px) {
-        .footer-grid { grid-template-columns: 1.4fr 1fr 1.2fr; gap: 48px; }
-    }
-
+    @media (min-width: 768px) { .footer-grid { grid-template-columns: 1.4fr 1fr 1.2fr; gap: 48px; } }
     .footer-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-    .footer-logo .logo-bar {
-        width: 3px; height: 42px;
-        background: #FDB913;
-        border-radius: 2px;
-    }
+    .footer-logo .logo-bar { width: 3px; height: 42px; background: #FDB913; border-radius: 2px; }
     .footer-logo .logo-text { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; text-transform: uppercase; }
     .footer-logo .line-small { font-size: 0.62rem; letter-spacing: 0.2em; color: #FDB913; margin-bottom: 2px; }
     .footer-logo .line-large { font-size: 0.95rem; color: #fff; }
-
-    .footer-desc {
-        font-size: 12px;
-        line-height: 1.7;
-        color: rgba(255,255,255,0.75);
-        font-weight: 500;
-        max-width: 380px;
-    }
-
-    .footer-heading {
-        font-size: 10px;
-        font-weight: 900;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: #FDB913;
-        margin-bottom: 18px;
-    }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+    .footer-desc { font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.75); font-weight: 500; max-width: 380px; }
+    .footer-heading { font-size: 10px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: #FDB913; margin-bottom: 18px; }
+    .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
     .footer-links a {
-        color: rgba(255,255,255,0.8);
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: 600;
+        color: rgba(255,255,255,0.8); text-decoration: none;
+        font-size: 12px; font-weight: 600;
         transition: color .2s ease, padding-left .2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        display: inline-flex; align-items: center; gap: 8px;
     }
     .footer-links a::before {
-        content: '';
-        width: 4px; height: 4px;
-        border-radius: 50%;
-        background: #9B26B6;
-        display: inline-block;
-        transition: background .2s ease;
+        content: ''; width: 4px; height: 4px; border-radius: 50%;
+        background: #9B26B6; display: inline-block; transition: background .2s ease;
     }
     .footer-links a:hover { color: #FDB913; padding-left: 4px; }
     .footer-links a:hover::before { background: #FDB913; }
-
-    .footer-contact {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
+    .footer-contact { display: flex; flex-direction: column; gap: 14px; }
     .footer-contact-item {
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-        font-size: 12px;
-        color: rgba(255,255,255,0.8);
-        font-weight: 500;
-        line-height: 1.6;
+        display: flex; gap: 12px; align-items: flex-start;
+        font-size: 12px; color: rgba(255,255,255,0.8);
+        font-weight: 500; line-height: 1.6;
     }
-    .footer-contact-item i {
-        color: #FDB913;
-        font-size: 13px;
-        margin-top: 3px;
-        width: 16px;
-        flex-shrink: 0;
-    }
-    .footer-contact-item a {
-        color: rgba(255,255,255,0.85);
-        text-decoration: none;
-        transition: color .2s ease;
-    }
+    .footer-contact-item i { color: #FDB913; font-size: 13px; margin-top: 3px; width: 16px; flex-shrink: 0; }
+    .footer-contact-item a { color: rgba(255,255,255,0.85); text-decoration: none; transition: color .2s ease; }
     .footer-contact-item a:hover { color: #FDB913; }
-
     .footer-bottom {
-        padding: 22px 0;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-        justify-content: space-between;
+        padding: 22px 0; display: flex; flex-direction: column;
+        gap: 12px; align-items: center; justify-content: space-between;
     }
-    @media (min-width: 640px) {
-        .footer-bottom { flex-direction: row; }
-    }
-
-    .footer-copy {
-        font-size: 11px;
-        font-weight: 600;
-        color: rgba(255,255,255,0.65);
-        letter-spacing: 0.03em;
-    }
-
-    .footer-legal {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-    .footer-legal a {
-        font-size: 11px;
-        font-weight: 700;
-        color: rgba(255,255,255,0.75);
-        text-decoration: none;
-        letter-spacing: 0.05em;
-        transition: color .2s ease;
-    }
+    @media (min-width: 640px) { .footer-bottom { flex-direction: row; } }
+    .footer-copy { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.65); letter-spacing: 0.03em; }
+    .footer-legal { display: flex; align-items: center; gap: 20px; }
+    .footer-legal a { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.75); text-decoration: none; letter-spacing: 0.05em; transition: color .2s ease; }
     .footer-legal a:hover { color: #FDB913; }
 </style>
 </head>
@@ -714,7 +389,7 @@
                     <button id="profileToggle" class="flex items-center gap-3 pl-3 sm:pl-4 border-l border-white/20">
                         <div class="hidden sm:block text-right leading-tight">
                             <p id="navName" class="text-[11px] font-black text-white uppercase tracking-wide">—</p>
-                            <p id="navRole" class="text-[9px] font-bold text-p130c uppercase tracking-widest">—</p>
+                            <p id="navRole" class="text-[9px] font-bold text-yellow-300 uppercase tracking-widest">—</p>
                         </div>
                         <div id="navAvatar"
                              class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 border-white/40 text-white"
@@ -725,16 +400,19 @@
                     <div id="profileDropdown"
                          class="dropdown absolute right-0 top-[calc(100%+14px)] w-64 bg-white shadow-2xl border border-slate-200 z-50 rounded-2xl overflow-hidden">
                         <div class="p-5 border-b border-slate-100 bg-slate-50">
-                            <p id="ddName" class="text-sm font-black text-p655c leading-tight">—</p>
+                            <p id="ddName" class="text-sm font-black text-[#002D62] leading-tight">—</p>
                             <p id="ddEmail" class="text-[10px] font-bold text-slate-500 mt-1 truncate">—</p>
                         </div>
                         <div class="py-2">
-                            <button id="settingsBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-purple-50 hover:text-p254c transition">
-                                <i class="fas fa-gear w-4 text-p254c"></i> <span data-i18n="menu_settings">Settings</span>
+                            <a href="index.html" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-purple-50 hover:text-[#9B26B6] transition">
+                                <i class="fas fa-house w-4 text-[#9B26B6]"></i> <span data-i18n="menu_dashboard">Dashboard</span>
+                            </a>
+                            <button id="settingsBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-purple-50 hover:text-[#9B26B6] transition">
+                                <i class="fas fa-gear w-4 text-[#9B26B6]"></i> <span data-i18n="menu_settings">Settings</span>
                             </button>
                         </div>
                         <div class="border-t border-slate-100 py-2">
-                            <button id="logoutBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-p254c hover:bg-purple-50 transition">
+                            <button id="logoutBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[#9B26B6] hover:bg-purple-50 transition">
                                 <i class="fas fa-arrow-right-from-bracket w-4"></i> <span data-i18n="menu_logout">Sign Out</span>
                             </button>
                         </div>
@@ -750,19 +428,30 @@
 ============================================================= -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
-    <!-- Welcome banner -->
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 anim-up">
+        <a href="index.html" class="hover:text-[#9B26B6] transition flex items-center gap-2">
+            <i class="fas fa-house"></i> <span data-i18n="crumb_home">Portal Utama</span>
+        </a>
+        <i class="fas fa-chevron-right text-[8px]"></i>
+        <span class="text-[#002D62]" data-i18n="crumb_loan">Pinjaman Alat Radas</span>
+    </div>
+
+    <!-- Hero banner -->
     <div class="hero-banner p-8 sm:p-10 mb-6 rounded-3xl anim-up">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
                 <span class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-yellow-300 mb-3">
                     <span class="w-2 h-2 rounded-full bg-yellow-300 animate-pulse"></span>
-                    <span data-i18n="lab_dash_online">Lab Operational</span>
+                    <span data-i18n="loan_tag">Sistem Pinjaman Makmal</span>
                 </span>
 
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
-                    <span data-i18n="lab_dash_welcome">Welcome back,</span><br>
-                    <span id="bannerName" class="text-yellow-300">—</span>
+                    <span data-i18n="loan_title">Pinjaman Alat Radas</span>
                 </h1>
+                <p class="text-white/75 text-xs sm:text-sm font-medium mt-3 max-w-xl leading-relaxed" data-i18n="loan_sub">
+                    Mohon pinjaman alat radas &amp; peralatan makmal untuk sesi amali, penyelidikan dan projek pelajar.
+                </p>
 
                 <div class="mt-4 flex flex-wrap items-center gap-2">
                     <span class="chip chip-gold"><i class="fas fa-id-badge"></i> <span id="staffIdChip">—</span></span>
@@ -772,488 +461,193 @@
 
             <div class="shrink-0">
                 <div class="bg-white/15 border border-white/25 p-5 min-w-[200px] rounded-2xl float-anim">
-                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="lab_dash_today">Today</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="loan_today">Hari Ini</p>
                     <p id="todayDate" class="text-white font-bold text-sm">—</p>
                     <div class="h-px bg-white/25 my-3"></div>
-                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="lab_dash_lastlogin">Last Login</p>
-                    <p id="lastLogin" class="text-white font-bold text-xs">—</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="loan_officer">Pegawai Bertugas</p>
+                    <p id="bannerName" class="text-white font-bold text-xs">—</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============================================================
-         PORTAL MENU (NEW SECTION)
-    ============================================================ -->
-    <div class="card rounded-3xl mb-6 anim-up">
-        <!-- Header -->
-        <div class="bg-[#002D62] px-6 py-5 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-[#FDB913] flex items-center justify-center shadow-md">
-                    <i class="fas fa-table-cells text-white text-lg"></i>
-                </div>
-                <div>
-                    <h3 class="text-white font-black text-sm uppercase tracking-wide">PORTAL MENU</h3>
-                    <p class="text-[#FDB913] text-[9px] font-bold uppercase tracking-widest">QUICK ACCESS TO ALL SYSTEMS</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 border border-yellow-500/50 rounded-full px-3 py-1 bg-yellow-500/10">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#FDB913]"></span>
-                <span class="text-[#FDB913] text-[9px] font-black uppercase tracking-widest">UPDATED 2026</span>
-            </div>
-        </div>
-        
-        <!-- Body -->
-        <div class="p-6">
-            <!-- Group 1: ADMINISTRATION -->
-            <div class="mb-4">
-                <h4 class="text-[#9B26B6] text-[10px] font-black uppercase tracking-widest border-b-2 border-[#9B26B6] pb-1 inline-block" data-i18n="portal_admin">ADMINISTRATION</h4>
-            </div>
-            <ul class="space-y-0">
-                <li class="border-b border-slate-100">
-                    <a href="resume_portal.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
-                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
-                            <i class="fas fa-file-lines text-[#9B26B6] text-sm"></i>
-                        </div>
-                        <span class="text-sm font-bold">Resume</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="portalSettingsBtn" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
-                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
-                            <i class="fas fa-user-gear text-[#9B26B6] text-sm"></i>
-                        </div>
-                        <span class="text-sm font-bold">Account Settings</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- ============================================================
-                 NEW GROUP: PINJAMAN & PERMOHONAN
-            ============================================================ -->
-            <div class="mt-8 mb-4">
-                <h4 class="text-[#9B26B6] text-[10px] font-black uppercase tracking-widest border-b-2 border-[#9B26B6] pb-1 inline-block" data-i18n="portal_request_group">PINJAMAN &amp; PERMOHONAN</h4>
-            </div>
-            <ul class="space-y-0">
-                <li class="border-b border-slate-100">
-                    <a href="pinjaman_alat_radas.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
-                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
-                            <i class="fas fa-screwdriver-wrench text-[#9B26B6] text-sm"></i>
-                        </div>
-                        <span class="text-sm font-bold" data-i18n="portal_loan_tools">Pinjaman Alat Radas</span>
-                    </a>
-                </li>
-                <li class="border-b border-slate-100">
-                    <a href="permohonan_bahan_kimia.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
-                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
-                            <i class="fas fa-flask-vial text-[#9B26B6] text-sm"></i>
-                        </div>
-                        <span class="text-sm font-bold" data-i18n="portal_loan_chem">Permohonan Bahan Kimia</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="permohonan_peralatan_makmal.html" class="flex items-center gap-3 py-4 text-slate-700 hover:text-[#9B26B6] transition group">
-                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
-                            <i class="fas fa-microscope text-[#9B26B6] text-sm"></i>
-                        </div>
-                        <span class="text-sm font-bold" data-i18n="portal_loan_equip">Permohonan Peralatan Makmal</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Personal stat cards -->
+    <!-- Stat cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
         <div class="stat-card stat-navy card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-flask"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="lab_stat_week">This Week</span>
+                <div class="stat-icon-box"><i class="fas fa-clipboard-list"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="loan_stat_total_tag">All</span>
             </div>
-            <p class="text-3xl font-black leading-none mb-2 relative z-10">14</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="lab_stat_sessions">Lab Sessions</p>
-        </div>
-
-        <div class="stat-card stat-purple card-hover p-6 rounded-2xl">
-            <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-microscope"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="lab_stat_active">Active</span>
-            </div>
-            <p class="text-3xl font-black leading-none mb-2 relative z-10">28</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10" data-i18n="lab_stat_equipment">Equipment Items</p>
+            <p id="statTotal" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="loan_stat_total">Jumlah Permohonan</p>
         </div>
 
         <div class="stat-card stat-gold card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-vial"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="lab_stat_low">Low Stock</span>
+                <div class="stat-icon-box"><i class="fas fa-hourglass-half"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="loan_stat_pending_tag">Pending</span>
             </div>
-            <p class="text-3xl font-black leading-none mb-2 relative z-10">6</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-yellow-100 relative z-10" data-i18n="lab_stat_chemicals">Chemical Alerts</p>
+            <p id="statPending" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-yellow-100 relative z-10" data-i18n="loan_stat_pending">Menunggu Kelulusan</p>
         </div>
 
-        <div class="stat-card stat-deep card-hover p-6 rounded-2xl">
+        <div class="stat-card stat-purple card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-clipboard-check"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full">2026</span>
+                <div class="stat-icon-box"><i class="fas fa-circle-check"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="loan_stat_active_tag">Active</span>
             </div>
-            <p class="text-3xl font-black leading-none mb-2 relative z-10">98<small style="font-size:1.2rem;">%</small></p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="lab_stat_safety">Safety Compliance</p>
+            <p id="statApproved" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10" data-i18n="loan_stat_approved">Diluluskan / Aktif</p>
+        </div>
+
+        <div class="stat-card stat-slate card-hover p-6 rounded-2xl">
+            <div class="flex items-start justify-between mb-4 relative z-10">
+                <div class="stat-icon-box"><i class="fas fa-rotate-left"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="loan_stat_returned_tag">Done</span>
+            </div>
+            <p id="statReturned" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-200 relative z-10" data-i18n="loan_stat_returned">Dipulangkan</p>
         </div>
     </div>
 
     <!-- ============================================================
-         LAB PERFORMANCE DASHBOARD
+         APPLICATION FORM
     ============================================================ -->
-    <section class="mb-8 anim-up">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
-            <div>
-                <span class="section-label" data-i18n="lab_ach_tag">Lab Performance</span>
-                <h2 class="text-2xl sm:text-3xl font-black text-p655c mt-2" data-i18n="lab_ach_title">Laboratory Dashboard</h2>
-                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="lab_ach_sub">Equipment, safety &amp; operations · FKK Johor</p>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-                <span class="chip chip-gold"><i class="fas fa-calendar"></i> 2024 – 2026</span>
-                <span class="chip chip-purple"><i class="fas fa-arrow-trend-up"></i> <span data-i18n="lab_ach_trend">Improving</span></span>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <!-- EQUIPMENT UPTIME -->
-            <div class="ach-card">
-                <div class="ach-header ach-header-pub">
-                    <div class="flex items-center justify-between mb-5 relative z-10">
-                        <div class="flex items-center gap-3">
-                            <div class="ach-icon-box"><i class="fas fa-microscope"></i></div>
-                            <div>
-                                <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/70">Peralatan</p>
-                                <p class="text-sm font-black text-white uppercase tracking-wide" data-i18n="lab_equipment">Equipment</p>
-                            </div>
-                        </div>
-                        <span class="ach-badge"><i class="fas fa-arrow-up text-[8px]"></i> +2.4%</span>
-                    </div>
-                    <div class="relative z-10">
-                        <p class="ach-big-number">96<small style="font-size:1.4rem;">%</small></p>
-                        <p class="ach-sub" data-i18n="lab_equipment_sub">Overall uptime rate</p>
-                    </div>
+    <section class="card rounded-3xl mb-6 anim-up">
+        <div class="bg-[#002D62] px-6 py-5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#FDB913] flex items-center justify-center shadow-md">
+                    <i class="fas fa-file-circle-plus text-white text-lg"></i>
                 </div>
-                <div class="ach-body">
-                    <div class="ach-chart-wrap"><canvas id="equipChart"></canvas></div>
-                    <div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="lab_eq_operational">Operational</span></span>
-                            <span class="ach-legend-value">24</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #FDB913;"></span><span data-i18n="lab_eq_maintenance">Under Maintenance</span></span>
-                            <span class="ach-legend-value">3</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #9B26B6;"></span><span data-i18n="lab_eq_repair">Under Repair</span></span>
-                            <span class="ach-legend-value">1</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="lab_eq_total">Total Tracked</span></span>
-                            <span class="ach-legend-value">28</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SAFETY COMPLIANCE -->
-            <div class="ach-card">
-                <div class="ach-header ach-header-inv">
-                    <div class="flex items-center justify-between mb-5 relative z-10">
-                        <div class="flex items-center gap-3">
-                            <div class="ach-icon-box"><i class="fas fa-shield-halved"></i></div>
-                            <div>
-                                <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/70">Keselamatan</p>
-                                <p class="text-sm font-black text-white uppercase tracking-wide" data-i18n="lab_safety">Safety</p>
-                            </div>
-                        </div>
-                        <span class="ach-badge"><i class="fas fa-arrow-up text-[8px]"></i> +1.5%</span>
-                    </div>
-                    <div class="relative z-10">
-                        <p class="ach-big-number">98<small style="font-size:1.4rem;">%</small></p>
-                        <p class="ach-sub" data-i18n="lab_safety_sub">Compliance score</p>
-                    </div>
-                </div>
-                <div class="ach-body">
-                    <div class="ach-chart-wrap"><canvas id="safetyChart"></canvas></div>
-                    <div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #9B26B6;"></span><span data-i18n="lab_safe_checks">Passed Inspections</span></span>
-                            <span class="ach-legend-value">42</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #FDB913;"></span><span data-i18n="lab_safe_pending">Pending Review</span></span>
-                            <span class="ach-legend-value">3</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="lab_safe_training">Training Completed</span></span>
-                            <span class="ach-legend-value">18</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="lab_safe_incidents">Incidents (0 target)</span></span>
-                            <span class="ach-legend-value">0</span>
-                        </div>
-                    </div>
-                    <div class="ach-progress-wrap">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500" data-i18n="lab_safe_annual">Annual Safety Target</span>
-                            <span class="text-[11px] font-black text-p254c">98%</span>
-                        </div>
-                        <div class="ach-progress-track"><div class="ach-progress-fill fill-purple" style="width: 98%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CHEMICAL INVENTORY -->
-            <div class="ach-card">
-                <div class="ach-header ach-header-grt">
-                    <div class="flex items-center justify-between mb-5 relative z-10">
-                        <div class="flex items-center gap-3">
-                            <div class="ach-icon-box"><i class="fas fa-vial"></i></div>
-                            <div>
-                                <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/80">Inventori</p>
-                                <p class="text-sm font-black text-white uppercase tracking-wide" data-i18n="lab_inventory">Inventory</p>
-                            </div>
-                        </div>
-                        <span class="ach-badge"><i class="fas fa-boxes-stacked text-[8px]"></i> 340 <span data-i18n="lab_inv_items">items</span></span>
-                    </div>
-                    <div class="relative z-10">
-                        <p class="ach-big-number">340</p>
-                        <p class="ach-sub" data-i18n="lab_inventory_sub">Chemicals &amp; consumables tracked</p>
-                    </div>
-                </div>
-                <div class="ach-body">
-                    <div class="ach-chart-wrap"><canvas id="invChart"></canvas></div>
-                    <div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="lab_inv_solvents">Solvents</span></span>
-                            <span class="ach-legend-value">128</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #9B26B6;"></span><span data-i18n="lab_inv_reagents">Reagents</span></span>
-                            <span class="ach-legend-value">96</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #FDB913;"></span><span data-i18n="lab_inv_consumables">Consumables</span></span>
-                            <span class="ach-legend-value">82</span>
-                        </div>
-                        <div class="ach-legend-row">
-                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="lab_inv_gases">Compressed Gases</span></span>
-                            <span class="ach-legend-value">34</span>
-                        </div>
-                    </div>
-                    <div class="ach-progress-wrap">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500" data-i18n="lab_inv_stock">Stock Health</span>
-                            <span class="text-[11px] font-black text-p130c">82%</span>
-                        </div>
-                        <div class="ach-progress-track"><div class="ach-progress-fill fill-gold" style="width: 82%"></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Lab Utilisation Trend -->
-        <div class="trend-wrap">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
                 <div>
-                    <span class="section-label" data-i18n="lab_yearly_label">Yearly Trend</span>
-                    <h3 class="text-lg font-black text-p655c mt-1" data-i18n="lab_yearly_title">Lab Utilisation &amp; Sample Processing (2023 – 2026)</h3>
-                </div>
-                <div class="flex items-center gap-3 flex-wrap">
-                    <span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        <span class="w-3 h-3 rounded" style="background: #002D62;"></span>
-                        <span data-i18n="lab_legend_sessions">Lab Sessions</span>
-                    </span>
-                    <span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        <span class="w-3 h-3 rounded" style="background: #9B26B6;"></span>
-                        <span data-i18n="lab_legend_samples">Samples Processed</span>
-                    </span>
-                    <span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        <span class="w-3 h-3 rounded" style="background: #FDB913;"></span>
-                        <span data-i18n="lab_legend_uptime">Uptime (%)</span>
-                    </span>
+                    <h3 class="text-white font-black text-sm uppercase tracking-wide" data-i18n="loan_form_title">Borang Permohonan Pinjaman</h3>
+                    <p class="text-[#FDB913] text-[9px] font-bold uppercase tracking-widest" data-i18n="loan_form_sub">Lengkapkan maklumat di bawah</p>
                 </div>
             </div>
-            <div style="position: relative; height: 260px;">
-                <canvas id="labTrendChart"></canvas>
+            <div class="flex items-center gap-2 border border-yellow-500/50 rounded-full px-3 py-1 bg-yellow-500/10">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#FDB913]"></span>
+                <span class="text-[#FDB913] text-[9px] font-black uppercase tracking-widest" data-i18n="loan_form_required">Semua medan wajib diisi</span>
             </div>
         </div>
-    </section>
 
-    <!-- Task Schedule + Alerts -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+        <form id="loanForm" class="p-6" novalidate>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        <div class="xl:col-span-2 card p-6 rounded-3xl">
-            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                <!-- Applicant (read only) -->
                 <div>
-                    <span class="section-label" data-i18n="lab_sched_label">Today's Tasks</span>
-                    <h3 class="text-lg font-black text-p655c mt-1" data-i18n="lab_sched_title">Lab Duty Schedule</h3>
+                    <label class="field-label" data-i18n="loan_field_applicant">Nama Pemohon</label>
+                    <input id="fApplicant" type="text" class="field-input" disabled>
                 </div>
-                <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p254c hover:text-p655c transition" data-i18n="lab_view_all">View All</a>
-            </div>
-
-            <div class="space-y-3">
-                <div class="task-row sched-gold">
-                    <div class="task-time" style="background:#FDB913;">
-                        <p class="hour">08:00</p>
-                        <p class="suffix">AM</p>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-bold text-p655c truncate" data-i18n="lab_task_1">Prepare Lab 3 — Thermodynamics Practical</p>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            <i class="fas fa-location-dot mr-1 text-amber-600"></i> <span data-i18n="lab_task_1_loc">Lab 3 · 32 students</span>
-                        </p>
-                    </div>
-                    <span class="chip chip-gold shrink-0">2H</span>
+                <div>
+                    <label class="field-label" data-i18n="loan_field_staffid">No. Staf</label>
+                    <input id="fStaffId" type="text" class="field-input" disabled>
+                </div>
+                <div>
+                    <label class="field-label" data-i18n="loan_field_lab">Makmal</label>
+                    <input id="fLab" type="text" class="field-input" disabled>
                 </div>
 
-                <div class="task-row sched-purple">
-                    <div class="task-time" style="background:#9B26B6;">
-                        <p class="hour">11:00</p>
-                        <p class="suffix">AM</p>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-bold text-p655c truncate" data-i18n="lab_task_2">Equipment Calibration — HPLC System</p>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            <i class="fas fa-location-dot mr-1 text-purple-600"></i> <span data-i18n="lab_task_2_loc">Analytical Lab · Quarterly</span>
-                        </p>
-                    </div>
-                    <span class="chip chip-purple shrink-0">1H</span>
+                <!-- Equipment -->
+                <div class="lg:col-span-2">
+                    <label class="field-label" data-i18n="loan_field_equip">Jenis Alat Radas / Peralatan</label>
+                    <select id="fEquip" class="field-input"></select>
+                    <p id="equipHint" class="text-[10px] font-bold text-[#9B26B6] uppercase tracking-widest mt-2 hidden"></p>
+                </div>
+                <div>
+                    <label class="field-label" data-i18n="loan_field_qty">Kuantiti</label>
+                    <input id="fQty" type="number" min="1" value="1" class="field-input" placeholder="1">
                 </div>
 
-                <div class="task-row sched-navy">
-                    <div class="task-time" style="background:#002D62;">
-                        <p class="hour">02:30</p>
-                        <p class="suffix">PM</p>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-bold text-p655c truncate" data-i18n="lab_task_3">Chemical Inventory Restocking — Solvents</p>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            <i class="fas fa-location-dot mr-1 text-blue-700"></i> <span data-i18n="lab_task_3_loc">Store Room · Monthly</span>
-                        </p>
-                    </div>
-                    <span class="chip chip-navy shrink-0">2H</span>
+                <!-- Dates -->
+                <div>
+                    <label class="field-label" data-i18n="loan_field_from">Tarikh Pinjaman</label>
+                    <input id="fFrom" type="date" class="field-input">
+                </div>
+                <div>
+                    <label class="field-label" data-i18n="loan_field_to">Tarikh Pulang</label>
+                    <input id="fTo" type="date" class="field-input">
+                </div>
+                <div>
+                    <label class="field-label" data-i18n="loan_field_usage">Kegunaan</label>
+                    <select id="fUsage" class="field-input">
+                        <option value="practical" data-i18n="usage_practical">Sesi Amali Pelajar</option>
+                        <option value="research"  data-i18n="usage_research">Penyelidikan</option>
+                        <option value="project"   data-i18n="usage_project">Projek Pelajar</option>
+                        <option value="service"   data-i18n="usage_service">Servis / Penyelenggaraan</option>
+                        <option value="other"     data-i18n="usage_other">Lain-lain</option>
+                    </select>
+                </div>
+
+                <!-- Purpose -->
+                <div class="lg:col-span-3">
+                    <label class="field-label" data-i18n="loan_field_purpose">Tujuan / Catatan</label>
+                    <textarea id="fPurpose" class="field-input" placeholder="Nyatakan tujuan pinjaman..." data-i18n-ph="loan_ph_purpose"></textarea>
                 </div>
             </div>
-        </div>
 
-        <div class="card p-6 rounded-3xl">
-            <div class="mb-5 pb-4 border-b border-slate-100">
-                <span class="section-label" data-i18n="lab_alert_label">Alerts</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="lab_alert_title">Lab Notices</h3>
-            </div>
-            <ul class="space-y-4">
-                <li class="flex gap-3">
-                    <span class="w-2 h-2 rounded-full dot-gold mt-2 shrink-0"></span>
-                    <div>
-                        <p class="text-xs font-bold text-p655c leading-snug" data-i18n="lab_alert_1">Low stock: Acetone &amp; Ethanol — reorder soon</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">1 <span data-i18n="lab_alert_hour">hour ago</span></p>
-                    </div>
-                </li>
-                <li class="flex gap-3">
-                    <span class="w-2 h-2 rounded-full dot-purple mt-2 shrink-0"></span>
-                    <div>
-                        <p class="text-xs font-bold text-p655c leading-snug" data-i18n="lab_alert_2">Autoclave servicing scheduled next Tuesday</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">4 <span data-i18n="lab_alert_hours">hours ago</span></p>
-                    </div>
-                </li>
-                <li class="flex gap-3">
-                    <span class="w-2 h-2 rounded-full dot-navy mt-2 shrink-0"></span>
-                    <div>
-                        <p class="text-xs font-bold text-p655c leading-snug" data-i18n="lab_alert_3">New safety SOP issued for chemical waste handling</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">2 <span data-i18n="lab_alert_days">days ago</span></p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
+            <div id="formError" class="error-box mt-5"></div>
 
-    <!-- ============================================================
-         ACTIVITY TRAIL
-    ============================================================ -->
-    <section class="card p-6 rounded-3xl mb-10 anim-up">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
-            <div>
-                <span class="section-label" data-i18n="activity_label">Jejak Aktiviti</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="activity_title">Activity Trail</h3>
-                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="lab_activity_sub">Recent actions on your account</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="chip chip-purple">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <span id="activityCount">0</span>
-                    <span data-i18n="activity_records">records</span>
-                </span>
-                <button id="clearActivityBtn"
-                        class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-p254c transition px-3 py-2">
-                    <i class="fas fa-broom"></i> <span data-i18n="activity_clear">Clear</span>
+            <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-5 border-t border-slate-100">
+                <button type="button" id="btnReset" class="btn-outline sm:w-40 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                    <i class="fas fa-eraser"></i> <span data-i18n="loan_btn_reset">Set Semula</span>
+                </button>
+                <button type="submit" id="btnSubmit" class="btn-gold flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i> <span data-i18n="loan_btn_submit">Hantar Permohonan</span>
                 </button>
             </div>
-        </div>
-        <div id="activityTimeline" class="activity-timeline">
-            <!-- rendered by JS -->
-        </div>
+        </form>
     </section>
 
-    <!-- Newsroom & Events -->
-    <section class="mb-10">
-        <div class="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
-            <div>
-                <span class="section-label" data-i18n="lab_news_tag">Latest Updates</span>
-                <h2 class="text-2xl sm:text-3xl font-black text-p655c mt-2" data-i18n="lab_news_title">Lab News &amp; Events</h2>
+    <!-- ============================================================
+         RECORDS TABLE
+    ============================================================ -->
+    <section class="card rounded-3xl mb-10 anim-up">
+        <div class="px-6 py-5 border-b border-slate-100">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <span class="section-label" data-i18n="loan_list_tag">Rekod Pinjaman</span>
+                    <h3 class="text-lg font-black text-[#002D62] mt-1" data-i18n="loan_list_title">Sejarah Permohonan</h3>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-full">
+                        <i class="fas fa-magnifying-glass text-slate-400 text-xs"></i>
+                        <input id="searchInput" type="text" placeholder="Cari alat atau ID..."
+                               data-i18n-ph="loan_ph_search"
+                               class="bg-transparent border-none outline-none text-xs text-[#002D62] font-semibold placeholder-slate-400 w-full sm:w-44">
+                    </div>
+                </div>
             </div>
-            <a href="#" class="text-xs font-black uppercase tracking-widest text-p254c hover:text-p655c transition flex items-center gap-2">
-                <span data-i18n="lab_btn_archive">View Archive</span> <i class="fas fa-chevron-right text-[10px]"></i>
-            </a>
+
+            <div class="flex flex-wrap items-center gap-2 mt-4">
+                <button class="filter-tab active" data-filter="all"      data-i18n="filter_all">Semua</button>
+                <button class="filter-tab" data-filter="pending"  data-i18n="status_pending">Menunggu</button>
+                <button class="filter-tab" data-filter="approved" data-i18n="status_approved">Diluluskan</button>
+                <button class="filter-tab" data-filter="returned" data-i18n="status_returned">Dipulangkan</button>
+                <button class="filter-tab" data-filter="rejected" data-i18n="status_rejected">Ditolak</button>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <article class="news-card group">
-                <div class="news-img">
-                    <img src="https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&q=80&w=800" alt="Safety">
-                    <div class="news-badge badge-safety">Safety</div>
-                </div>
-                <div class="p-5">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">March 15, 2026</div>
-                    <h3 class="text-base font-bold text-p655c mb-3 leading-snug group-hover:text-p254c transition" data-i18n="lab_news_1_title">
-                        Annual Lab Safety Audit Completed Successfully.
-                    </h3>
-                    <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p130c mt-2 inline-block">Read More</a>
-                </div>
-            </article>
-
-            <article class="news-card group">
-                <div class="news-img">
-                    <img src="https://images.unsplash.com/photo-1554475901-4538ddfbccc2?auto=format&fit=crop&q=80&w=800" alt="Equipment">
-                    <div class="news-badge badge-equipment">Equipment</div>
-                </div>
-                <div class="p-5">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">March 10, 2026</div>
-                    <h3 class="text-base font-bold text-p655c mb-3 leading-snug group-hover:text-p254c transition" data-i18n="lab_news_2_title">
-                        New FTIR Spectrometer Now Available for Research Use.
-                    </h3>
-                    <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p130c mt-2 inline-block">Read More</a>
-                </div>
-            </article>
-
-            <article class="news-card group">
-                <div class="news-img">
-                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800" alt="Training">
-                    <div class="news-badge badge-training">Training</div>
-                </div>
-                <div class="p-5">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">March 05, 2026</div>
-                    <h3 class="text-base font-bold text-p655c mb-3 leading-snug group-hover:text-p254c transition" data-i18n="lab_news_3_title">
-                        Chemical Handling Certification Course — Register Now.
-                    </h3>
-                    <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p130c mt-2 inline-block">Read More</a>
-                </div>
-            </article>
+        <div class="p-6">
+            <div id="tableWrap" class="table-wrap">
+                <table class="loan-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="tbl_id">No. Rujukan</th>
+                            <th data-i18n="tbl_equip">Alat Radas</th>
+                            <th data-i18n="tbl_qty">Kuantiti</th>
+                            <th data-i18n="tbl_period">Tempoh Pinjaman</th>
+                            <th data-i18n="tbl_status">Status</th>
+                            <th class="text-right" data-i18n="tbl_action">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loanTbody"></tbody>
+                </table>
+            </div>
+            <div id="loanEmpty" class="empty-state hidden">
+                <i class="fas fa-inbox"></i>
+                <p class="text-xs font-bold uppercase tracking-widest" data-i18n="loan_empty">Tiada rekod pinjaman</p>
+            </div>
         </div>
     </section>
 
@@ -1264,7 +658,6 @@
 ============================================================= -->
 <footer class="site-footer">
     <div class="footer-inner">
-
         <div class="footer-grid">
             <div>
                 <div class="footer-logo">
@@ -1283,10 +676,10 @@
             <div>
                 <h4 class="footer-heading" data-i18n="footer_quick_links">Quick Links</h4>
                 <ul class="footer-links">
-                    <li><a href="#" data-i18n="footer_lab_dir">Lab Directory</a></li>
+                    <li><a href="index.html" data-i18n="menu_dashboard">Dashboard</a></li>
+                    <li><a href="pinjaman_alat_radas.html" data-i18n="crumb_loan">Pinjaman Alat Radas</a></li>
                     <li><a href="#" data-i18n="footer_safety_manual">Safety Manual</a></li>
                     <li><a href="#" data-i18n="footer_equipment_log">Equipment Log</a></li>
-                    <li><a href="#" data-i18n="footer_chemical_db">Chemical Database</a></li>
                     <li><a href="#" data-i18n="footer_contact">Contact</a></li>
                 </ul>
             </div>
@@ -1317,9 +710,35 @@
                 <a href="#" data-i18n="footer_terms">Terms of Use</a>
             </div>
         </div>
-
     </div>
 </footer>
+
+<!-- ============================================================
+     DETAIL MODAL
+============================================================= -->
+<div id="detailModal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-box bg-white w-full max-w-lg shadow-2xl max-h-[92vh] overflow-hidden flex flex-col">
+        <div class="modal-header-gradient flex items-center justify-between px-6 py-5 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/20 border border-white/30">
+                    <i class="fas fa-screwdriver-wrench text-white text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black leading-none" data-i18n="loan_detail_title">Butiran Permohonan</h3>
+                    <p id="detailRef" class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">—</p>
+                </div>
+            </div>
+            <button id="detailClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
+        </div>
+
+        <div id="detailBody" class="p-6 overflow-y-auto flex-1"></div>
+
+        <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
+            <button id="detailDismiss" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-[#002D62] transition" data-i18n="loan_btn_close">Tutup</button>
+            <button id="detailAction" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hidden"></button>
+        </div>
+    </div>
+</div>
 
 <!-- ============================================================
      SETTINGS MODAL
@@ -1377,37 +796,16 @@
                 </div>
                 <div>
                     <label class="field-label" data-i18n="settings_current_pwd">Current Password</label>
-                    <div class="pwd-wrap">
-                        <input id="currentPwd" type="password" class="field-input" placeholder="Enter current password" autocomplete="current-password">
-                        <button type="button" class="pwd-toggle" data-target="currentPwd"><i class="fas fa-eye"></i></button>
-                    </div>
+                    <input id="currentPwd" type="password" class="field-input" placeholder="Enter current password" autocomplete="current-password">
                 </div>
                 <div>
                     <label class="field-label" data-i18n="settings_new_pwd">New Password</label>
-                    <div class="pwd-wrap">
-                        <input id="newPwd" type="password" class="field-input" placeholder="Enter new password" autocomplete="new-password">
-                        <button type="button" class="pwd-toggle" data-target="newPwd"><i class="fas fa-eye"></i></button>
-                    </div>
-                    <div class="mt-3">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[9px] font-black uppercase tracking-widest text-slate-400" data-i18n="pwd_strength_label">Strength</span>
-                            <span id="strengthText" class="strength-text" data-i18n="pwd_strength_none">—</span>
-                        </div>
-                        <div class="strength-bar">
-                            <div class="strength-seg" id="seg1"></div>
-                            <div class="strength-seg" id="seg2"></div>
-                            <div class="strength-seg" id="seg3"></div>
-                            <div class="strength-seg" id="seg4"></div>
-                        </div>
-                        <p class="text-[9px] font-bold text-slate-400 mt-2 leading-relaxed" data-i18n="pwd_hint">Minimum 8 characters · at least 1 uppercase · 1 lowercase · 1 number</p>
-                    </div>
+                    <input id="newPwd" type="password" class="field-input" placeholder="Enter new password" autocomplete="new-password">
+                    <p class="text-[9px] font-bold text-slate-400 mt-2 leading-relaxed" data-i18n="pwd_hint">Minimum 8 characters · at least 1 uppercase · 1 lowercase · 1 number</p>
                 </div>
                 <div>
                     <label class="field-label" data-i18n="settings_confirm_pwd">Confirm New Password</label>
-                    <div class="pwd-wrap">
-                        <input id="confirmPwd" type="password" class="field-input" placeholder="Re-enter new password" autocomplete="new-password">
-                        <button type="button" class="pwd-toggle" data-target="confirmPwd"><i class="fas fa-eye"></i></button>
-                    </div>
+                    <input id="confirmPwd" type="password" class="field-input" placeholder="Re-enter new password" autocomplete="new-password">
                 </div>
                 <div id="pwdError" class="error-box"></div>
             </div>
@@ -1415,247 +813,347 @@
 
         <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
             <div id="footerProfile" class="flex gap-3 w-full">
-                <button id="settingsCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition"><span data-i18n="settings_cancel">Cancel</span></button>
+                <button id="settingsCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-[#002D62] transition"><span data-i18n="settings_cancel">Cancel</span></button>
                 <button id="settingsSave" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"><i class="fas fa-check"></i> <span data-i18n="settings_save">Save Changes</span></button>
             </div>
             <div id="footerSecurity" class="hidden flex gap-3 w-full">
-                <button id="pwdCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition"><span data-i18n="settings_cancel">Cancel</span></button>
+                <button id="pwdCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-[#002D62] transition"><span data-i18n="settings_cancel">Cancel</span></button>
                 <button id="pwdUpdate" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"><i class="fas fa-key"></i> <span data-i18n="btn_update_pwd">Update Password</span></button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- TOAST -->
 <div id="toast" class="toast">
     <i class="fas fa-circle-check"></i>
-    <span id="toastMsg" data-i18n="toast_saved">Settings Saved</span>
+    <span id="toastMsg">—</span>
 </div>
 
-<!-- AUTH CHANGE: load cookie session helper BEFORE the main script -->
+<!-- AUTH: cookie session helper MUST load before main script -->
 <script src="auth.js"></script>
 
 <script>
 (function () {
 
     /* =========================================================
-       AUTH CHANGE: GUARD — lab staff only
+       AUTH GUARD — lab staff only
     ========================================================== */
     const session = FMSAuth.requireAuth(['lab_staff']);
     if (!session) return;
 
-    // Keep session alive on user activity
     ['click', 'keydown'].forEach(evt =>
         document.addEventListener(evt, () => FMSAuth.touch(), { passive: true })
     );
-    /* ========================================================= */
 
     /* =========================================================
        CONSTANTS & STATE
     ========================================================== */
-    // AUTH CHANGE: DEFAULT_STAFF removed — data comes from session.
-    const DEMO_PASSWORD = 'lab123';
-    const ACTIVITY_KEY = 'fkkLabActivityTrail';
+    const LOAN_KEY      = 'fkkLabLoanRecords';
+    const ACTIVITY_KEY  = 'fkkLabActivityTrail';
     const ACTIVITY_LIMIT = 40;
+    const DEMO_PASSWORD = 'lab123';
 
     let currentLang = 'en';
     let staff = null;
-    let charts = { equip: null, safety: null, inv: null, labTrend: null };
-    let activities = [];
+    let records = [];
+    let activeFilter = 'all';
+    let searchTerm = '';
+    let detailId = null;
 
-    /* Activity type meta — SOLID colours */
-    const ACTIVITY_TYPES = {
-        login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
-        profile_update:  { icon: 'fa-user-pen',                   bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
-        password_change: { icon: 'fa-key',                        bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
-        settings_open:   { icon: 'fa-gear',                       bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
-        activity_clear:  { icon: 'fa-broom',                      bg: '#002D62', en: 'Cleared activity trail', ms: 'Kosongkan jejak aktiviti' }
+    /* ---------------------------------------------------------
+       EQUIPMENT CATALOG
+    --------------------------------------------------------- */
+    const CATEGORY_LABELS = {
+        analytical: { en: 'Analytical',       ms: 'Analitikal' },
+        general:    { en: 'General Purpose',  ms: 'Tujuan Umum' },
+        safety:     { en: 'Safety',           ms: 'Keselamatan' },
+        storage:    { en: 'Storage',          ms: 'Penyimpanan' }
     };
+
+    const CATALOG = [
+        { id:'EQ-001', cat:'analytical', stock:4,  icon:'fa-scale-balanced',    en:'Analytical Balance',        ms:'Penimbang Analitikal' },
+        { id:'EQ-002', cat:'analytical', stock:1,  icon:'fa-wave-square',       en:'FTIR Spectrometer',         ms:'Spektrometer FTIR' },
+        { id:'EQ-003', cat:'analytical', stock:2,  icon:'fa-chart-line',        en:'HPLC System',               ms:'Sistem HPLC' },
+        { id:'EQ-004', cat:'analytical', stock:3,  icon:'fa-lightbulb',         en:'UV-Vis Spectrophotometer',  ms:'Spektrofotometer UV-Vis' },
+        { id:'EQ-005', cat:'general',    stock:5,  icon:'fa-fan',               en:'Centrifuge',                ms:'Sentrifuge' },
+        { id:'EQ-006', cat:'general',    stock:2,  icon:'fa-temperature-high',  en:'Autoclave',                 ms:'Autoklaf' },
+        { id:'EQ-007', cat:'general',    stock:3,  icon:'fa-fire-burner',       en:'Laboratory Oven',           ms:'Ketuhar Makmal' },
+        { id:'EQ-008', cat:'analytical', stock:1,  icon:'fa-fire-flame-simple', en:'Muffle Furnace',            ms:'Relau Mufel' },
+        { id:'EQ-009', cat:'analytical', stock:2,  icon:'fa-rotate',            en:'Rotary Evaporator',         ms:'Penyejat Berputar' },
+        { id:'EQ-010', cat:'general',    stock:6,  icon:'fa-droplet',           en:'pH Meter',                  ms:'Meter pH' },
+        { id:'EQ-011', cat:'analytical', stock:2,  icon:'fa-gauge-high',        en:'Viscometer',                ms:'Viscometer' },
+        { id:'EQ-012', cat:'analytical', stock:1,  icon:'fa-bomb',              en:'Bomb Calorimeter',          ms:'Kalorimeter Bom' },
+        { id:'EQ-013', cat:'safety',     stock:4,  icon:'fa-mask-ventilator',   en:'Fume Hood Access Kit',      ms:'Kit Akses Kebuk Wasap' },
+        { id:'EQ-014', cat:'storage',    stock:8,  icon:'fa-box-archive',       en:'Desiccator',                ms:'Desikator' },
+        { id:'EQ-015', cat:'general',    stock:4,  icon:'fa-water',             en:'Water Bath',                ms:'Mandian Air' },
+        { id:'EQ-016', cat:'general',    stock:2,  icon:'fa-volume-high',       en:'Sonicator',                 ms:'Sonikator' },
+        { id:'EQ-017', cat:'general',    stock:20, icon:'fa-flask',             en:'Glassware Set (Burette/Pipette)', ms:'Set Alat Kaca (Buret/Pipet)' },
+        { id:'EQ-018', cat:'general',    stock:3,  icon:'fa-wind',              en:'Vacuum Pump',               ms:'Pam Vakum' }
+    ];
 
     /* =========================================================
        i18n
     ========================================================== */
     const i18n = {
         en: {
-            nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Search portal...",
-            menu_settings: "Settings", menu_logout: "Sign Out",
-            portal_admin: "ADMINISTRATION",
-            portal_request_group: "PINJAMAN &amp; PERMOHONAN",
-            portal_loan_tools: "Pinjaman Alat Radas",
-            portal_loan_chem: "Permohonan Bahan Kimia",
-            portal_loan_equip: "Permohonan Peralatan Makmal",
-            lab_dash_online: "Lab Operational", lab_dash_welcome: "Welcome back,",
-            lab_dash_today: "Today", lab_dash_lastlogin: "Last Login",
-            lab_stat_week: "This Week", lab_stat_sessions: "Lab Sessions",
-            lab_stat_active: "Active", lab_stat_equipment: "Equipment Items",
-            lab_stat_low: "Low Stock", lab_stat_chemicals: "Chemical Alerts",
-            lab_stat_safety: "Safety Compliance",
-            lab_ach_tag: "Lab Performance", lab_ach_title: "Laboratory Dashboard",
-            lab_ach_sub: "Equipment, safety &amp; operations · FKK Johor", lab_ach_trend: "Improving",
-            lab_equipment: "Equipment", lab_equipment_sub: "Overall uptime rate",
-            lab_eq_operational: "Operational", lab_eq_maintenance: "Under Maintenance",
-            lab_eq_repair: "Under Repair", lab_eq_total: "Total Tracked",
-            lab_safety: "Safety", lab_safety_sub: "Compliance score",
-            lab_safe_checks: "Passed Inspections", lab_safe_pending: "Pending Review",
-            lab_safe_training: "Training Completed", lab_safe_incidents: "Incidents (0 target)",
-            lab_safe_annual: "Annual Safety Target",
-            lab_inventory: "Inventory", lab_inventory_sub: "Chemicals &amp; consumables tracked",
-            lab_inv_items: "items",
-            lab_inv_solvents: "Solvents", lab_inv_reagents: "Reagents",
-            lab_inv_consumables: "Consumables", lab_inv_gases: "Compressed Gases",
-            lab_inv_stock: "Stock Health",
-            lab_yearly_label: "Yearly Trend", lab_yearly_title: "Lab Utilisation &amp; Sample Processing (2023 – 2026)",
-            lab_legend_sessions: "Lab Sessions", lab_legend_samples: "Samples Processed", lab_legend_uptime: "Uptime (%)",
-            lab_sched_label: "Today's Tasks", lab_sched_title: "Lab Duty Schedule", lab_view_all: "View All",
-            lab_task_1: "Prepare Lab 3 — Thermodynamics Practical",
-            lab_task_1_loc: "Lab 3 · 32 students",
-            lab_task_2: "Equipment Calibration — HPLC System",
-            lab_task_2_loc: "Analytical Lab · Quarterly",
-            lab_task_3: "Chemical Inventory Restocking — Solvents",
-            lab_task_3_loc: "Store Room · Monthly",
-            lab_alert_label: "Alerts", lab_alert_title: "Lab Notices",
-            lab_alert_1: "Low stock: Acetone &amp; Ethanol — reorder soon",
-            lab_alert_2: "Autoclave servicing scheduled next Tuesday",
-            lab_alert_3: "New safety SOP issued for chemical waste handling",
-            lab_alert_hour: "hour ago", lab_alert_hours: "hours ago", lab_alert_days: "days ago",
-            activity_label: "Jejak Aktiviti", activity_title: "Activity Trail",
-            lab_activity_sub: "Recent actions on your account",
-            activity_clear: "Clear", activity_records: "records",
-            activity_empty: "No activity recorded yet",
-            activity_confirm_clear: "Clear the entire activity trail?",
-            lab_news_tag: "Latest Updates", lab_news_title: "Lab News &amp; Events", lab_btn_archive: "View Archive",
-            lab_news_1_title: "Annual Lab Safety Audit Completed Successfully.",
-            lab_news_2_title: "New FTIR Spectrometer Now Available for Research Use.",
-            lab_news_3_title: "Chemical Handling Certification Course — Register Now.",
-            settings_title: "Profile Settings", settings_sub: "Update your profile information",
-            settings_tab_profile: "Profile", settings_tab_security: "Security",
-            settings_avatar_hint: "Avatar initials auto-generated",
-            settings_avatar_sub: "Based on your full name below",
-            settings_name: "Full Name", settings_position: "Position",
-            settings_email: "Email", settings_lab: "Assigned Laboratory",
-            settings_staffid: "Staff ID (Read-only)",
-            settings_cancel: "Cancel", settings_save: "Save Changes",
-            toast_saved: "Settings Saved",
-            pwd_info_title: "Change Your Password",
-            pwd_info_sub: "Choose a strong password you don't use anywhere else.",
-            settings_current_pwd: "Current Password",
-            settings_new_pwd: "New Password", settings_confirm_pwd: "Confirm New Password",
-            pwd_strength_label: "Strength", pwd_strength_none: "—",
-            pwd_strength_weak: "Weak", pwd_strength_medium: "Medium", pwd_strength_strong: "Strong",
-            pwd_hint: "Minimum 8 characters · at least 1 uppercase · 1 lowercase · 1 number",
-            btn_update_pwd: "Update Password", toast_pwd: "Password Updated",
-            toast_activity_cleared: "Activity Cleared",
-            err_current_wrong: "Current password is incorrect.",
-            err_pwd_short: "Password must be at least 8 characters.",
-            err_pwd_upper: "Password must contain an uppercase letter.",
-            err_pwd_lower: "Password must contain a lowercase letter.",
-            err_pwd_number: "Password must contain a number.",
-            err_pwd_match: "New password and confirmation do not match.",
-            err_pwd_same: "New password must be different from the current one.",
-            err_pwd_empty: "Please fill in all password fields.",
-            footer_desc: "Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.",
-            footer_quick_links: "Quick Links",
-            footer_lab_dir: "Lab Directory",
-            footer_safety_manual: "Safety Manual",
-            footer_equipment_log: "Equipment Log",
-            footer_chemical_db: "Chemical Database",
-            footer_contact: "Contact",
-            footer_contact_heading: "UiTM Cawangan Johor",
-            footer_address: "Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
-            footer_copyright: "© 2026 FKK UiTM Johor. All Rights Reserved.",
-            footer_privacy: "Privacy Policy",
-            footer_terms: "Terms of Use"
+            nav_faculty:"FAKULTI", nav_dept:"KEJURUTERAAN KIMIA", ph_search:"Search portal...",
+            menu_dashboard:"Dashboard", menu_settings:"Settings", menu_logout:"Sign Out",
+
+            crumb_home:"Main Portal", crumb_loan:"Apparatus Loan",
+
+            loan_tag:"Lab Loan System",
+            loan_title:"Apparatus Loan",
+            loan_sub:"Request lab apparatus & equipment loans for practical sessions, research and student projects.",
+            loan_today:"Today", loan_officer:"Duty Officer",
+
+            loan_stat_total_tag:"All",        loan_stat_total:"Total Applications",
+            loan_stat_pending_tag:"Pending",  loan_stat_pending:"Awaiting Approval",
+            loan_stat_active_tag:"Active",    loan_stat_approved:"Approved / Active",
+            loan_stat_returned_tag:"Done",    loan_stat_returned:"Returned",
+
+            loan_form_title:"Loan Application Form",
+            loan_form_sub:"Complete the information below",
+            loan_form_required:"All fields are required",
+
+            loan_field_applicant:"Applicant Name",
+            loan_field_staffid:"Staff ID",
+            loan_field_lab:"Laboratory",
+            loan_field_equip:"Apparatus / Equipment Type",
+            loan_field_qty:"Quantity",
+            loan_field_from:"Loan Date",
+            loan_field_to:"Return Date",
+            loan_field_usage:"Usage",
+            loan_field_purpose:"Purpose / Remarks",
+
+            usage_practical:"Student Practical Session",
+            usage_research:"Research",
+            usage_project:"Student Project",
+            usage_service:"Service / Maintenance",
+            usage_other:"Others",
+
+            loan_ph_equip:"— Select apparatus —",
+            loan_ph_purpose:"Describe the purpose of this loan...",
+            loan_ph_search:"Search apparatus or ID...",
+            loan_units:"units",
+            loan_avail:"Available stock",
+            loan_btn_reset:"Reset",
+            loan_btn_submit:"Submit Application",
+            loan_btn_close:"Close",
+            loan_btn_return:"Mark Returned",
+            loan_btn_cancel_loan:"Cancel Request",
+
+            loan_list_tag:"Loan Records",
+            loan_list_title:"Application History",
+
+            filter_all:"All",
+            status_pending:"Pending",
+            status_approved:"Approved",
+            status_returned:"Returned",
+            status_rejected:"Rejected",
+
+            tbl_id:"Reference No.",
+            tbl_equip:"Apparatus",
+            tbl_qty:"Qty",
+            tbl_period:"Loan Period",
+            tbl_status:"Status",
+            tbl_action:"Action",
+
+            loan_empty:"No loan records found",
+
+            loan_detail_title:"Application Details",
+            d_ref:"Reference No.", d_equip:"Apparatus", d_qty:"Quantity",
+            d_period:"Loan Period", d_usage:"Usage", d_purpose:"Purpose",
+            d_applicant:"Applicant", d_staffid:"Staff ID", d_lab:"Laboratory",
+            d_status:"Status", d_submitted:"Submitted On", d_updated:"Last Updated",
+            d_remark:"Remark",
+
+            err_equip:"Please select an apparatus or equipment.",
+            err_qty:"Quantity must be at least 1.",
+            err_qty_max:"Quantity exceeds available stock ({max} units).",
+            err_from:"Please select a loan date.",
+            err_to:"Please select a return date.",
+            err_past:"Loan date cannot be in the past.",
+            err_dates:"Return date must be on or after the loan date.",
+            err_purpose:"Please provide the purpose of this loan.",
+
+            toast_loan_submitted:"Loan Application Submitted",
+            toast_loan_cancelled:"Loan Request Cancelled",
+            toast_loan_returned:"Marked as Returned",
+            confirm_cancel_loan:"Cancel this loan request?",
+            confirm_return_loan:"Confirm that the apparatus has been returned?",
+
+            remark_pending:"Awaiting approval from the Lab Coordinator.",
+            remark_approved:"Approved. Please collect the apparatus from the lab store.",
+            remark_rejected:"Rejected. Please contact the Lab Coordinator for details.",
+            remark_returned:"Apparatus returned and verified.",
+
+            /* settings */
+            settings_title:"Profile Settings", settings_sub:"Update your profile information",
+            settings_tab_profile:"Profile", settings_tab_security:"Security",
+            settings_avatar_hint:"Avatar initials auto-generated",
+            settings_avatar_sub:"Based on your full name below",
+            settings_name:"Full Name", settings_position:"Position",
+            settings_email:"Email", settings_lab:"Assigned Laboratory",
+            settings_staffid:"Staff ID (Read-only)",
+            settings_cancel:"Cancel", settings_save:"Save Changes",
+            toast_saved:"Settings Saved",
+            pwd_info_title:"Change Your Password",
+            pwd_info_sub:"Choose a strong password you don't use anywhere else.",
+            settings_current_pwd:"Current Password",
+            settings_new_pwd:"New Password", settings_confirm_pwd:"Confirm New Password",
+            pwd_hint:"Minimum 8 characters · at least 1 uppercase · 1 lowercase · 1 number",
+            btn_update_pwd:"Update Password", toast_pwd:"Password Updated",
+            err_current_wrong:"Current password is incorrect.",
+            err_pwd_short:"Password must be at least 8 characters.",
+            err_pwd_upper:"Password must contain an uppercase letter.",
+            err_pwd_lower:"Password must contain a lowercase letter.",
+            err_pwd_number:"Password must contain a number.",
+            err_pwd_match:"New password and confirmation do not match.",
+            err_pwd_same:"New password must be different from the current one.",
+            err_pwd_empty:"Please fill in all password fields.",
+
+            footer_desc:"Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.",
+            footer_quick_links:"Quick Links",
+            footer_safety_manual:"Safety Manual",
+            footer_equipment_log:"Equipment Log",
+            footer_contact:"Contact",
+            footer_contact_heading:"UiTM Cawangan Johor",
+            footer_address:"Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
+            footer_copyright:"© 2026 FKK UiTM Johor. All Rights Reserved.",
+            footer_privacy:"Privacy Policy",
+            footer_terms:"Terms of Use"
         },
         ms: {
-            nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Cari dalam portal...",
-            menu_settings: "Tetapan", menu_logout: "Log Keluar",
-            portal_admin: "PENTADBIRAN",
-            portal_request_group: "PINJAMAN &amp; PERMOHONAN",
-            portal_loan_tools: "Pinjaman Alat Radas",
-            portal_loan_chem: "Permohonan Bahan Kimia",
-            portal_loan_equip: "Permohonan Peralatan Makmal",
-            lab_dash_online: "Makmal Beroperasi", lab_dash_welcome: "Selamat kembali,",
-            lab_dash_today: "Hari Ini", lab_dash_lastlogin: "Log Masuk Terakhir",
-            lab_stat_week: "Minggu Ini", lab_stat_sessions: "Sesi Makmal",
-            lab_stat_active: "Aktif", lab_stat_equipment: "Item Peralatan",
-            lab_stat_low: "Stok Rendah", lab_stat_chemicals: "Amaran Kimia",
-            lab_stat_safety: "Pematuhan Keselamatan",
-            lab_ach_tag: "Prestasi Makmal", lab_ach_title: "Papan Pemuka Makmal",
-            lab_ach_sub: "Peralatan, keselamatan &amp; operasi · FKK Johor", lab_ach_trend: "Meningkat",
-            lab_equipment: "Peralatan", lab_equipment_sub: "Kadar masa operasi keseluruhan",
-            lab_eq_operational: "Beroperasi", lab_eq_maintenance: "Dalam Penyelenggaraan",
-            lab_eq_repair: "Dalam Pembaikan", lab_eq_total: "Jumlah Dipantau",
-            lab_safety: "Keselamatan", lab_safety_sub: "Skor pematuhan",
-            lab_safe_checks: "Pemeriksaan Lulus", lab_safe_pending: "Menunggu Semakan",
-            lab_safe_training: "Latihan Selesai", lab_safe_incidents: "Insiden (sasaran 0)",
-            lab_safe_annual: "Sasaran Keselamatan Tahunan",
-            lab_inventory: "Inventori", lab_inventory_sub: "Kimia &amp; bahan habis dipantau",
-            lab_inv_items: "item",
-            lab_inv_solvents: "Pelarut", lab_inv_reagents: "Reagen",
-            lab_inv_consumables: "Bahan Habis", lab_inv_gases: "Gas Mampat",
-            lab_inv_stock: "Kesihatan Stok",
-            lab_yearly_label: "Trend Tahunan", lab_yearly_title: "Penggunaan Makmal &amp; Pemprosesan Sampel (2023 – 2026)",
-            lab_legend_sessions: "Sesi Makmal", lab_legend_samples: "Sampel Diproses", lab_legend_uptime: "Masa Operasi (%)",
-            lab_sched_label: "Tugasan Hari Ini", lab_sched_title: "Jadual Tugas Makmal", lab_view_all: "Lihat Semua",
-            lab_task_1: "Sediakan Makmal 3 — Amali Termodinamik",
-            lab_task_1_loc: "Makmal 3 · 32 pelajar",
-            lab_task_2: "Kalibrasi Peralatan — Sistem HPLC",
-            lab_task_2_loc: "Makmal Analitikal · Suku Tahunan",
-            lab_task_3: "Isi Semula Inventori Kimia — Pelarut",
-            lab_task_3_loc: "Bilik Simpan · Bulanan",
-            lab_alert_label: "Amaran", lab_alert_title: "Notis Makmal",
-            lab_alert_1: "Stok rendah: Aseton &amp; Etanol — pesan segera",
-            lab_alert_2: "Servis autoklaf dijadualkan Selasa depan",
-            lab_alert_3: "SOP keselamatan baharu dikeluarkan untuk pengendalian sisa kimia",
-            lab_alert_hour: "jam lalu", lab_alert_hours: "jam lalu", lab_alert_days: "hari lalu",
-            activity_label: "Jejak Aktiviti", activity_title: "Jejak Aktiviti",
-            lab_activity_sub: "Tindakan terkini pada akaun anda",
-            activity_clear: "Kosongkan", activity_records: "rekod",
-            activity_empty: "Tiada aktiviti direkodkan lagi",
-            activity_confirm_clear: "Kosongkan keseluruhan jejak aktiviti?",
-            lab_news_tag: "Terkini", lab_news_title: "Berita &amp; Acara Makmal", lab_btn_archive: "Lihat Arkib",
-            lab_news_1_title: "Audit Keselamatan Makmal Tahunan Selesai Dengan Jayanya.",
-            lab_news_2_title: "Spektrometer FTIR Baharu Kini Tersedia untuk Penyelidikan.",
-            lab_news_3_title: "Kursus Pensijilan Pengendalian Kimia — Daftar Sekarang.",
-            settings_title: "Tetapan Profil", settings_sub: "Kemas kini maklumat profil anda",
-            settings_tab_profile: "Profil", settings_tab_security: "Keselamatan",
-            settings_avatar_hint: "Inisial avatar dijana automatik",
-            settings_avatar_sub: "Berdasarkan nama penuh anda di bawah",
-            settings_name: "Nama Penuh", settings_position: "Jawatan",
-            settings_email: "E-mel", settings_lab: "Makmal Ditugaskan",
-            settings_staffid: "ID Staf (Baca sahaja)",
-            settings_cancel: "Batal", settings_save: "Simpan Perubahan",
-            toast_saved: "Tetapan Disimpan",
-            pwd_info_title: "Tukar Kata Laluan Anda",
-            pwd_info_sub: "Pilih kata laluan yang kukuh dan tidak digunakan di tempat lain.",
-            settings_current_pwd: "Kata Laluan Semasa",
-            settings_new_pwd: "Kata Laluan Baharu", settings_confirm_pwd: "Sahkan Kata Laluan Baharu",
-            pwd_strength_label: "Kekuatan", pwd_strength_none: "—",
-            pwd_strength_weak: "Lemah", pwd_strength_medium: "Sederhana", pwd_strength_strong: "Kukuh",
-            pwd_hint: "Minimum 8 aksara · sekurang-kurangnya 1 huruf besar · 1 huruf kecil · 1 nombor",
-            btn_update_pwd: "Kemas Kini Kata Laluan", toast_pwd: "Kata Laluan Dikemas Kini",
-            toast_activity_cleared: "Aktiviti Dikosongkan",
-            err_current_wrong: "Kata laluan semasa tidak betul.",
-            err_pwd_short: "Kata laluan mestilah sekurang-kurangnya 8 aksara.",
-            err_pwd_upper: "Kata laluan mesti mengandungi huruf besar.",
-            err_pwd_lower: "Kata laluan mesti mengandungi huruf kecil.",
-            err_pwd_number: "Kata laluan mesti mengandungi nombor.",
-            err_pwd_match: "Kata laluan baharu dan pengesahan tidak sepadan.",
-            err_pwd_same: "Kata laluan baharu mestilah berbeza daripada kata laluan semasa.",
-            err_pwd_empty: "Sila isi semua medan kata laluan.",
-            footer_desc: "Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Berdedikasi untuk kecemerlangan akademik dan inovasi industri.",
-            footer_quick_links: "Pautan Pantas",
-            footer_lab_dir: "Direktori Makmal",
-            footer_safety_manual: "Manual Keselamatan",
-            footer_equipment_log: "Log Peralatan",
-            footer_chemical_db: "Pangkalan Data Kimia",
-            footer_contact: "Hubungi",
-            footer_contact_heading: "UiTM Cawangan Johor",
-            footer_address: "Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
-            footer_copyright: "© 2026 FKK UiTM Johor. Hak Cipta Terpelihara.",
-            footer_privacy: "Dasar Privasi",
-            footer_terms: "Terma Penggunaan"
+            nav_faculty:"FAKULTI", nav_dept:"KEJURUTERAAN KIMIA", ph_search:"Cari dalam portal...",
+            menu_dashboard:"Papan Pemuka", menu_settings:"Tetapan", menu_logout:"Log Keluar",
+
+            crumb_home:"Portal Utama", crumb_loan:"Pinjaman Alat Radas",
+
+            loan_tag:"Sistem Pinjaman Makmal",
+            loan_title:"Pinjaman Alat Radas",
+            loan_sub:"Mohon pinjaman alat radas & peralatan makmal untuk sesi amali, penyelidikan dan projek pelajar.",
+            loan_today:"Hari Ini", loan_officer:"Pegawai Bertugas",
+
+            loan_stat_total_tag:"Semua",       loan_stat_total:"Jumlah Permohonan",
+            loan_stat_pending_tag:"Menunggu",  loan_stat_pending:"Menunggu Kelulusan",
+            loan_stat_active_tag:"Aktif",      loan_stat_approved:"Diluluskan / Aktif",
+            loan_stat_returned_tag:"Selesai",  loan_stat_returned:"Dipulangkan",
+
+            loan_form_title:"Borang Permohonan Pinjaman",
+            loan_form_sub:"Lengkapkan maklumat di bawah",
+            loan_form_required:"Semua medan wajib diisi",
+
+            loan_field_applicant:"Nama Pemohon",
+            loan_field_staffid:"No. Staf",
+            loan_field_lab:"Makmal",
+            loan_field_equip:"Jenis Alat Radas / Peralatan",
+            loan_field_qty:"Kuantiti",
+            loan_field_from:"Tarikh Pinjaman",
+            loan_field_to:"Tarikh Pulang",
+            loan_field_usage:"Kegunaan",
+            loan_field_purpose:"Tujuan / Catatan",
+
+            usage_practical:"Sesi Amali Pelajar",
+            usage_research:"Penyelidikan",
+            usage_project:"Projek Pelajar",
+            usage_service:"Servis / Penyelenggaraan",
+            usage_other:"Lain-lain",
+
+            loan_ph_equip:"— Pilih alat radas —",
+            loan_ph_purpose:"Nyatakan tujuan pinjaman...",
+            loan_ph_search:"Cari alat atau ID...",
+            loan_units:"unit",
+            loan_avail:"Stok tersedia",
+            loan_btn_reset:"Set Semula",
+            loan_btn_submit:"Hantar Permohonan",
+            loan_btn_close:"Tutup",
+            loan_btn_return:"Tanda Dipulangkan",
+            loan_btn_cancel_loan:"Batal Permohonan",
+
+            loan_list_tag:"Rekod Pinjaman",
+            loan_list_title:"Sejarah Permohonan",
+
+            filter_all:"Semua",
+            status_pending:"Menunggu",
+            status_approved:"Diluluskan",
+            status_returned:"Dipulangkan",
+            status_rejected:"Ditolak",
+
+            tbl_id:"No. Rujukan",
+            tbl_equip:"Alat Radas",
+            tbl_qty:"Kuantiti",
+            tbl_period:"Tempoh Pinjaman",
+            tbl_status:"Status",
+            tbl_action:"Tindakan",
+
+            loan_empty:"Tiada rekod pinjaman",
+
+            loan_detail_title:"Butiran Permohonan",
+            d_ref:"No. Rujukan", d_equip:"Alat Radas", d_qty:"Kuantiti",
+            d_period:"Tempoh Pinjaman", d_usage:"Kegunaan", d_purpose:"Tujuan",
+            d_applicant:"Pemohon", d_staffid:"No. Staf", d_lab:"Makmal",
+            d_status:"Status", d_submitted:"Dihantar Pada", d_updated:"Kemas Kini Terakhir",
+            d_remark:"Catatan",
+
+            err_equip:"Sila pilih alat radas atau peralatan.",
+            err_qty:"Kuantiti mestilah sekurang-kurangnya 1.",
+            err_qty_max:"Kuantiti melebihi stok tersedia ({max} unit).",
+            err_from:"Sila pilih tarikh pinjaman.",
+            err_to:"Sila pilih tarikh pulang.",
+            err_past:"Tarikh pinjaman tidak boleh sebelum hari ini.",
+            err_dates:"Tarikh pulang mestilah pada atau selepas tarikh pinjaman.",
+            err_purpose:"Sila nyatakan tujuan pinjaman ini.",
+
+            toast_loan_submitted:"Permohonan Pinjaman Dihantar",
+            toast_loan_cancelled:"Permohonan Pinjaman Dibatalkan",
+            toast_loan_returned:"Ditanda Sebagai Dipulangkan",
+            confirm_cancel_loan:"Batal permohonan pinjaman ini?",
+            confirm_return_loan:"Sahkan alat radas telah dipulangkan?",
+
+            remark_pending:"Menunggu kelulusan daripada Penyelaras Makmal.",
+            remark_approved:"Diluluskan. Sila ambil alat radas di stor makmal.",
+            remark_rejected:"Ditolak. Sila hubungi Penyelaras Makmal untuk maklumat lanjut.",
+            remark_returned:"Alat radas telah dipulangkan dan disahkan.",
+
+            settings_title:"Tetapan Profil", settings_sub:"Kemas kini maklumat profil anda",
+            settings_tab_profile:"Profil", settings_tab_security:"Keselamatan",
+            settings_avatar_hint:"Inisial avatar dijana automatik",
+            settings_avatar_sub:"Berdasarkan nama penuh anda di bawah",
+            settings_name:"Nama Penuh", settings_position:"Jawatan",
+            settings_email:"E-mel", settings_lab:"Makmal Ditugaskan",
+            settings_staffid:"ID Staf (Baca sahaja)",
+            settings_cancel:"Batal", settings_save:"Simpan Perubahan",
+            toast_saved:"Tetapan Disimpan",
+            pwd_info_title:"Tukar Kata Laluan Anda",
+            pwd_info_sub:"Pilih kata laluan yang kukuh dan tidak digunakan di tempat lain.",
+            settings_current_pwd:"Kata Laluan Semasa",
+            settings_new_pwd:"Kata Laluan Baharu", settings_confirm_pwd:"Sahkan Kata Laluan Baharu",
+            pwd_hint:"Minimum 8 aksara · sekurang-kurangnya 1 huruf besar · 1 huruf kecil · 1 nombor",
+            btn_update_pwd:"Kemas Kini Kata Laluan", toast_pwd:"Kata Laluan Dikemas Kini",
+            err_current_wrong:"Kata laluan semasa tidak betul.",
+            err_pwd_short:"Kata laluan mestilah sekurang-kurangnya 8 aksara.",
+            err_pwd_upper:"Kata laluan mesti mengandungi huruf besar.",
+            err_pwd_lower:"Kata laluan mesti mengandungi huruf kecil.",
+            err_pwd_number:"Kata laluan mesti mengandungi nombor.",
+            err_pwd_match:"Kata laluan baharu dan pengesahan tidak sepadan.",
+            err_pwd_same:"Kata laluan baharu mestilah berbeza daripada kata laluan semasa.",
+            err_pwd_empty:"Sila isi semua medan kata laluan.",
+
+            footer_desc:"Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Berdedikasi untuk kecemerlangan akademik dan inovasi industri.",
+            footer_quick_links:"Pautan Pantas",
+            footer_safety_manual:"Manual Keselamatan",
+            footer_equipment_log:"Log Peralatan",
+            footer_contact:"Hubungi",
+            footer_contact_heading:"UiTM Cawangan Johor",
+            footer_address:"Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
+            footer_copyright:"© 2026 FKK UiTM Johor. Hak Cipta Terpelihara.",
+            footer_privacy:"Dasar Privasi",
+            footer_terms:"Terma Penggunaan"
         }
     };
+
+    function t(key) { return (i18n[currentLang] && i18n[currentLang][key]) || key; }
 
     /* =========================================================
        UTILITIES
@@ -1668,24 +1166,58 @@
 
     function makeInitials(name) {
         if (!name) return '--';
-        const parts = name.trim().split(/\s+/).filter(w => !/^(bin|binti|bin\.|binti\.|bt|a\/l|a\/p)$/i.test(w));
+        const parts = name.trim().split(/\s+/).filter(w =>
+            !/^(bin|binti|bin\.|binti\.|bt|a\/l|a\/p)$/i.test(w));
         if (parts.length === 0) return '--';
         if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    function relativeTime(iso) {
-        const diff = Date.now() - new Date(iso).getTime();
-        const sec = Math.max(0, Math.floor(diff / 1000));
-        if (sec < 45) return currentLang === 'ms' ? 'Baru sahaja' : 'Just now';
-        const min = Math.floor(sec / 60);
-        if (min < 60) return min + (currentLang === 'ms' ? ' min lalu' : 'm ago');
-        const hr = Math.floor(min / 60);
-        if (hr < 24) return hr + (currentLang === 'ms' ? ' jam lalu' : 'h ago');
-        const day = Math.floor(hr / 24);
-        if (day < 7) return day + (currentLang === 'ms' ? ' hari lalu' : 'd ago');
-        return new Date(iso).toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
-            { day: '2-digit', month: 'short' });
+    function todayISO() { return new Date().toISOString().split('T')[0]; }
+
+    function fmtDate(value) {
+        if (!value) return '—';
+        const iso = String(value).length === 10 ? value + 'T00:00:00' : value;
+        const d = new Date(iso);
+        if (isNaN(d)) return '—';
+        return d.toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
+            { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function fmtDateTime(value) {
+        if (!value) return '—';
+        const d = new Date(value);
+        if (isNaN(d)) return '—';
+        return d.toLocaleString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
+            { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function equipById(id) { return CATALOG.find(e => e.id === id) || null; }
+    function equipName(id) {
+        const e = equipById(id);
+        return e ? e[currentLang] : id;
+    }
+
+    /* =========================================================
+       ACTIVITY TRAIL (shared key with dashboard)
+    ========================================================== */
+    function logActivity(type, entity, detail) {
+        let list = [];
+        try {
+            const raw = localStorage.getItem(ACTIVITY_KEY);
+            if (raw) { const p = JSON.parse(raw); if (Array.isArray(p)) list = p; }
+        } catch (e) { list = []; }
+
+        list.unshift({
+            id: 'a_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            type: type,
+            entity: entity || '',
+            detail: detail || '',
+            timestamp: new Date().toISOString()
+        });
+        if (list.length > ACTIVITY_LIMIT) list = list.slice(0, ACTIVITY_LIMIT);
+
+        try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(list)); } catch (e) {}
     }
 
     /* =========================================================
@@ -1693,6 +1225,7 @@
     ========================================================== */
     window.switchLanguage = function (lang) {
         currentLang = lang;
+
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (i18n[lang] && i18n[lang][key] !== undefined) el.innerHTML = i18n[lang][key];
@@ -1701,243 +1234,517 @@
             const key = el.getAttribute('data-i18n-ph');
             if (i18n[lang] && i18n[lang][key]) el.setAttribute('placeholder', i18n[lang][key]);
         });
+
         document.getElementById('btn-en').classList.toggle('active', lang === 'en');
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (staff) fillStaff(staff);
-        renderActivities();
-        updateStrength();
+        populateCatalog();
+        updateEquipHint();
+        renderRecords();
+        renderStats();
+        if (detailId) openDetail(detailId, true);
     };
 
     /* =========================================================
-       STAFF
+       STAFF FILL
     ========================================================== */
     function fillStaff(s) {
         const initials = s.initials || makeInitials(s.name);
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-        set('navName', s.name); set('navRole', s.position || ''); set('navAvatar', initials);
-        set('ddName', s.name); set('ddEmail', s.email || ''); set('bannerName', s.name);
+
+        set('navName', s.name);
+        set('navRole', s.position || '');
+        set('navAvatar', initials);
+        set('ddName', s.name);
+        set('ddEmail', s.email || '');
+        set('bannerName', s.name);
         set('staffIdChip', s.id || '');
         set('labChip', s.lab || '');
 
-        const loginEl = document.getElementById('lastLogin');
-        if (loginEl) {
-            const d = new Date(s.loginAt || Date.now());
-            loginEl.textContent = d.toLocaleString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
-                { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        }
         const todayEl = document.getElementById('todayDate');
         if (todayEl) {
-            todayEl.textContent = new Date().toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
+            todayEl.textContent = new Date().toLocaleDateString(
+                currentLang === 'ms' ? 'ms-MY' : 'en-GB',
                 { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
         }
+
         const sAvatar = document.getElementById('settingsAvatar');
         if (sAvatar) sAvatar.textContent = initials;
+
+        // form prefilled fields
+        const fa = document.getElementById('fApplicant');
+        const fs = document.getElementById('fStaffId');
+        const fl = document.getElementById('fLab');
+        if (fa) fa.value = s.name || '';
+        if (fs) fs.value = s.id || '';
+        if (fl) fl.value = s.lab || '';
     }
 
     /* =========================================================
-       ACTIVITY TRAIL
+       CATALOG SELECT
     ========================================================== */
-    function loadActivities() {
+    function populateCatalog() {
+        const sel = document.getElementById('fEquip');
+        if (!sel) return;
+
+        const keep = sel.value;
+        const groups = {};
+        CATALOG.forEach(e => { (groups[e.cat] = groups[e.cat] || []).push(e); });
+
+        let html = `<option value="" disabled ${keep ? '' : 'selected'}>${escapeHtml(t('loan_ph_equip'))}</option>`;
+
+        Object.keys(CATEGORY_LABELS).forEach(cat => {
+            if (!groups[cat]) return;
+            html += `<optgroup label="${escapeHtml(CATEGORY_LABELS[cat][currentLang])}">`;
+            groups[cat].forEach(e => {
+                html += `<option value="${e.id}">${escapeHtml(e[currentLang])} — ${e.stock} ${escapeHtml(t('loan_units'))}</option>`;
+            });
+            html += `</optgroup>`;
+        });
+
+        sel.innerHTML = html;
+        if (keep) sel.value = keep;
+    }
+
+    function updateEquipHint() {
+        const sel = document.getElementById('fEquip');
+        const hint = document.getElementById('equipHint');
+        const qty = document.getElementById('fQty');
+        if (!sel || !hint) return;
+
+        const eq = equipById(sel.value);
+        if (!eq) { hint.classList.add('hidden'); if (qty) qty.removeAttribute('max'); return; }
+
+        hint.classList.remove('hidden');
+        hint.innerHTML = `<i class="fas fa-boxes-stacked mr-1"></i> ${escapeHtml(t('loan_avail'))}: <strong>${eq.stock}</strong> ${escapeHtml(t('loan_units'))}`;
+        if (qty) qty.setAttribute('max', String(eq.stock));
+    }
+
+    /* =========================================================
+       RECORDS — storage
+    ========================================================== */
+    function loadRecords() {
         try {
-            const raw = localStorage.getItem(ACTIVITY_KEY);
+            const raw = localStorage.getItem(LOAN_KEY);
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed)) { activities = parsed; return; }
+                if (Array.isArray(parsed)) { records = parsed; return; }
             }
         } catch (e) {}
-        activities = [];
+        records = [];
     }
 
-    function saveActivities() {
-        try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activities)); } catch (e) {}
+    function saveRecords() {
+        try { localStorage.setItem(LOAN_KEY, JSON.stringify(records)); } catch (e) {}
     }
 
-    function logActivity(type, entity, detail) {
-        const entry = {
-            id: 'a_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            type, entity: entity || '', detail: detail || '',
-            timestamp: new Date().toISOString()
-        };
-        activities.unshift(entry);
-        if (activities.length > ACTIVITY_LIMIT) activities = activities.slice(0, ACTIVITY_LIMIT);
-        saveActivities();
-        renderActivities();
+    function nextLoanId() {
+        const d = new Date();
+        const ymd = d.getFullYear()
+            + String(d.getMonth() + 1).padStart(2, '0')
+            + String(d.getDate()).padStart(2, '0');
+        const prefix = 'LN-' + ymd + '-';
+        const count = records.filter(r => String(r.id).indexOf(prefix) === 0).length + 1;
+        return prefix + String(count).padStart(3, '0');
     }
 
-    function renderActivities() {
-        const tl = document.getElementById('activityTimeline');
-        const countEl = document.getElementById('activityCount');
-        if (countEl) countEl.textContent = activities.length;
-        if (!tl) return;
+    /* =========================================================
+       RENDER — stats
+    ========================================================== */
+    function renderStats() {
+        const total    = records.length;
+        const pending  = records.filter(r => r.status === 'pending').length;
+        const approved = records.filter(r => r.status === 'approved').length;
+        const returned = records.filter(r => r.status === 'returned').length;
 
-        if (!activities.length) {
-            tl.innerHTML = `
-                <div class="activity-empty">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <p class="text-xs font-bold uppercase tracking-widest">${escapeHtml(i18n[currentLang].activity_empty)}</p>
-                </div>`;
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('statTotal', total);
+        set('statPending', pending);
+        set('statApproved', approved);
+        set('statReturned', returned);
+    }
+
+    /* =========================================================
+       RENDER — table
+    ========================================================== */
+    const STATUS_META = {
+        pending:  { cls: 'status-warn',  icon: 'fa-hourglass-half', key: 'status_pending' },
+        approved: { cls: 'status-ok',    icon: 'fa-circle-check',   key: 'status_approved' },
+        rejected: { cls: 'status-alert', icon: 'fa-circle-xmark',   key: 'status_rejected' },
+        returned: { cls: 'status-mute',  icon: 'fa-rotate-left',    key: 'status_returned' }
+    };
+
+    function statusBadge(status) {
+        const m = STATUS_META[status] || STATUS_META.pending;
+        return `<span class="status-badge ${m.cls}"><i class="fas ${m.icon}"></i> ${escapeHtml(t(m.key))}</span>`;
+    }
+
+    function renderRecords() {
+        const tbody = document.getElementById('loanTbody');
+        const emptyEl = document.getElementById('loanEmpty');
+        const wrapEl = document.getElementById('tableWrap');
+        if (!tbody) return;
+
+        let list = records.slice();
+
+        if (activeFilter !== 'all') list = list.filter(r => r.status === activeFilter);
+
+        if (searchTerm) {
+            const q = searchTerm.toLowerCase();
+            list = list.filter(r =>
+                String(r.id).toLowerCase().includes(q) ||
+                equipName(r.equipId).toLowerCase().includes(q) ||
+                String(r.purpose || '').toLowerCase().includes(q)
+            );
+        }
+
+        if (list.length === 0) {
+            tbody.innerHTML = '';
+            if (wrapEl) wrapEl.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.remove('hidden');
             return;
         }
 
-        tl.innerHTML = activities.map(a => {
-            const meta = ACTIVITY_TYPES[a.type] || ACTIVITY_TYPES.login;
-            const label = currentLang === 'ms' ? meta.ms : meta.en;
-            const entityHtml = a.entity
-                ? ` <span class="activity-entity">· ${escapeHtml(a.entity)}</span>`
-                : '';
-            const detailHtml = a.detail
-                ? `<p class="activity-detail">${escapeHtml(a.detail)}</p>`
-                : '';
+        if (wrapEl) wrapEl.classList.remove('hidden');
+        if (emptyEl) emptyEl.classList.add('hidden');
+
+        tbody.innerHTML = list.map(r => {
+            const eq = equipById(r.equipId);
+            const icon = eq ? eq.icon : 'fa-toolbox';
+
+            let actions = `<button class="icon-btn" data-act="view" data-id="${r.id}" title="${escapeHtml(t('loan_detail_title'))}"><i class="fas fa-eye"></i></button>`;
+
+            if (r.status === 'pending') {
+                actions += ` <button class="icon-btn" data-act="cancel" data-id="${r.id}" title="${escapeHtml(t('loan_btn_cancel_loan'))}"><i class="fas fa-xmark"></i></button>`;
+            } else if (r.status === 'approved') {
+                actions += ` <button class="icon-btn" data-act="return" data-id="${r.id}" title="${escapeHtml(t('loan_btn_return'))}"><i class="fas fa-rotate-left"></i></button>`;
+            }
+
             return `
-                <div class="activity-item">
-                    <div class="activity-icon" style="background: ${meta.bg};">
-                        <i class="fas ${meta.icon}"></i>
-                    </div>
-                    <div class="activity-content">
-                        <p class="activity-title">${escapeHtml(label)}${entityHtml}</p>
-                        ${detailHtml}
-                        <p class="activity-time"><i class="far fa-clock"></i> ${escapeHtml(relativeTime(a.timestamp))}</p>
-                    </div>
-                </div>`;
+                <tr class="row-${r.status}">
+                    <td><span class="mono">${escapeHtml(r.id)}</span></td>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                                <i class="fas ${icon} text-[#9B26B6] text-[11px]"></i>
+                            </div>
+                            <span class="leading-tight">${escapeHtml(equipName(r.equipId))}</span>
+                        </div>
+                    </td>
+                    <td><span class="text-[#002D62] font-black">${escapeHtml(r.qty)}</span> <span class="text-slate-400 font-bold text-[10px]">${escapeHtml(t('loan_units'))}</span></td>
+                    <td>
+                        <div class="leading-tight text-[11px]">
+                            ${escapeHtml(fmtDate(r.dateFrom))}
+                            <span class="text-slate-400 mx-1">→</span>
+                            ${escapeHtml(fmtDate(r.dateTo))}
+                        </div>
+                    </td>
+                    <td>${statusBadge(r.status)}</td>
+                    <td class="text-right whitespace-nowrap">${actions}</td>
+                </tr>`;
         }).join('');
     }
 
-    function clearActivities() {
-        if (!activities.length) return;
-        if (!confirm(i18n[currentLang].activity_confirm_clear)) return;
-        activities = [];
-        logActivity('activity_clear', staff ? staff.name : '', '');
-        showToast(i18n[currentLang].toast_activity_cleared, true);
+    /* =========================================================
+       FORM VALIDATION + SUBMIT
+    ========================================================== */
+    const formError = document.getElementById('formError');
+
+    function showFormError(messages) {
+        formError.innerHTML = '<ul>' + messages.map(m => `<li>${escapeHtml(m)}</li>`).join('') + '</ul>';
+        formError.classList.add('show');
+    }
+    function hideFormError() { formError.classList.remove('show'); }
+
+    function clearInvalid() {
+        ['fEquip','fQty','fFrom','fTo','fPurpose'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('is-invalid');
+        });
     }
 
-    document.getElementById('clearActivityBtn').addEventListener('click', clearActivities);
+    function resetForm() {
+        const form = document.getElementById('loanForm');
+        form.reset();
+        document.getElementById('fEquip').value = '';
+        document.getElementById('fQty').value = 1;
+        document.getElementById('fUsage').value = 'practical';
+        updateEquipHint();
+        clearInvalid();
+        hideFormError();
+        if (staff) fillStaff(staff);
+    }
+
+    document.getElementById('btnReset').addEventListener('click', resetForm);
+    document.getElementById('fEquip').addEventListener('change', function () {
+        this.classList.remove('is-invalid');
+        updateEquipHint();
+    });
+    document.getElementById('fQty').addEventListener('input', function () { this.classList.remove('is-invalid'); });
+    document.getElementById('fFrom').addEventListener('change', function () { this.classList.remove('is-invalid'); });
+    document.getElementById('fTo').addEventListener('change', function () { this.classList.remove('is-invalid'); });
+    document.getElementById('fPurpose').addEventListener('input', function () { this.classList.remove('is-invalid'); });
+
+    document.getElementById('loanForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        hideFormError();
+        clearInvalid();
+
+        const equipId  = document.getElementById('fEquip').value;
+        const qty      = parseInt(document.getElementById('fQty').value, 10);
+        const dateFrom = document.getElementById('fFrom').value;
+        const dateTo   = document.getElementById('fTo').value;
+        const usage    = document.getElementById('fUsage').value;
+        const purpose  = document.getElementById('fPurpose').value.trim();
+
+        const errors = [];
+
+        if (!equipId) { errors.push(t('err_equip')); document.getElementById('fEquip').classList.add('is-invalid'); }
+
+        const eq = equipById(equipId);
+        if (!qty || qty < 1 || isNaN(qty)) {
+            errors.push(t('err_qty'));
+            document.getElementById('fQty').classList.add('is-invalid');
+        } else if (eq && qty > eq.stock) {
+            errors.push(t('err_qty_max').replace('{max}', eq.stock));
+            document.getElementById('fQty').classList.add('is-invalid');
+        }
+
+        if (!dateFrom) { errors.push(t('err_from')); document.getElementById('fFrom').classList.add('is-invalid'); }
+        else if (dateFrom < todayISO()) { errors.push(t('err_past')); document.getElementById('fFrom').classList.add('is-invalid'); }
+
+        if (!dateTo) { errors.push(t('err_to')); document.getElementById('fTo').classList.add('is-invalid'); }
+        else if (dateFrom && dateTo < dateFrom) { errors.push(t('err_dates')); document.getElementById('fTo').classList.add('is-invalid'); }
+
+        if (!purpose) { errors.push(t('err_purpose')); document.getElementById('fPurpose').classList.add('is-invalid'); }
+
+        if (errors.length) { showFormError(errors); return; }
+
+        const record = {
+            id: nextLoanId(),
+            equipId: equipId,
+            qty: qty,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            usage: usage,
+            purpose: purpose,
+            status: 'pending',
+            applicantId: staff.id,
+            applicantName: staff.name,
+            lab: staff.lab,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            remark: ''
+        };
+
+        records.unshift(record);
+        saveRecords();
+        renderRecords();
+        renderStats();
+
+        resetForm();
+        showToast(t('toast_loan_submitted'), false);
+        logActivity('loan_request', equipName(record.equipId), record.id + ' · ' + record.qty + ' ' + t('loan_units'));
+
+        // Scroll to the records table
+        document.getElementById('loanTbody').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
 
     /* =========================================================
-       CHART.JS — SOLID colours only
+       TABLE ACTIONS
     ========================================================== */
-    function initCharts() {
-        if (typeof Chart === 'undefined') return;
+    document.getElementById('loanTbody').addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-act]');
+        if (!btn) return;
 
-        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-        Chart.defaults.font.weight = '700';
-        Chart.defaults.color = '#64748B';
+        const act = btn.getAttribute('data-act');
+        const id = btn.getAttribute('data-id');
 
-        /* Equipment status — horizontal bar */
-        const equipCtx = document.getElementById('equipChart');
-        if (equipCtx) {
-            charts.equip = new Chart(equipCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Operational', 'Maintenance', 'Repair', 'Total'],
-                    datasets: [{
-                        data: [24, 3, 1, 28],
-                        backgroundColor: ['#002D62', '#FDB913', '#9B26B6', '#002D62'],
-                        borderRadius: 8, borderSkipped: false, barThickness: 22
-                    }]
-                },
-                options: {
-                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                    animation: { duration: 1200, easing: 'easeOutQuart' },
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#002D62', padding: 10, cornerRadius: 8, titleFont: { size: 11, weight: '800' }, bodyFont: { size: 11, weight: '600' } } },
-                    scales: {
-                        x: { grid: { display: false, drawBorder: false }, ticks: { display: false }, max: 30 },
-                        y: { grid: { display: false, drawBorder: false }, ticks: { color: '#475569', font: { size: 10, weight: '800' } } }
-                    }
-                }
-            });
+        if (act === 'view')   openDetail(id);
+        if (act === 'cancel') cancelLoan(id);
+        if (act === 'return') returnLoan(id);
+    });
+
+    function cancelLoan(id) {
+        const r = records.find(x => x.id === id);
+        if (!r) return;
+        if (!confirm(t('confirm_cancel_loan'))) return;
+
+        r.status = 'rejected';
+        r.remark = t('remark_rejected');
+        r.updatedAt = new Date().toISOString();
+        saveRecords();
+        renderRecords();
+        renderStats();
+        showToast(t('toast_loan_cancelled'), true);
+        logActivity('loan_cancel', equipName(r.equipId), r.id);
+    }
+
+    function returnLoan(id) {
+        const r = records.find(x => x.id === id);
+        if (!r) return;
+        if (!confirm(t('confirm_return_loan'))) return;
+
+        r.status = 'returned';
+        r.remark = t('remark_returned');
+        r.updatedAt = new Date().toISOString();
+        saveRecords();
+        renderRecords();
+        renderStats();
+        showToast(t('toast_loan_returned'), false);
+        logActivity('loan_return', equipName(r.equipId), r.id);
+    }
+
+    /* =========================================================
+       DETAIL MODAL
+    ========================================================== */
+    const detailModal = document.getElementById('detailModal');
+
+    function openDetail(id, silent) {
+        const r = records.find(x => x.id === id);
+        if (!r) return;
+
+        detailId = id;
+
+        const eq = equipById(r.equipId);
+        const icon = eq ? eq.icon : 'fa-toolbox';
+
+        document.getElementById('detailRef').textContent = r.id;
+
+        const usageKey = 'usage_' + (r.usage || 'other');
+        const usageLabel = i18n[currentLang][usageKey] || r.usage;
+
+        const remarkKey = r.status === 'pending' ? 'remark_pending'
+                        : r.status === 'approved' ? 'remark_approved'
+                        : r.status === 'rejected' ? 'remark_rejected'
+                        : 'remark_returned';
+
+        const remarkText = r.remark || t(remarkKey);
+
+        document.getElementById('detailBody').innerHTML = `
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 mb-5">
+                <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+                    <i class="fas ${icon} text-[#9B26B6] text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-black text-[#002D62] leading-tight">${escapeHtml(equipName(r.equipId))}</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">${escapeHtml(r.equipId)}</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_ref'))}</span>
+                    <span class="detail-val mono">${escapeHtml(r.id)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_qty'))}</span>
+                    <span class="detail-val">${escapeHtml(r.qty)} ${escapeHtml(t('loan_units'))}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_period'))}</span>
+                    <span class="detail-val">${escapeHtml(fmtDate(r.dateFrom))} → ${escapeHtml(fmtDate(r.dateTo))}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_usage'))}</span>
+                    <span class="detail-val">${escapeHtml(usageLabel)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_purpose'))}</span>
+                    <span class="detail-val">${escapeHtml(r.purpose)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_applicant'))}</span>
+                    <span class="detail-val">${escapeHtml(r.applicantName)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_staffid'))}</span>
+                    <span class="detail-val">${escapeHtml(r.applicantId)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_lab'))}</span>
+                    <span class="detail-val">${escapeHtml(r.lab || '—')}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_status'))}</span>
+                    <span class="detail-val">${statusBadge(r.status)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_submitted'))}</span>
+                    <span class="detail-val">${escapeHtml(fmtDateTime(r.createdAt))}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">${escapeHtml(t('d_updated'))}</span>
+                    <span class="detail-val">${escapeHtml(fmtDateTime(r.updatedAt))}</span>
+                </div>
+            </div>
+
+            <div class="info-banner flex gap-3 p-4 mt-5">
+                <i class="fas fa-circle-info text-purple-600 mt-0.5"></i>
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-purple-800 mb-1">${escapeHtml(t('d_remark'))}</p>
+                    <p class="text-[10px] font-medium text-purple-700 leading-relaxed">${escapeHtml(remarkText)}</p>
+                </div>
+            </div>
+        `;
+
+        // Footer action button
+        const actionBtn = document.getElementById('detailAction');
+        actionBtn.classList.add('hidden');
+        actionBtn.onclick = null;
+
+        if (r.status === 'pending') {
+            actionBtn.classList.remove('hidden');
+            actionBtn.innerHTML = `<i class="fas fa-xmark"></i> <span>${escapeHtml(t('loan_btn_cancel_loan'))}</span>`;
+            actionBtn.onclick = function () { closeDetail(); cancelLoan(r.id); };
+        } else if (r.status === 'approved') {
+            actionBtn.classList.remove('hidden');
+            actionBtn.innerHTML = `<i class="fas fa-rotate-left"></i> <span>${escapeHtml(t('loan_btn_return'))}</span>`;
+            actionBtn.onclick = function () { closeDetail(); returnLoan(r.id); };
         }
 
-        /* Safety — doughnut */
-        const safetyCtx = document.getElementById('safetyChart');
-        if (safetyCtx) {
-            charts.safety = new Chart(safetyCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Passed', 'Pending', 'Training', 'Incidents'],
-                    datasets: [{
-                        data: [42, 3, 18, 0],
-                        backgroundColor: ['#9B26B6', '#FDB913', '#002D62', '#002D62'],
-                        borderWidth: 3, borderColor: '#fff', hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '62%',
-                    animation: { duration: 1200, easing: 'easeOutQuart' },
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#002D62', padding: 10, cornerRadius: 8, titleFont: { size: 11, weight: '800' }, bodyFont: { size: 11, weight: '600' } } }
-                }
-            });
-        }
-
-        /* Inventory — vertical bar */
-        const invCtx = document.getElementById('invChart');
-        if (invCtx) {
-            charts.inv = new Chart(invCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Solvents', 'Reagents', 'Consumables', 'Gases'],
-                    datasets: [{
-                        data: [128, 96, 82, 34],
-                        backgroundColor: ['#002D62', '#9B26B6', '#FDB913', '#002D62'],
-                        borderRadius: 8, borderSkipped: false, barThickness: 30
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    animation: { duration: 1200, easing: 'easeOutQuart', delay: (ctx) => ctx.dataIndex * 120 },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#002D62', padding: 10, cornerRadius: 8,
-                            titleFont: { size: 11, weight: '800' }, bodyFont: { size: 11, weight: '600' },
-                            callbacks: { label: (ctx) => ctx.parsed.y + ' items' }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            grid: { color: '#F1F5F9', drawBorder: false },
-                            ticks: { color: '#94A3B8', font: { size: 9, weight: '700' } }
-                        },
-                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#475569', font: { size: 10, weight: '800' } } }
-                    }
-                }
-            });
-        }
-
-        /* Lab Utilisation Trend — line, solid colours */
-        const trendCtx = document.getElementById('labTrendChart');
-        if (trendCtx) {
-            charts.labTrend = new Chart(trendCtx, {
-                type: 'line',
-                data: {
-                    labels: ['2023', '2024', '2025', '2026'],
-                    datasets: [
-                        { label: 'Lab Sessions',     data: [420, 480, 540, 580],  borderColor: '#002D62', backgroundColor: 'rgba(0, 45, 98, 0.08)',  borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#002D62', pointBorderWidth: 3, pointRadius: 6, pointHoverRadius: 9, fill: false, tension: 0.4 },
-                        { label: 'Samples Processed', data: [280, 340, 410, 460], borderColor: '#9B26B6', backgroundColor: 'rgba(155, 38, 182, 0.08)', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#9B26B6', pointBorderWidth: 3, pointRadius: 6, pointHoverRadius: 9, fill: false, tension: 0.4 },
-                        { label: 'Uptime (%)',        data: [88, 91, 94, 96],      borderColor: '#FDB913', backgroundColor: 'rgba(253, 185, 19, 0.08)', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#FDB913', pointBorderWidth: 3, pointRadius: 6, pointHoverRadius: 9, fill: false, tension: 0.4, yAxisID: 'y1' }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    animation: { duration: 1400, easing: 'easeOutQuart' },
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#002D62', padding: 12, cornerRadius: 10, titleFont: { size: 12, weight: '800' }, bodyFont: { size: 11, weight: '600' }, bodySpacing: 6 } },
-                    scales: {
-                        y: { position: 'left', beginAtZero: true, grid: { color: '#F1F5F9', drawBorder: false }, ticks: { color: '#94A3B8', font: { size: 10, weight: '700' } }, title: { display: true, text: 'Count', color: '#94A3B8', font: { size: 9, weight: '800' } } },
-                        y1: { position: 'right', beginAtZero: true, max: 100, grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 10, weight: '700' }, callback: (v) => v + '%' }, title: { display: true, text: 'Uptime (%)', color: '#94A3B8', font: { size: 9, weight: '800' } } },
-                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#475569', font: { size: 11, weight: '800' } } }
-                    }
-                }
-            });
+        if (!silent) {
+            detailModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
     }
+
+    function closeDetail() {
+        detailId = null;
+        detailModal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('detailClose').addEventListener('click', closeDetail);
+    document.getElementById('detailDismiss').addEventListener('click', closeDetail);
+    detailModal.addEventListener('click', function (e) { if (e.target === detailModal) closeDetail(); });
+
+    /* =========================================================
+       FILTERS & SEARCH
+    ========================================================== */
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
+            this.classList.add('active');
+            activeFilter = this.getAttribute('data-filter');
+            renderRecords();
+        });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        searchTerm = this.value.trim();
+        renderRecords();
+    });
 
     /* =========================================================
        DROPDOWN
     ========================================================== */
     const profileToggle = document.getElementById('profileToggle');
     const profileDropdown = document.getElementById('profileDropdown');
+
     function closeDropdown() { profileDropdown.classList.remove('open'); }
+
     profileToggle.addEventListener('click', function (e) {
         e.stopPropagation();
         profileDropdown.classList.toggle('open');
@@ -1958,11 +1765,12 @@
     const setStaffId = document.getElementById('setStaffId');
 
     function switchTab(tabName) {
-        document.querySelectorAll('.settings-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+        document.querySelectorAll('.settings-tab').forEach(x => x.classList.toggle('active', x.dataset.tab === tabName));
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabName));
         document.getElementById('footerProfile').classList.toggle('hidden', tabName !== 'profile');
         document.getElementById('footerSecurity').classList.toggle('hidden', tabName !== 'security');
     }
+
     document.querySelectorAll('.settings-tab').forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
@@ -1980,25 +1788,21 @@
         hidePwdError();
         settingsModal.classList.add('open');
         document.body.style.overflow = 'hidden';
-        logActivity('settings_open', staff.name, '');
     }
+
     function closeSettings() {
         settingsModal.classList.remove('open');
         document.body.style.overflow = '';
     }
+
     document.getElementById('settingsBtn').addEventListener('click', openSettings);
     document.getElementById('settingsClose').addEventListener('click', closeSettings);
     document.getElementById('settingsCancel').addEventListener('click', closeSettings);
     document.getElementById('pwdCancel').addEventListener('click', closeSettings);
     settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
+
     setName.addEventListener('input', function () {
         settingsAvatar.textContent = makeInitials(this.value) || '--';
-    });
-
-    // Bind the "Account Settings" link in the Portal Menu to open settings
-    document.getElementById('portalSettingsBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        openSettings();
     });
 
     document.getElementById('settingsSave').addEventListener('click', function () {
@@ -2006,27 +1810,19 @@
         const newPos  = setPosition.value.trim();
         const newMail = setEmail.value.trim();
         const newLab  = setLab.value.trim();
+
         if (!newName) { setName.focus(); return; }
 
-        const oldName = staff.name;
-        const oldPos  = staff.position;
-        const oldMail = staff.email;
-        const oldLab  = staff.lab;
-
-        staff.name = newName; staff.position = newPos;
-        staff.email = newMail; staff.lab = newLab;
+        staff.name = newName;
+        staff.position = newPos;
+        staff.email = newMail;
+        staff.lab = newLab;
         staff.initials = makeInitials(newName);
 
-        persistStaff(); fillStaff(staff); closeSettings();
-        showToast(i18n[currentLang].toast_saved, false);
-
-        const changes = [];
-        if (oldName !== newName) changes.push('name');
-        if (oldPos  !== newPos)  changes.push('position');
-        if (oldMail !== newMail) changes.push('email');
-        if (oldLab  !== newLab)  changes.push('lab');
-        const detail = changes.length ? 'Changed: ' + changes.join(', ') : 'Profile saved';
-        logActivity('profile_update', newName, detail);
+        persistStaff();
+        fillStaff(staff);
+        closeSettings();
+        showToast(t('toast_saved'), false);
     });
 
     /* =========================================================
@@ -2039,67 +1835,19 @@
 
     function clearPwdFields() {
         [currentPwd, newPwd, confirmPwd].forEach(f => {
-            if (f) { f.value = ''; f.type = 'password'; f.classList.remove('is-invalid'); }
+            if (f) { f.value = ''; f.classList.remove('is-invalid'); }
         });
-        document.querySelectorAll('.pwd-toggle i').forEach(ic => {
-            ic.classList.remove('fa-eye-slash'); ic.classList.add('fa-eye');
-        });
-        updateStrength();
     }
 
-    document.querySelectorAll('.pwd-toggle').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const target = document.getElementById(this.dataset.target);
-            const icon = this.querySelector('i');
-            const isHidden = target.type === 'password';
-            target.type = isHidden ? 'text' : 'password';
-            icon.classList.toggle('fa-eye', !isHidden);
-            icon.classList.toggle('fa-eye-slash', isHidden);
+    [currentPwd, newPwd, confirmPwd].forEach(f => {
+        f.addEventListener('input', function () {
+            hidePwdError();
+            this.classList.remove('is-invalid');
         });
-    });
-
-    const strengthText = document.getElementById('strengthText');
-    const segs = [document.getElementById('seg1'), document.getElementById('seg2'), document.getElementById('seg3'), document.getElementById('seg4')];
-
-    function scorePassword(pwd) {
-        if (!pwd) return 0;
-        let s = 0;
-        if (pwd.length >= 8) s++;
-        if (/[A-Z]/.test(pwd)) s++;
-        if (/[a-z]/.test(pwd)) s++;
-        if (/[0-9]/.test(pwd)) s++;
-        if (/[^A-Za-z0-9]/.test(pwd)) s++;
-        return Math.min(s, 4);
-    }
-
-    function updateStrength() {
-        const pwd = newPwd ? newPwd.value : '';
-        const score = scorePassword(pwd);
-        segs.forEach(s => s.className = 'strength-seg');
-        if (!pwd) {
-            strengthText.className = 'strength-text';
-            strengthText.textContent = i18n[currentLang].pwd_strength_none;
-            return;
-        }
-        let level, label;
-        if (score <= 1) { level = 'weak'; label = i18n[currentLang].pwd_strength_weak; }
-        else if (score <= 3) { level = 'medium'; label = i18n[currentLang].pwd_strength_medium; }
-        else { level = 'strong'; label = i18n[currentLang].pwd_strength_strong; }
-        for (let i = 0; i < score; i++) segs[i].classList.add('on-' + level);
-        strengthText.className = 'strength-text ' + level;
-        strengthText.textContent = label;
-    }
-
-    newPwd.addEventListener('input', function () {
-        updateStrength(); hidePwdError();
-        [newPwd, confirmPwd].forEach(f => f.classList.remove('is-invalid'));
-    });
-    [currentPwd, confirmPwd].forEach(f => {
-        f.addEventListener('input', function () { hidePwdError(); f.classList.remove('is-invalid'); });
     });
 
     function showPwdError(messages) {
-        pwdError.innerHTML = '<ul>' + messages.map(m => `<li>${m}</li>`).join('') + '</ul>';
+        pwdError.innerHTML = '<ul>' + messages.map(m => `<li>${escapeHtml(m)}</li>`).join('') + '</ul>';
         pwdError.classList.add('show');
     }
     function hidePwdError() { pwdError.classList.remove('show'); }
@@ -2108,6 +1856,7 @@
         hidePwdError();
         const cur = currentPwd.value, np = newPwd.value, cp = confirmPwd.value;
         const T = i18n[currentLang];
+
         [currentPwd, newPwd, confirmPwd].forEach(f => f.classList.remove('is-invalid'));
 
         if (!cur || !np || !cp) {
@@ -2124,17 +1873,19 @@
         if (!/[A-Z]/.test(np)) { errors.push(T.err_pwd_upper); newPwd.classList.add('is-invalid'); }
         if (!/[a-z]/.test(np)) { errors.push(T.err_pwd_lower); newPwd.classList.add('is-invalid'); }
         if (!/[0-9]/.test(np)) { errors.push(T.err_pwd_number); newPwd.classList.add('is-invalid'); }
-        if (np === cur && cur) { errors.push(T.err_pwd_same); newPwd.classList.add('is-invalid'); }
+        if (np === cur) { errors.push(T.err_pwd_same); newPwd.classList.add('is-invalid'); }
         if (np !== cp) { errors.push(T.err_pwd_match); confirmPwd.classList.add('is-invalid'); }
 
-        if (errors.length > 0) { showPwdError(errors); return; }
+        if (errors.length) { showPwdError(errors); return; }
 
-        persistStaff(); closeSettings();
-        showToast(i18n[currentLang].toast_pwd, true);
-        logActivity('password_change', staff.name, 'Password successfully updated');
+        persistStaff();
+        closeSettings();
+        showToast(t('toast_pwd'), true);
     });
 
-    /* AUTH CHANGE: persist staff into session cookie */
+    /* =========================================================
+       PERSIST SESSION
+    ========================================================== */
     function persistStaff() {
         FMSAuth.saveSession(staff, 'lab_staff');
     }
@@ -2145,16 +1896,17 @@
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
     let toastTimer = null;
-    function showToast(message, purple) {
+
+    function showToast(message, blue) {
         toastMsg.innerHTML = message;
-        toast.classList.toggle('toast-blue', !!purple);
+        toast.classList.toggle('toast-blue', !!blue);
         toast.classList.add('show');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
     }
 
     /* =========================================================
-       LOGOUT — AUTH CHANGE
+       LOGOUT
     ========================================================== */
     document.getElementById('logoutBtn').addEventListener('click', function () {
         FMSAuth.clearSession();
@@ -2162,9 +1914,10 @@
     });
 
     /* =========================================================
-       INIT — AUTH CHANGE
+       INIT
     ========================================================== */
     document.addEventListener('DOMContentLoaded', function () {
+
         staff = {
             id:       session.user.id       || '—',
             name:     session.user.name     || '—',
@@ -2175,19 +1928,26 @@
             loginAt:  new Date(session.loginAt).toISOString()
         };
 
-        loadActivities();
+        loadRecords();
 
         switchLanguage('en');
         fillStaff(staff);
 
-        setTimeout(initCharts, 150);
+        // Date defaults
+        const fromEl = document.getElementById('fFrom');
+        const toEl = document.getElementById('fTo');
+        const today = todayISO();
+        fromEl.setAttribute('min', today);
+        toEl.setAttribute('min', today);
+        fromEl.value = today;
 
-        if (!sessionStorage.getItem('fkkLabLoginLogged')) {
-            sessionStorage.setItem('fkkLabLoginLogged', '1');
-            setTimeout(() => {
-                if (staff) logActivity('login', staff.name, staff.email || '');
-            }, 600);
-        }
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        toEl.value = tomorrow.toISOString().split('T')[0];
+
+        updateEquipHint();
+        renderStats();
+        renderRecords();
     });
 
 })();
