@@ -1252,15 +1252,17 @@
    Borang + Senarai Permohonan (semua sheet + permohonan saya).
 
    ✦ KEMASKINI TERKINI:
-     1) Butang Padam pada kad permohonan — hanya untuk permohonan
-        sendiri (authUserId === USER.id).
+     1) Butang Padam pada kad permohonan — HANYA muncul untuk:
+        • permohonan MILIK pengguna sendiri (authUserId === USER.id), DAN
+        • status permohonan masih "pending" (Menunggu kelulusan).
+        Permohonan yang telah Diluluskan / Ditolak TIDAK boleh dipadam.
      2) Refresh kekal pada halaman semasa (sessionStorage + history.state).
      3) Butang "← Kembali" dalam senarai = history.back() browser.
 
    ⚠ NOTA PELAYAN (Google Apps Script):
      Tindakan padam menghantar POST { action:"delete", payload:{ ref, userId } }.
-     Pastikan skrip pelayan menyokong action "delete" untuk memadam
-     baris berkaitan dalam sheet. Jika tidak, sila tambah handler tersebut.
+     Pastikan skrip pelayan menyokong action "delete" DAN juga menolak
+     permohonan yang statusnya bukan "pending" (sebagai perlindungan pelayan).
    ============================================================ */
 
 /* ============================================================
@@ -1715,7 +1717,8 @@ var AUTH_PORTAL_URL = "login.html";
       confirmDelete: "Padam permohonan ini? Tindakan ini tidak boleh dibatalkan.",
       toastDeleted: "Permohonan berjaya dipadam.",
       toastDeleteFail: "Gagal memadam permohonan. Sila cuba lagi.",
-      toastDeleteNotOwner: "Anda hanya boleh padam permohonan anda sendiri."
+      toastDeleteNotOwner: "Anda hanya boleh padam permohonan anda sendiri.",
+      toastDeleteNotPending: "Hanya permohonan yang masih Menunggu kelulusan boleh dipadam."
     },
     en: {
       brandSmall: "FACULTY",
@@ -1856,7 +1859,8 @@ var AUTH_PORTAL_URL = "login.html";
       confirmDelete: "Delete this application? This action cannot be undone.",
       toastDeleted: "Application deleted successfully.",
       toastDeleteFail: "Failed to delete application. Please try again.",
-      toastDeleteNotOwner: "You can only delete your own applications."
+      toastDeleteNotOwner: "You can only delete your own applications.",
+      toastDeleteNotPending: "Only applications that are still Pending can be deleted."
     }
   };
 
@@ -1935,10 +1939,17 @@ var AUTH_PORTAL_URL = "login.html";
     });
   }
 
-  /* ---------- Ownership check (untuk padam) ---------- */
+  /* ---------- Ownership & deletability check ---------- */
   function isOwner(entry) {
     if (!entry) return false;
     return entry.authUserId === USER.id;
+  }
+  /* Boleh dipadam HANYA jika milik sendiri DAN status masih "pending" */
+  function canDelete(entry) {
+    if (!entry) return false;
+    if (!isOwner(entry)) return false;
+    var status = entry.status || "pending";
+    return status === "pending";
   }
 
   /* ---------- Row templates ---------- */
@@ -2911,6 +2922,7 @@ var AUTH_PORTAL_URL = "login.html";
   function appCardHTML(entry) {
     var status = entry.status || "pending";
     var mine = isOwner(entry);
+    var deletable = canDelete(entry); /* HANYA owner + status pending */
     var refSafe = esc(entry.ref);
 
     return (
@@ -2936,7 +2948,7 @@ var AUTH_PORTAL_URL = "login.html";
           (entry.notes ? '<div class="app-notes"><strong>' +
             esc(t("approvalNotesLabel")) + '</strong>' + esc(entry.notes) + '</div>' : '') +
           '<div class="app-actions">' +
-            (mine
+            (deletable
               ? '<button type="button" class="btn-delete" data-action="delete" data-ref="' + refSafe + '">' + esc(t("btnDelete")) + '</button>'
               : '') +
             '<button type="button" class="btn-view" data-action="view" data-ref="' + refSafe + '">' + esc(t("btnView")) + '</button>' +
@@ -3076,7 +3088,8 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   /* ============================================================
-     DELETE APPLICATION (hanya pemilik)
+     DELETE APPLICATION
+     Syarat:  (1) pemilik, DAN (2) status === "pending"
      ============================================================ */
   function deleteApplication(ref, btnEl) {
     var entry = findEntry(ref);
@@ -3085,9 +3098,15 @@ var AUTH_PORTAL_URL = "login.html";
       return;
     }
 
-    /* Pastikan hanya pemilik boleh padam */
+    /* Perlindungan 1: hanya pemilik */
     if (!isOwner(entry)) {
       toast(t("toastDeleteNotOwner"));
+      return;
+    }
+
+    /* Perlindungan 2: hanya status pending */
+    if (!canDelete(entry)) {
+      toast(t("toastDeleteNotPending"));
       return;
     }
 
