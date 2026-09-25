@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pinjaman Alat Radas | Fakulti Kejuruteraan Kimia | UiTM Cawangan Johor</title>
+<title>Student Portal | Fakulti Kejuruteraan Kimia | UiTM Cawangan Johor</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -24,16 +25,19 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
         scroll-behavior: smooth;
         background: #F8FAFC;
+        background-attachment: fixed;
     }
 
-    /* ================= LOGO ================= */
     .faculty-logo { display: flex; align-items: center; gap: 14px; }
-    .logo-bar { width: 3px; height: 42px; background: #FDB913; border-radius: 2px; }
+    .logo-bar {
+        width: 3px; height: 42px;
+        background: #FDB913;
+        border-radius: 2px;
+    }
     .logo-text { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; text-transform: uppercase; letter-spacing: -0.01em; }
     .logo-text .line-small { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 2px; }
     .logo-text .line-large { font-size: 0.95rem; color: #fff; }
 
-    /* ================= NAV ================= */
     .glass-nav {
         background: #002D62;
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -55,11 +59,12 @@
     }
     .lang-btn:hover { opacity: 1; background: rgba(255,255,255,.1); }
     .lang-btn.active {
-        opacity: 1; background: #FDB913; color: #002D62;
+        opacity: 1;
+        background: #FDB913;
+        color: #002D62;
         box-shadow: 0 4px 14px rgba(253,185,19,.5);
     }
 
-    /* ================= CARDS ================= */
     .card {
         background: #fff;
         border: 1px solid rgba(226, 232, 240, 0.8);
@@ -77,7 +82,6 @@
         position: relative; overflow: hidden; color: #fff;
         border: none !important;
         box-shadow: 0 14px 30px -12px rgba(0,0,0,.25);
-        border-radius: 18px;
     }
     .stat-card::before {
         content: ''; position: absolute;
@@ -88,6 +92,7 @@
     .stat-navy   { background: #002D62; }
     .stat-purple { background: #9B26B6; }
     .stat-gold   { background: #FDB913; }
+    .stat-deep   { background: #002D62; }
 
     .stat-card .stat-icon-box {
         width: 44px; height: 44px; border-radius: 12px;
@@ -97,30 +102,22 @@
     }
     .stat-card .stat-icon-box i { color: #fff; font-size: 16px; }
 
-    /* ================= BUTTONS ================= */
     .btn-gold {
-        background: #FDB913; color: #fff;
+        background: #FDB913;
+        color: #fff;
         transition: all .25s cubic-bezier(.4,0,.2,1);
         box-shadow: 0 10px 22px -8px rgba(253,185,19,.6);
     }
     .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -10px rgba(253, 185, 19, .7); }
-    .btn-gold:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .btn-navy {
-        background: #002D62; color: #fff;
-        transition: all .25s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 10px 22px -8px rgba(0,45,98,.55);
-    }
-    .btn-navy:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -10px rgba(0,45,98,.65); }
 
     .text-p655c { color: var(--navy); }
     .text-p254c { color: var(--purple); }
     .text-p130c { color: var(--gold); }
 
-    /* ================= CHIPS ================= */
     .section-label {
         font-size: 10px; font-weight: 800; letter-spacing: .2em;
-        text-transform: uppercase; color: #9B26B6;
+        text-transform: uppercase;
+        color: #9B26B6;
     }
 
     .chip {
@@ -132,21 +129,16 @@
     .chip-gold   { background: rgba(253,185,19,.18); color: #B45309; border: 1px solid rgba(253,185,19,.4); }
     .chip-purple { background: rgba(155,38,182,.12); color: #9B26B6; border: 1px solid rgba(155,38,182,.3); }
     .chip-navy   { background: rgba(0,45,98,.10); color: #002D62; border: 1px solid rgba(0,45,98,.25); }
-    .chip-green  { background: rgba(16,185,129,.12); color: #047857; border: 1px solid rgba(16,185,129,.35); }
-    .chip-red    { background: rgba(225,29,72,.10); color: #BE123C; border: 1px solid rgba(225,29,72,.3); }
 
-    /* ================= ANIMATION ================= */
     @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
     .anim-up { animation: fadeUp .45s cubic-bezier(.4,0,.2,1) both; }
 
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     .float-anim { animation: float 5s ease-in-out infinite; }
 
-    /* ================= DROPDOWN ================= */
     .dropdown { opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all .22s cubic-bezier(.4,0,.2,1); }
     .dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
 
-    /* ================= HERO ================= */
     .hero-banner {
         background: #002D62;
         position: relative; overflow: hidden;
@@ -158,192 +150,262 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    /* ================= EQUIPMENT CATALOG ================= */
-    .equip-card {
-        background: #fff;
-        border: 2px solid #E2E8F0;
-        border-radius: 18px;
-        padding: 18px;
-        cursor: pointer;
-        transition: all .25s cubic-bezier(.4,0,.2,1);
+    .quick-link {
+        position: relative; overflow: hidden;
+        border-radius: 14px; color: #fff;
+        transition: all .28s cubic-bezier(.4,0,.2,1);
+        box-shadow: 0 8px 20px -10px rgba(0,0,0,.25);
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        padding: 20px 12px; text-align: center; text-decoration: none;
+    }
+    .quick-link::before {
+        content: ''; position: absolute;
+        top: -30px; right: -30px;
+        width: 90px; height: 90px; border-radius: 50%;
+        background: rgba(255,255,255,0.14); transition: transform .35s;
+    }
+    .quick-link:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 34px -14px rgba(0,0,0,.35); }
+    .quick-link:hover::before { transform: scale(1.4); }
+    .quick-link i { font-size: 22px; position: relative; z-index: 1; }
+    .quick-link span {
+        font-size: 10px; font-weight: 800; letter-spacing: .1em;
+        text-transform: uppercase; line-height: 1.25; position: relative; z-index: 1;
+        word-break: break-word;
+    }
+    .ql-navy   { background: #002D62; }
+    .ql-purple { background: #9B26B6; }
+    .ql-gold   { background: #FDB913; }
+
+    .activity-timeline { position: relative; }
+    .activity-timeline::before {
+        content: ''; position: absolute;
+        left: 19px; top: 22px; bottom: 22px;
+        width: 2px;
+        background: #E2E8F0;
+    }
+    .activity-item {
+        display: flex; gap: 16px; padding: 12px 0;
         position: relative;
+    }
+    .activity-icon {
+        width: 40px; height: 40px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; flex-shrink: 0; z-index: 1;
+        box-shadow: 0 6px 16px -6px rgba(0,0,0,.35);
+        border: 2px solid #fff;
+    }
+    .activity-icon i { font-size: 14px; }
+    .activity-content { flex: 1; min-width: 0; padding-top: 2px; }
+    .activity-title {
+        font-size: 12px; font-weight: 800;
+        color: var(--navy); line-height: 1.4;
+    }
+    .activity-entity {
+        color: var(--purple); font-weight: 900;
+    }
+    .activity-detail {
+        font-size: 11px; font-weight: 500;
+        color: #64748B; margin-top: 3px;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+    .activity-time {
+        font-size: 9px; font-weight: 800;
+        letter-spacing: .12em; text-transform: uppercase;
+        color: #94A3B8; margin-top: 5px;
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .activity-empty {
+        text-align: center; padding: 36px 20px;
+        color: #94A3B8;
+    }
+    .activity-empty i { font-size: 30px; margin-bottom: 12px; display: block; opacity: .4; }
+
+    .ach-card {
+        background: #fff;
+        border-radius: 24px;
         overflow: hidden;
+        box-shadow: 0 18px 40px -20px rgba(0,45,98,.25);
+        border: 1px solid rgba(226,232,240,.7);
+        transition: all .3s cubic-bezier(.4,0,.2,1);
+        position: relative;
         display: flex;
         flex-direction: column;
-        height: 100%;
     }
-    .equip-card:hover {
-        border-color: rgba(155,38,182,.45);
-        transform: translateY(-4px);
-        box-shadow: 0 20px 36px -18px rgba(0,45,98,.3);
+    .ach-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 28px 50px -22px rgba(0,45,98,.35);
     }
-    .equip-card.selected {
-        border-color: #9B26B6;
-        background: #FDF7FF;
-        box-shadow: 0 20px 36px -18px rgba(155,38,182,.45);
-    }
-    .equip-card.selected::after {
-        content: '\f00c';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        position: absolute;
-        top: 12px; right: 12px;
-        width: 24px; height: 24px;
-        border-radius: 50%;
-        background: #9B26B6;
-        color: #fff;
-        font-size: 11px;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .equip-card.is-out { opacity: .55; cursor: not-allowed; }
-    .equip-card.is-out:hover { transform: none; border-color: #E2E8F0; box-shadow: none; }
 
-    .equip-icon {
+    .ach-header {
+        padding: 22px 24px 20px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .ach-header::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.10);
+        pointer-events: none;
+    }
+
+    .ach-header-pub  { background: #002D62; }
+    .ach-header-inv  { background: #9B26B6; }
+    .ach-header-grt  { background: #FDB913; }
+
+    .ach-icon-box {
         width: 46px; height: 46px;
         border-radius: 14px;
+        background: rgba(255,255,255,0.20);
+        border: 1px solid rgba(255,255,255,0.3);
         display: flex; align-items: center; justify-content: center;
-        font-size: 18px;
-        margin-bottom: 12px;
+    }
+    .ach-icon-box i { color: #fff; font-size: 18px; }
+
+    .ach-badge {
+        font-size: 10px; font-weight: 900;
+        padding: 4px 10px; border-radius: 9999px;
+        background: rgba(255,255,255,0.25);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: #fff;
+        letter-spacing: .06em;
+        display: inline-flex; align-items: center; gap: 4px;
     }
 
-    .filter-btn {
-        padding: 8px 14px;
-        border-radius: 9999px;
+    .ach-big-number {
+        font-size: 2.6rem;
+        font-weight: 900;
+        line-height: 1;
+        color: #fff;
+        letter-spacing: -0.02em;
+    }
+    .ach-big-number small {
+        font-size: 0.95rem;
+        font-weight: 800;
+        opacity: .85;
+        margin-right: 4px;
+    }
+    .ach-sub {
         font-size: 10px;
         font-weight: 800;
-        letter-spacing: .1em;
+        letter-spacing: .16em;
         text-transform: uppercase;
-        border: 1px solid #E2E8F0;
-        background: #fff;
-        color: #64748B;
-        cursor: pointer;
-        transition: all .2s ease;
-        white-space: nowrap;
-    }
-    .filter-btn:hover { border-color: #9B26B6; color: #9B26B6; }
-    .filter-btn.active {
-        background: #002D62; border-color: #002D62; color: #fff;
-        box-shadow: 0 8px 18px -8px rgba(0,45,98,.6);
+        color: rgba(255,255,255,.8);
+        margin-top: 6px;
     }
 
-    /* ================= FORM ================= */
-    .field-label {
-        display: block; font-size: 9px; font-weight: 800;
-        letter-spacing: .18em; text-transform: uppercase;
-        color: #94A3B8; margin-bottom: 6px;
+    .ach-body {
+        padding: 18px 22px 22px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
-    .field-input {
-        width: 100%; padding: 12px 14px;
-        font-size: 13px; font-weight: 600;
-        color: var(--navy);
-        background: #F8FAFC;
-        border: 1px solid #E2E8F0;
-        border-radius: 10px; outline: none;
-        transition: all .2s ease;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+
+    .ach-chart-wrap {
+        position: relative;
+        height: 150px;
+        margin-bottom: 16px;
     }
-    .field-input::placeholder { color: #94A3B8; font-weight: 500; }
-    .field-input:focus { background: #fff; border-color: #9B26B6; box-shadow: 0 0 0 4px rgba(155, 38, 182, .12); }
-    .field-input:disabled { background: #F1F5F9; color: #64748B; cursor: not-allowed; }
-    .field-input.is-invalid { border-color: #E11D48; background: #FFF1F2; }
-    select.field-input { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 40px; }
-    textarea.field-input { resize: vertical; min-height: 96px; line-height: 1.6; }
 
-    .error-box {
-        display: none; padding: 12px 14px;
-        background: #FFF1F2;
-        border-left: 4px solid #E11D48;
-        border-radius: 8px;
-        font-size: 11px; color: #9F1239;
-        font-weight: 600; line-height: 1.6;
-    }
-    .error-box.show { display: block; animation: fadeUp .25s cubic-bezier(.4,0,.2,1) both; }
-    .error-box ul { list-style: disc; padding-left: 16px; }
-
-    .info-banner { background: #EFF6FF; border-left: 4px solid #9B26B6; border-radius: 10px; }
-
-    /* ================= CHECKBOX ================= */
-    .check-row { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; user-select: none; }
-    .check-row input { position: absolute; opacity: 0; width: 0; height: 0; }
-    .check-box {
-        width: 20px; height: 20px; flex-shrink: 0;
-        border: 2px solid #CBD5E1;
-        border-radius: 6px;
-        background: #fff;
-        display: flex; align-items: center; justify-content: center;
-        transition: all .2s ease;
-        margin-top: 1px;
-    }
-    .check-box i { font-size: 10px; color: #fff; opacity: 0; transition: opacity .15s; }
-    .check-row input:checked + .check-box { background: #9B26B6; border-color: #9B26B6; }
-    .check-row input:checked + .check-box i { opacity: 1; }
-    .check-row input:focus-visible + .check-box { box-shadow: 0 0 0 4px rgba(155,38,182,.18); }
-
-    /* ================= SUMMARY PANEL ================= */
-    .summary-row {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 11px 0;
+    .ach-legend-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
         border-bottom: 1px dashed #E2E8F0;
         font-size: 11px;
-        gap: 12px;
+        font-weight: 700;
     }
-    .summary-row:last-child { border-bottom: none; }
-    .summary-label {
-        font-size: 9px; font-weight: 800; letter-spacing: .12em;
-        text-transform: uppercase; color: #94A3B8;
+    .ach-legend-row:last-child { border-bottom: none; }
+    .ach-legend-label {
+        display: flex; align-items: center; gap: 8px;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-weight: 800;
+        font-size: 10px;
     }
-    .summary-value {
-        font-size: 12px; font-weight: 900; color: #002D62;
-        text-align: right; word-break: break-word;
+    .ach-dot {
+        width: 10px; height: 10px; border-radius: 3px;
+        display: inline-block;
+        flex-shrink: 0;
     }
-    .summary-value.muted { color: #CBD5E1; font-weight: 800; }
+    .ach-legend-value {
+        font-weight: 900;
+        color: var(--navy);
+        font-size: 13px;
+    }
 
-    /* ================= TABLE ================= */
-    .loan-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .loan-table thead th {
-        font-size: 9px; font-weight: 900; letter-spacing: .14em;
-        text-transform: uppercase; color: #94A3B8;
-        padding: 12px 14px; text-align: left;
-        background: #F8FAFC;
-        border-bottom: 1px solid #E2E8F0;
-        white-space: nowrap;
+    .ach-progress-wrap {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px dashed #E2E8F0;
     }
-    .loan-table thead th:first-child { border-top-left-radius: 12px; }
-    .loan-table thead th:last-child { border-top-right-radius: 12px; }
-    .loan-table tbody td {
-        padding: 14px;
-        font-size: 12px; font-weight: 600; color: #334155;
-        border-bottom: 1px solid #F1F5F9;
-        vertical-align: middle;
+    .ach-progress-track {
+        height: 8px;
+        background: #F1F5F9;
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-top: 6px;
     }
-    .loan-table tbody tr:hover { background: #F8FAFC; }
-    .loan-table tbody tr:last-child td { border-bottom: none; }
+    .ach-progress-fill {
+        height: 100%;
+        border-radius: 9999px;
+        transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .fill-navy   { background: #002D62; }
+    .fill-purple { background: #9B26B6; }
+    .fill-gold   { background: #FDB913; }
 
-    .status-pill {
-        display: inline-flex; align-items: center; gap: 5px;
-        padding: 4px 10px; border-radius: 9999px;
+    .trend-wrap {
+        background: #fff;
+        border-radius: 24px;
+        padding: 24px;
+        border: 1px solid rgba(226,232,240,.7);
+        box-shadow: 0 18px 40px -22px rgba(0,45,98,.25);
+        position: relative;
+        overflow: hidden;
+    }
+    .trend-wrap::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: #9B26B6;
+    }
+
+    .news-card {
+        background: #fff;
+        border: 1px solid rgba(226,232,240,.8);
+        transition: all .3s cubic-bezier(.4,0,.2,1);
+        cursor: pointer; overflow: hidden;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px -14px rgba(0,45,98,.15);
+    }
+    .news-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 26px 40px -18px rgba(155, 38, 182, .35);
+        border-color: rgba(155, 38, 182, .3);
+    }
+    .news-card .news-img { height: 180px; overflow: hidden; position: relative; }
+    .news-card .news-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
+    .news-card:hover .news-img img { transform: scale(1.08); }
+    .news-badge {
+        position: absolute; top: 12px; left: 12px;
+        padding: 5px 14px;
         font-size: 9px; font-weight: 900;
-        letter-spacing: .08em; text-transform: uppercase;
-        white-space: nowrap;
+        text-transform: uppercase; letter-spacing: .1em;
+        color: #fff; border-radius: 9999px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.2);
     }
-    .st-pending  { background: rgba(253,185,19,.18); color: #B45309; border: 1px solid rgba(253,185,19,.45); }
-    .st-approved { background: rgba(0,45,98,.10); color: #002D62; border: 1px solid rgba(0,45,98,.28); }
-    .st-returned { background: rgba(16,185,129,.12); color: #047857; border: 1px solid rgba(16,185,129,.35); }
-    .st-rejected { background: rgba(225,29,72,.10); color: #BE123C; border: 1px solid rgba(225,29,72,.3); }
+    .badge-research { background: #002D62; }
+    .badge-academic { background: #9B26B6; }
+    .badge-industry { background: #FDB913; }
 
-    .tbl-btn {
-        width: 30px; height: 30px; border-radius: 9px;
-        display: inline-flex; align-items: center; justify-content: center;
-        font-size: 11px; transition: all .2s ease;
-        border: 1px solid #E2E8F0; background: #fff; color: #94A3B8;
-        cursor: pointer;
-    }
-    .tbl-btn:hover { border-color: #E11D48; color: #E11D48; background: #FFF1F2; }
-
-    .empty-state { text-align: center; padding: 44px 20px; color: #94A3B8; }
-    .empty-state i { font-size: 34px; opacity: .35; margin-bottom: 14px; display: block; }
-
-    /* ================= MODAL ================= */
     .modal-backdrop {
         background: rgba(15, 23, 42, 0.55);
         backdrop-filter: blur(6px);
@@ -371,6 +433,25 @@
     .tab-pane { display: none; }
     .tab-pane.active { display: block; animation: fadeUp .3s cubic-bezier(.4,0,.2,1) both; }
 
+    .field-label {
+        display: block; font-size: 9px; font-weight: 800;
+        letter-spacing: .18em; text-transform: uppercase;
+        color: #94A3B8; margin-bottom: 6px;
+    }
+    .field-input {
+        width: 100%; padding: 12px 14px;
+        font-size: 13px; font-weight: 600;
+        color: var(--navy);
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px; outline: none;
+        transition: all .2s ease;
+    }
+    .field-input::placeholder { color: #94A3B8; font-weight: 500; }
+    .field-input:focus { background: #fff; border-color: #9B26B6; box-shadow: 0 0 0 4px rgba(155, 38, 182, .12); }
+    .field-input:disabled { background: #F1F5F9; color: #64748B; cursor: not-allowed; }
+    .field-input.is-invalid { border-color: #9B26B6; background: #FAF5FF; }
+
     .pwd-wrap { position: relative; }
     .pwd-wrap .field-input { padding-right: 44px; }
     .pwd-toggle {
@@ -392,11 +473,22 @@
     .strength-text.medium { color: #9B26B6; }
     .strength-text.strong { color: #002D62; }
 
-    /* ================= TOAST ================= */
+    .error-box {
+        display: none; padding: 12px 14px;
+        background: #FAF5FF;
+        border-left: 4px solid #9B26B6;
+        border-radius: 8px;
+        font-size: 11px; color: #6B21A8;
+        font-weight: 600; line-height: 1.5;
+    }
+    .error-box.show { display: block; animation: fadeUp .25s cubic-bezier(.4,0,.2,1) both; }
+    .error-box ul { list-style: disc; padding-left: 16px; }
+
     .toast {
         position: fixed; bottom: 24px; left: 50%;
         transform: translateX(-50%) translateY(80px);
-        background: #FDB913; color: #fff;
+        background: #FDB913;
+        color: #fff;
         padding: 14px 22px; border-radius: 9999px;
         font-size: 11px; font-weight: 800;
         letter-spacing: .1em; text-transform: uppercase;
@@ -404,71 +496,190 @@
         display: flex; align-items: center; gap: 10px;
         z-index: 200; opacity: 0;
         transition: all .35s cubic-bezier(.4,0,.2,1);
-        max-width: calc(100vw - 32px);
-        text-align: center;
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.toast-blue { background: #002D62; box-shadow: 0 18px 40px -12px rgba(0,45,98,.6); }
-    .toast.toast-red { background: #E11D48; box-shadow: 0 18px 40px -12px rgba(225,29,72,.6); }
 
-    /* ================= BREADCRUMB ================= */
-    .crumb {
-        display: flex; align-items: center; gap: 8px;
-        font-size: 10px; font-weight: 800;
-        letter-spacing: .1em; text-transform: uppercase;
-        color: #94A3B8;
+    .info-banner { background: #EFF6FF; border-left: 4px solid #9B26B6; border-radius: 10px; }
+
+    .sched-item { border-radius: 12px; transition: all .25s cubic-bezier(.4,0,.2,1); border-left: 4px solid; background: #F8FAFC; }
+    .sched-item:hover { background: #fff; box-shadow: 0 12px 26px -14px rgba(0,45,98,.2); transform: translateX(2px); }
+    .sched-gold   { border-left-color: #FDB913; }
+    .sched-purple { border-left-color: #9B26B6; }
+    .sched-navy   { border-left-color: #002D62; }
+
+    .dot-gold   { background: #FDB913; }
+    .dot-purple { background: #9B26B6; }
+    .dot-navy   { background: #002D62; }
+
+    .deadline-row {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 16px;
+        background: #F8FAFC;
+        border-radius: 12px;
+        border-left: 4px solid;
+        transition: all .25s cubic-bezier(.4,0,.2,1);
     }
-    .crumb a { color: #9B26B6; text-decoration: none; transition: color .2s; }
-    .crumb a:hover { color: #002D62; }
-    .crumb i { font-size: 8px; }
+    .deadline-row:hover { background: #fff; box-shadow: 0 12px 26px -14px rgba(0,45,98,.2); transform: translateX(2px); }
+    .deadline-date {
+        text-align: center;
+        flex-shrink: 0;
+        width: 56px;
+        padding: 6px 0;
+        border-radius: 10px;
+        color: #fff;
+    }
+    .deadline-date .day { font-size: 18px; font-weight: 900; line-height: 1; }
+    .deadline-date .mon { font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
-    /* ================= FOOTER ================= */
-    .site-footer { background: #002D62; color: #fff; margin-top: 40px; position: relative; }
-    .site-footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #FDB913; }
-    .footer-inner { max-width: 80rem; margin: 0 auto; padding: 56px 24px 0; }
-    .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-    @media (min-width: 768px) { .footer-grid { grid-template-columns: 1.4fr 1fr 1.2fr; gap: 48px; } }
+    .site-footer {
+        background: #002D62;
+        color: #fff;
+        margin-top: 40px;
+        position: relative;
+    }
+    .site-footer::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: #FDB913;
+    }
+
+    .footer-inner {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 56px 24px 0;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding-bottom: 40px;
+        border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    @media (min-width: 768px) {
+        .footer-grid { grid-template-columns: 1.4fr 1fr 1.2fr; gap: 48px; }
+    }
+
     .footer-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-    .footer-logo .logo-bar { width: 3px; height: 42px; background: #FDB913; border-radius: 2px; }
+    .footer-logo .logo-bar {
+        width: 3px; height: 42px;
+        background: #FDB913;
+        border-radius: 2px;
+    }
     .footer-logo .logo-text { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; text-transform: uppercase; }
     .footer-logo .line-small { font-size: 0.62rem; letter-spacing: 0.2em; color: #FDB913; margin-bottom: 2px; }
     .footer-logo .line-large { font-size: 0.95rem; color: #fff; }
-    .footer-desc { font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.75); font-weight: 500; max-width: 380px; }
-    .footer-heading { font-size: 10px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: #FDB913; margin-bottom: 18px; }
-    .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .footer-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 12px; font-weight: 600; transition: color .2s ease, padding-left .2s ease; display: inline-flex; align-items: center; gap: 8px; }
-    .footer-links a::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #9B26B6; display: inline-block; transition: background .2s ease; }
+
+    .footer-desc {
+        font-size: 12px;
+        line-height: 1.7;
+        color: rgba(255,255,255,0.75);
+        font-weight: 500;
+        max-width: 380px;
+    }
+
+    .footer-heading {
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #FDB913;
+        margin-bottom: 18px;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .footer-links a {
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        transition: color .2s ease, padding-left .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .footer-links a::before {
+        content: '';
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: #9B26B6;
+        display: inline-block;
+        transition: background .2s ease;
+    }
     .footer-links a:hover { color: #FDB913; padding-left: 4px; }
     .footer-links a:hover::before { background: #FDB913; }
-    .footer-contact { display: flex; flex-direction: column; gap: 14px; }
-    .footer-contact-item { display: flex; gap: 12px; align-items: flex-start; font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; line-height: 1.6; }
-    .footer-contact-item i { color: #FDB913; font-size: 13px; margin-top: 3px; width: 16px; flex-shrink: 0; }
-    .footer-contact-item a { color: rgba(255,255,255,0.85); text-decoration: none; transition: color .2s ease; }
-    .footer-contact-item a:hover { color: #FDB913; }
-    .footer-bottom { padding: 22px 0; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: space-between; }
-    @media (min-width: 640px) { .footer-bottom { flex-direction: row; } }
-    .footer-copy { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.65); letter-spacing: 0.03em; }
-    .footer-legal { display: flex; align-items: center; gap: 20px; }
-    .footer-legal a { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.75); text-decoration: none; letter-spacing: 0.05em; transition: color .2s ease; }
-    .footer-legal a:hover { color: #FDB913; }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-track { background: #F1F5F9; }
-    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; border: 2px solid #F1F5F9; }
-    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-
-    @media (max-width: 640px) {
-        .loan-table thead { display: none; }
-        .loan-table tbody td { display: block; padding: 6px 14px; border: none; }
-        .loan-table tbody tr { display: block; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
-        .loan-table tbody td::before {
-            content: attr(data-label);
-            display: block;
-            font-size: 8px; font-weight: 900; letter-spacing: .14em;
-            text-transform: uppercase; color: #94A3B8; margin-bottom: 3px;
-        }
+    .footer-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
     }
+    .footer-contact-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        font-size: 12px;
+        color: rgba(255,255,255,0.8);
+        font-weight: 500;
+        line-height: 1.6;
+    }
+    .footer-contact-item i {
+        color: #FDB913;
+        font-size: 13px;
+        margin-top: 3px;
+        width: 16px;
+        flex-shrink: 0;
+    }
+    .footer-contact-item a {
+        color: rgba(255,255,255,0.85);
+        text-decoration: none;
+        transition: color .2s ease;
+    }
+    .footer-contact-item a:hover { color: #FDB913; }
+
+    .footer-bottom {
+        padding: 22px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    @media (min-width: 640px) {
+        .footer-bottom { flex-direction: row; }
+    }
+
+    .footer-copy {
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.65);
+        letter-spacing: 0.03em;
+    }
+
+    .footer-legal {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .footer-legal a {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.75);
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        transition: color .2s ease;
+    }
+    .footer-legal a:hover { color: #FDB913; }
 </style>
 </head>
 <body class="text-slate-900">
@@ -491,7 +702,7 @@
             <div class="flex items-center gap-3 sm:gap-4">
                 <div class="hidden md:flex items-center gap-3 bg-white/12 border border-white/20 px-4 py-2 w-64 rounded-full">
                     <i class="fas fa-magnifying-glass text-white/60 text-xs"></i>
-                    <input type="text" id="globalSearch" placeholder="Search portal..."
+                    <input type="text" placeholder="Search portal..."
                            data-i18n-ph="ph_search"
                            class="bg-transparent border-none outline-none text-white text-xs placeholder-white/60 w-full font-medium">
                 </div>
@@ -529,9 +740,6 @@
                             <p id="ddEmail" class="text-[10px] font-bold text-slate-500 mt-1 truncate">—</p>
                         </div>
                         <div class="py-2">
-                            <a href="index.html" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-purple-50 hover:text-p254c transition">
-                                <i class="fas fa-house w-4 text-p254c"></i> <span data-i18n="menu_dashboard">Dashboard</span>
-                            </a>
                             <button id="settingsBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-purple-50 hover:text-p254c transition">
                                 <i class="fas fa-gear w-4 text-p254c"></i> <span data-i18n="menu_settings">Settings</span>
                             </button>
@@ -549,387 +757,450 @@
 </nav>
 
 <!-- ============================================================
-     MAIN
+     MAIN CONTENT
 ============================================================= -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
-    <!-- Breadcrumb -->
-    <nav class="crumb mb-5 anim-up">
-        <a href="index.html"><i class="fas fa-house mr-1"></i> <span data-i18n="bc_home">Home</span></a>
-        <i class="fas fa-chevron-right"></i>
-        <a href="index.html"><span data-i18n="bc_portal">Student Portal</span></a>
-        <i class="fas fa-chevron-right"></i>
-        <span class="text-p655c" data-i18n="bc_loan">Pinjaman Alat Radas</span>
-    </nav>
-
-    <!-- Hero -->
+    <!-- Welcome banner -->
     <div class="hero-banner p-8 sm:p-10 mb-6 rounded-3xl anim-up">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
                 <span class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-yellow-300 mb-3">
                     <span class="w-2 h-2 rounded-full bg-yellow-300 animate-pulse"></span>
-                    <span data-i18n="loan_hero_tag">Laboratory Services</span>
+                    <span data-i18n="stu_dash_online">Semester Active</span>
                 </span>
 
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
-                    <span data-i18n="loan_hero_title">Equipment Loan</span>
+                    <span data-i18n="stu_dash_welcome">Welcome back,</span><br>
+                    <span id="bannerName" class="text-yellow-300">—</span>
                 </h1>
-                <p class="text-white/75 text-xs sm:text-sm font-medium mt-3 max-w-xl leading-relaxed" data-i18n="loan_hero_sub">
-                    Borrow laboratory apparatus, tools and instruments for teaching, research and final year projects.
-                </p>
 
-                <div class="mt-5 flex flex-wrap items-center gap-2">
-                    <span class="chip chip-gold"><i class="fas fa-id-card"></i> <span id="heroStudentId">—</span></span>
-                    <span class="chip chip-purple"><i class="fas fa-graduation-cap"></i> <span id="heroProgram">—</span></span>
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <span class="chip chip-gold"><i class="fas fa-id-card"></i> <span id="studentIdChip">—</span></span>
+                    <span class="chip chip-purple"><i class="fas fa-graduation-cap"></i> <span id="studentProgramChip">—</span></span>
                 </div>
             </div>
 
-            <div class="shrink-0 flex flex-col gap-3">
-                <a href="index.html"
-                   class="bg-white/15 hover:bg-white/25 border border-white/25 px-5 py-3 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest transition flex items-center gap-2 justify-center">
-                    <i class="fas fa-arrow-left"></i> <span data-i18n="loan_back">Back to Portal</span>
-                </a>
+            <div class="shrink-0">
                 <div class="bg-white/15 border border-white/25 p-5 min-w-[200px] rounded-2xl float-anim">
-                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="loan_today">Today</p>
-                    <p id="heroToday" class="text-white font-bold text-xs">—</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="stu_dash_today">Today</p>
+                    <p id="todayDate" class="text-white font-bold text-sm">—</p>
+                    <div class="h-px bg-white/25 my-3"></div>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-300 mb-1" data-i18n="stu_dash_lastlogin">Last Login</p>
+                    <p id="lastLogin" class="text-white font-bold text-xs">—</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============================================================
-         QUICK STATS
-    ============================================================ -->
+    <!-- Quick Links -->
+    <div class="card p-6 mb-6 anim-up rounded-3xl">
+        <div class="mb-5 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <span class="section-label" data-i18n="stu_quick_links_label">Quick Menu</span>
+                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="stu_quick_links_title">Student Quick Links</h3>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="stu_quick_links_hint">Opens in new tab</span>
+        </div>
+
+        <div id="quickLinksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <!-- rendered by JS -->
+        </div>
+    </div>
+
+    <!-- Personal stat cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-        <div class="stat-card stat-navy p-6">
+        <div class="stat-card stat-navy card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-warehouse"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="stat_live">Live</span>
+                <div class="stat-icon-box"><i class="fas fa-chart-line"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full">CGPA</span>
             </div>
-            <p id="statAvailable" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stat_available">Items Available</p>
+            <p class="text-3xl font-black leading-none mb-2 relative z-10">3.72</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stu_stat_cgpa">Current CGPA</p>
         </div>
 
-        <div class="stat-card stat-purple p-6">
+        <div class="stat-card stat-purple card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-hand-holding"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="stat_mine">Mine</span>
+                <div class="stat-icon-box"><i class="fas fa-book-open"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="stu_stat_sem">This Sem</span>
             </div>
-            <p id="statActive" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10" data-i18n="stat_active">Active Loans</p>
+            <p class="text-3xl font-black leading-none mb-2 relative z-10">6</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10" data-i18n="stu_stat_courses">Enrolled Courses</p>
         </div>
 
-        <div class="stat-card stat-gold p-6">
+        <div class="stat-card stat-gold card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-hourglass-half"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="stat_wait">Wait</span>
+                <div class="stat-icon-box"><i class="fas fa-award"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full">2026</span>
             </div>
-            <p id="statPending" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-yellow-100 relative z-10" data-i18n="stat_pending">Pending Approval</p>
+            <p class="text-3xl font-black leading-none mb-2 relative z-10">96</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-yellow-100 relative z-10" data-i18n="stu_stat_credits">Total Credits</p>
         </div>
 
-        <div class="stat-card stat-navy p-6">
+        <div class="stat-card stat-deep card-hover p-6 rounded-2xl">
             <div class="flex items-start justify-between mb-4 relative z-10">
-                <div class="stat-icon-box"><i class="fas fa-clock-rotate-left"></i></div>
-                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="stat_all">All</span>
+                <div class="stat-icon-box"><i class="fas fa-list-check"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-white/25 px-2 py-1 rounded-full" data-i18n="stu_stat_due">Due</span>
             </div>
-            <p id="statTotal" class="text-3xl font-black leading-none mb-2 relative z-10">0</p>
-            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stat_total">Total Requests</p>
+            <p class="text-3xl font-black leading-none mb-2 relative z-10">3</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10" data-i18n="stu_stat_assignments">Pending Assignments</p>
         </div>
     </div>
 
     <!-- ============================================================
-         EQUIPMENT CATALOG
+         ACADEMIC PERFORMANCE
     ============================================================ -->
-    <section class="card rounded-3xl mb-6 anim-up overflow-hidden">
-        <div class="bg-[#002D62] p-5 flex flex-wrap justify-between items-center gap-4 relative overflow-hidden">
-            <div class="flex items-center gap-4 relative z-10">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: #FDB913;">
-                    <i class="fas fa-toolbox text-white text-base"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-black text-white uppercase tracking-wider" data-i18n="catalog_title">Equipment Catalog</h3>
-                    <p class="text-[10px] font-bold text-[#FDB913] uppercase tracking-widest mt-1" data-i18n="catalog_sub">Select an item to start your request</p>
-                </div>
+    <section class="mb-8 anim-up">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
+            <div>
+                <span class="section-label" data-i18n="stu_ach_tag">Academic Performance</span>
+                <h2 class="text-2xl sm:text-3xl font-black text-p655c mt-2" data-i18n="stu_ach_title">My Progress</h2>
+                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="stu_ach_sub">Grades, attendance &amp; credit progress · FKK Johor</p>
             </div>
-            <div class="relative z-10">
-                <span class="text-[10px] font-black text-[#FDB913] uppercase tracking-widest border border-[#FDB913] px-4 py-1.5 rounded-full flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-[#FDB913]"></span> <span id="catalogCount">0</span> <span data-i18n="catalog_items">items</span>
-                </span>
+            <div class="flex items-center gap-2 shrink-0">
+                <span class="chip chip-gold"><i class="fas fa-calendar"></i> 2024 – 2026</span>
+                <span class="chip chip-purple"><i class="fas fa-arrow-trend-up"></i> <span data-i18n="stu_ach_trend">Improving</span></span>
             </div>
-            <div class="absolute right-[-30px] top-[-60px] w-40 h-40 rounded-full bg-white/5 pointer-events-none"></div>
-            <div class="absolute right-[20px] bottom-[-40px] w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
         </div>
 
-        <div class="p-6">
-            <!-- Search + Filters -->
-            <div class="flex flex-col lg:flex-row lg:items-center gap-4 mb-6">
-                <div class="relative flex-1">
-                    <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="equipSearch" data-i18n-ph="catalog_search_ph"
-                           placeholder="Search equipment, model or code..."
-                           class="field-input pl-11">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- GRADES -->
+            <div class="ach-card">
+                <div class="ach-header ach-header-pub">
+                    <div class="flex items-center justify-between mb-5 relative z-10">
+                        <div class="flex items-center gap-3">
+                            <div class="ach-icon-box"><i class="fas fa-graduation-cap"></i></div>
+                            <div>
+                                <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/70">Gred</p>
+                                <p class="text-sm font-black text-white uppercase tracking-wide" data-i18n="stu_grades">Grades</p>
+                            </div>
+                        </div>
+                        <span class="ach-badge"><i class="fas fa-arrow-up text-[8px]"></i> +0.18</span>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="ach-big-number">3.72</p>
+                        <p class="ach-sub" data-i18n="stu_grades_sub">Current CGPA (out of 4.00)</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0" id="filterBar">
-                    <button class="filter-btn active" data-cat="all" data-i18n="cat_all">All</button>
-                    <button class="filter-btn" data-cat="analysis" data-i18n="cat_analysis">Analysis</button>
-                    <button class="filter-btn" data-cat="instrument" data-i18n="cat_instrument">Instruments</button>
-                    <button class="filter-btn" data-cat="glassware" data-i18n="cat_glassware">Glassware</button>
-                    <button class="filter-btn" data-cat="safety" data-i18n="cat_safety">Safety</button>
-                    <button class="filter-btn" data-cat="general" data-i18n="cat_general">General</button>
+                <div class="ach-body">
+                    <div class="ach-chart-wrap"><canvas id="gradeChart"></canvas></div>
+                    <div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="stu_grade_a">A / A-</span></span>
+                            <span class="ach-legend-value">14</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #9B26B6;"></span><span data-i18n="stu_grade_b">B+ / B</span></span>
+                            <span class="ach-legend-value">8</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #FDB913;"></span><span data-i18n="stu_grade_c">B- / C+</span></span>
+                            <span class="ach-legend-value">3</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="stu_grade_d">C &amp; below</span></span>
+                            <span class="ach-legend-value">1</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Grid -->
-            <div id="equipGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            <!-- ATTENDANCE -->
+            <div class="ach-card">
+                <div class="ach-header ach-header-inv">
+                    <div class="flex items-center justify-between mb-5 relative z-10">
+                        <div class="flex items-center gap-3">
+                            <div class="ach-icon-box"><i class="fas fa-user-check"></i></div>
+                            <div>
+                                <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/70">Kehadiran</p>
+                                <p class="text-sm font-black text-white uppercase tracking-wide" data-i18n="stu_attendance">Attendance</p>
+                            </div>
+                        </div>
+                        <span class="ach-badge"><i class="fas fa-arrow-up text-[8px]"></i> +3%</span>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="ach-big-number">94<small style="font-size:1.4rem;">%</small></p>
+                        <p class="ach-sub" data-i18n="stu_attendance_sub">Overall attendance rate</p>
+                    </div>
+                </div>
+                <div class="ach-body">
+                    <div class="ach-chart-wrap"><canvas id="attChart"></canvas></div>
+                    <div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #9B26B6;"></span><span data-i18n="stu_att_present">Present</span></span>
+                            <span class="ach-legend-value">142</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="stu_att_mc">Medical / Leave</span></span>
+                            <span class="ach-legend-value">6</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #FDB913;"></span><span data-i18n="stu_att_absent">Absent</span></span>
+                            <span class="ach-legend-value">3</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="stu_att_total">Total Sessions</span></span>
+                            <span class="ach-legend-value">151</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div id="equipEmpty" class="empty-state hidden">
-                <i class="fas fa-box-open"></i>
-                <p class="text-xs font-bold uppercase tracking-widest" data-i18n="catalog_empty">No equipment matches your search</p>
+            <!-- CREDITS -->
+            <div class="ach-card">
+                <div class="ach-header ach-header-grt">
+                    <div class="flex items-center justify-between mb-5 relative z-10">
+                        <div class="flex items-center gap-3">
+                            <div class="ach-icon-box"><i class="fas fa-layer-group"></i></div>
+                            <div>
+                                <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/80">Kredit</p>
+                                <p class="text-sm font-black text-white uppercase tracking-wide" data-i18n="stu_credits">Credits</p>
+                            </div>
+                        </div>
+                        <span class="ach-badge"><i class="fas fa-flag-checkered text-[8px]"></i> <span id="creditPercent">78%</span></span>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="ach-big-number">96<small style="font-size:1.2rem;">/123</small></p>
+                        <p class="ach-sub" data-i18n="stu_credits_sub">Credits completed / required</p>
+                    </div>
+                </div>
+                <div class="ach-body">
+                    <div class="ach-chart-wrap"><canvas id="credChart"></canvas></div>
+                    <div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="stu_cred_core">Core</span></span>
+                            <span class="ach-legend-value">62</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #9B26B6;"></span><span data-i18n="stu_cred_elect">Electives</span></span>
+                            <span class="ach-legend-value">18</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #FDB913;"></span><span data-i18n="stu_cred_mpu">MPU</span></span>
+                            <span class="ach-legend-value">10</span>
+                        </div>
+                        <div class="ach-legend-row">
+                            <span class="ach-legend-label"><span class="ach-dot" style="background: #002D62;"></span><span data-i18n="stu_cred_remaining">Remaining</span></span>
+                            <span class="ach-legend-value">27</span>
+                        </div>
+                    </div>
+                    <div class="ach-progress-wrap">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500" data-i18n="stu_cred_progress">Degree Progress</span>
+                            <span class="text-[11px] font-black text-p130c">78%</span>
+                        </div>
+                        <div class="ach-progress-track"><div class="ach-progress-fill fill-gold" style="width: 78%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPA Trend Chart -->
+        <div class="trend-wrap">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+                <div>
+                    <span class="section-label" data-i18n="stu_yearly_label">GPA Trend</span>
+                    <h3 class="text-lg font-black text-p655c mt-1" data-i18n="stu_yearly_title">Semester GPA (Sem 1 – Sem 6)</h3>
+                </div>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <span class="w-3 h-3 rounded" style="background: #002D62;"></span>
+                        <span data-i18n="stu_legend_gpa">GPA</span>
+                    </span>
+                    <span class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <span class="w-3 h-3 rounded" style="background: #9B26B6;"></span>
+                        <span data-i18n="stu_legend_cgpa">CGPA</span>
+                    </span>
+                </div>
+            </div>
+            <div style="position: relative; height: 260px;">
+                <canvas id="gpaTrendChart"></canvas>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         FORM + SIDE PANEL
-    ============================================================ -->
+    <!-- Schedule + Deadlines -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
 
-        <!-- APPLICATION FORM -->
-        <section class="xl:col-span-2 card p-6 sm:p-7 rounded-3xl anim-up">
-            <div class="flex items-center gap-4 mb-6 pb-5 border-b border-slate-100">
-                <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background:#9B26B6;">
-                    <i class="fas fa-file-pen text-white text-sm"></i>
-                </div>
+        <div class="xl:col-span-2 card p-6 rounded-3xl">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
                 <div>
-                    <span class="section-label" data-i18n="form_tag">Loan Application</span>
-                    <h3 class="text-lg font-black text-p655c mt-1" data-i18n="form_title">Equipment Loan Form</h3>
-                    <p class="text-[11px] text-slate-500 font-medium mt-0.5" data-i18n="form_sub">Complete all required fields marked with *</p>
+                    <span class="section-label" data-i18n="stu_sched_label">Schedule</span>
+                    <h3 class="text-lg font-black text-p655c mt-1" data-i18n="stu_sched_title">Today's Classes</h3>
                 </div>
+                <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p254c hover:text-p655c transition" data-i18n="stu_view_all">View All</a>
             </div>
 
-            <form id="loanForm" novalidate>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                    <!-- Equipment -->
-                    <div class="md:col-span-2">
-                        <label class="field-label" for="fldEquipment">
-                            <span data-i18n="fld_equipment">Equipment / Apparatus</span> *
-                        </label>
-                        <select id="fldEquipment" class="field-input" required>
-                            <option value="" data-i18n="opt_select_equipment">— Select equipment —</option>
-                        </select>
-                        <p class="text-[9px] font-bold text-slate-400 mt-2 flex items-center gap-1.5">
-                            <i class="fas fa-circle-info text-purple-500"></i>
-                            <span data-i18n="fld_equipment_hint">Tip: click any card in the catalog above to auto-select.</span>
+            <div class="space-y-3">
+                <div class="sched-item sched-gold flex items-center gap-5 p-4">
+                    <div class="text-center shrink-0 w-16">
+                        <p class="text-lg font-black text-p655c leading-none">08:00</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">AM</p>
+                    </div>
+                    <div class="h-10 w-px bg-slate-200"></div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-p655c truncate">CHE423 — Process Control &amp; Instrumentation</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            <i class="fas fa-location-dot mr-1 text-amber-600"></i> BK-12 · <span data-i18n="stu_sched_lecture">Lecture</span> · <span data-i18n="stu_sched_lecturer">Dr. Ahmad</span>
                         </p>
                     </div>
-
-                    <!-- Quantity -->
-                    <div>
-                        <label class="field-label" for="fldQty"><span data-i18n="fld_qty">Quantity</span> *</label>
-                        <input type="number" id="fldQty" class="field-input" min="1" value="1" required>
-                        <p id="qtyHint" class="text-[9px] font-bold text-slate-400 mt-2">—</p>
-                    </div>
-
-                    <!-- Course code -->
-                    <div>
-                        <label class="field-label" for="fldCourse"><span data-i18n="fld_course">Course Code</span> *</label>
-                        <input type="text" id="fldCourse" class="field-input" data-i18n-ph="fld_course_ph" placeholder="e.g. CHE423" required>
-                    </div>
-
-                    <!-- Lab -->
-                    <div>
-                        <label class="field-label" for="fldLab"><span data-i18n="fld_lab">Laboratory / Venue</span> *</label>
-                        <select id="fldLab" class="field-input" required>
-                            <option value="" data-i18n="opt_select_lab">— Select laboratory —</option>
-                            <option value="Makmal Unit Operasi 1">Makmal Unit Operasi 1</option>
-                            <option value="Makmal Unit Operasi 2">Makmal Unit Operasi 2</option>
-                            <option value="Makmal Kimia Analitik">Makmal Kimia Analitik</option>
-                            <option value="Makmal Termodinamik">Makmal Termodinamik</option>
-                            <option value="Makmal Instrumentasi">Makmal Instrumentasi</option>
-                            <option value="Makmal Penyelidikan FYP">Makmal Penyelidikan FYP</option>
-                            <option value="Bengkel Kejuruteraan">Bengkel Kejuruteraan</option>
-                        </select>
-                    </div>
-
-                    <!-- Supervisor -->
-                    <div>
-                        <label class="field-label" for="fldSupervisor"><span data-i18n="fld_supervisor">Supervising Lecturer</span> *</label>
-                        <input type="text" id="fldSupervisor" class="field-input" data-i18n-ph="fld_supervisor_ph" placeholder="e.g. Dr. Ahmad bin Ismail" required>
-                    </div>
-
-                    <!-- Borrow date -->
-                    <div>
-                        <label class="field-label" for="fldDateBorrow"><span data-i18n="fld_date_borrow">Borrow Date</span> *</label>
-                        <input type="date" id="fldDateBorrow" class="field-input" required>
-                    </div>
-
-                    <!-- Return date -->
-                    <div>
-                        <label class="field-label" for="fldDateReturn"><span data-i18n="fld_date_return">Expected Return Date</span> *</label>
-                        <input type="date" id="fldDateReturn" class="field-input" required>
-                    </div>
-
-                    <!-- Purpose -->
-                    <div class="md:col-span-2">
-                        <label class="field-label" for="fldPurpose"><span data-i18n="fld_purpose">Purpose / Justification</span> *</label>
-                        <textarea id="fldPurpose" class="field-input" data-i18n-ph="fld_purpose_ph"
-                                  placeholder="Briefly explain how the equipment will be used..." required></textarea>
-                    </div>
-
-                    <!-- Terms -->
-                    <div class="md:col-span-2 pt-1">
-                        <label class="check-row">
-                            <input type="checkbox" id="fldTerms">
-                            <span class="check-box"><i class="fas fa-check"></i></span>
-                            <span class="text-[11px] font-semibold text-slate-600 leading-relaxed" data-i18n="chk_terms">
-                                I agree to return the equipment in good condition before the due date and accept liability for any loss or damage.
-                            </span>
-                        </label>
-                    </div>
+                    <span class="chip chip-gold shrink-0">3H</span>
                 </div>
 
-                <div id="formError" class="error-box mt-5"></div>
-
-                <div class="flex flex-col sm:flex-row gap-3 mt-7 pt-6 border-t border-slate-100">
-                    <button type="button" id="resetBtn"
-                            class="sm:w-40 py-3.5 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 hover:text-p655c transition flex items-center justify-center gap-2">
-                        <i class="fas fa-rotate-left"></i> <span data-i18n="btn_reset">Reset</span>
-                    </button>
-                    <button type="submit" id="submitBtn"
-                            class="flex-1 btn-gold py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
-                        <i class="fas fa-paper-plane"></i> <span data-i18n="btn_submit">Submit Loan Request</span>
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- SIDE PANEL -->
-        <aside class="space-y-6">
-
-            <!-- Live summary -->
-            <div class="card p-6 rounded-3xl anim-up">
-                <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:#002D62;">
-                        <i class="fas fa-receipt text-white text-xs"></i>
+                <div class="sched-item sched-purple flex items-center gap-5 p-4">
+                    <div class="text-center shrink-0 w-16">
+                        <p class="text-lg font-black text-p655c leading-none">11:00</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">AM</p>
                     </div>
-                    <div>
-                        <span class="section-label" data-i18n="side_summary_tag">Live Preview</span>
-                        <h3 class="text-base font-black text-p655c mt-0.5" data-i18n="side_summary_title">Request Summary</h3>
+                    <div class="h-10 w-px bg-slate-200"></div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-p655c truncate">CHE215 — Thermodynamics Lab</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            <i class="fas fa-location-dot mr-1 text-purple-600"></i> <span data-i18n="stu_sched_lab">Lab</span> 3 · <span data-i18n="stu_sched_practical">Practical</span> · <span data-i18n="stu_sched_lecturer">Dr. Nurul</span>
+                        </p>
                     </div>
+                    <span class="chip chip-purple shrink-0">2H</span>
                 </div>
 
-                <div>
-                    <div class="summary-row">
-                        <span class="summary-label" data-i18n="sum_equipment">Equipment</span>
-                        <span class="summary-value muted" id="sumEquipment">—</span>
+                <div class="sched-item sched-navy flex items-center gap-5 p-4">
+                    <div class="text-center shrink-0 w-16">
+                        <p class="text-lg font-black text-p655c leading-none">02:30</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">PM</p>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label" data-i18n="sum_code">Item Code</span>
-                        <span class="summary-value muted" id="sumCode">—</span>
+                    <div class="h-10 w-px bg-slate-200"></div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-p655c truncate">CHE499 — Final Year Project Meeting</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            <i class="fas fa-location-dot mr-1 text-blue-700"></i> <span data-i18n="stu_sched_office">Supervisor Office</span> · <span data-i18n="stu_sched_meeting">Meeting</span>
+                        </p>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label" data-i18n="sum_qty">Quantity</span>
-                        <span class="summary-value muted" id="sumQty">—</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label" data-i18n="sum_lab">Laboratory</span>
-                        <span class="summary-value muted" id="sumLab">—</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label" data-i18n="sum_dates">Borrow → Return</span>
-                        <span class="summary-value muted" id="sumDates">—</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label" data-i18n="sum_duration">Duration</span>
-                        <span class="summary-value muted" id="sumDuration">—</span>
-                    </div>
-                </div>
-
-                <div class="mt-5 p-4 rounded-xl info-banner flex gap-3">
-                    <i class="fas fa-lightbulb text-purple-600 mt-0.5 text-sm"></i>
-                    <p class="text-[10px] font-semibold text-purple-800 leading-relaxed" data-i18n="side_summary_note">
-                        Requests are reviewed by the Laboratory Coordinator within 1–2 working days.
-                    </p>
+                    <span class="chip chip-navy shrink-0">1H</span>
                 </div>
             </div>
+        </div>
 
-            <!-- Guidelines -->
-            <div class="card p-6 rounded-3xl anim-up">
-                <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:#FDB913;">
-                        <i class="fas fa-clipboard-list text-white text-xs"></i>
+        <div class="card p-6 rounded-3xl">
+            <div class="mb-5 pb-4 border-b border-slate-100">
+                <span class="section-label" data-i18n="stu_deadline_label">Due Soon</span>
+                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="stu_deadline_title">Upcoming Deadlines</h3>
+            </div>
+
+            <div class="space-y-3">
+                <div class="deadline-row sched-gold">
+                    <div class="deadline-date bg-navy" style="background:#FDB913;">
+                        <p class="day">18</p>
+                        <p class="mon">SEP</p>
                     </div>
-                    <div>
-                        <span class="section-label" data-i18n="side_guide_tag">Read First</span>
-                        <h3 class="text-base font-black text-p655c mt-0.5" data-i18n="side_guide_title">Loan Guidelines</h3>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-bold text-p655c leading-snug" data-i18n="stu_dl_1">CHE423 Lab Report 3</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">11:59 PM · 2 <span data-i18n="stu_dl_days">days left</span></p>
                     </div>
                 </div>
-
-                <ul class="space-y-3.5">
-                    <li class="flex gap-3">
-                        <span class="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0 mt-0.5" style="background:#002D62;">1</span>
-                        <p class="text-[11px] font-semibold text-slate-600 leading-relaxed" data-i18n="guide_1">A valid student ID card must be presented when collecting the equipment.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0 mt-0.5" style="background:#9B26B6;">2</span>
-                        <p class="text-[11px] font-semibold text-slate-600 leading-relaxed" data-i18n="guide_2">Standard loan period is a maximum of 14 days. Extensions require written approval.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0 mt-0.5" style="background:#FDB913;">3</span>
-                        <p class="text-[11px] font-semibold text-slate-600 leading-relaxed" data-i18n="guide_3">Fragile glassware and calibrated instruments must be handled by trained students only.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0 mt-0.5" style="background:#002D62;">4</span>
-                        <p class="text-[11px] font-semibold text-slate-600 leading-relaxed" data-i18n="guide_4">Any damage or loss must be reported to the laboratory technician immediately.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0 mt-0.5" style="background:#9B26B6;">5</span>
-                        <p class="text-[11px] font-semibold text-slate-600 leading-relaxed" data-i18n="guide_5">Late returns may affect your eligibility for future laboratory loans.</p>
-                    </li>
-                </ul>
+                <div class="deadline-row sched-purple">
+                    <div class="deadline-date" style="background:#9B26B6;">
+                        <p class="day">22</p>
+                        <p class="mon">SEP</p>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-bold text-p655c leading-snug" data-i18n="stu_dl_2">CHE215 Midterm Exam</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">09:00 AM · 6 <span data-i18n="stu_dl_days">days left</span></p>
+                    </div>
+                </div>
+                <div class="deadline-row sched-navy">
+                    <div class="deadline-date" style="background:#002D62;">
+                        <p class="day">28</p>
+                        <p class="mon">SEP</p>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-bold text-p655c leading-snug" data-i18n="stu_dl_3">CHE499 FYP Progress Report</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">11:59 PM · 12 <span data-i18n="stu_dl_days">days left</span></p>
+                    </div>
+                </div>
             </div>
-        </aside>
+        </div>
     </div>
 
     <!-- ============================================================
-         LOAN HISTORY
+         ACTIVITY TRAIL
     ============================================================ -->
     <section class="card p-6 rounded-3xl mb-10 anim-up">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
             <div>
-                <span class="section-label" data-i18n="hist_tag">Records</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="hist_title">My Loan History</h3>
-                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="hist_sub">All equipment loan requests submitted from this account</p>
+                <span class="section-label" data-i18n="activity_label">Jejak Aktiviti</span>
+                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="activity_title">Activity Trail</h3>
+                <p class="text-xs text-slate-500 font-medium mt-1" data-i18n="stu_activity_sub">Recent actions on your account</p>
             </div>
-            <span class="chip chip-purple">
-                <i class="fas fa-list"></i>
-                <span id="histCount">0</span>
-                <span data-i18n="hist_records">records</span>
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="chip chip-purple">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <span id="activityCount">0</span>
+                    <span data-i18n="activity_records">records</span>
+                </span>
+                <button id="clearActivityBtn"
+                        class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-p254c transition px-3 py-2">
+                    <i class="fas fa-broom"></i> <span data-i18n="activity_clear">Clear</span>
+                </button>
+            </div>
+        </div>
+        <div id="activityTimeline" class="activity-timeline">
+            <!-- rendered by JS -->
+        </div>
+    </section>
+
+    <!-- Newsroom & Events -->
+    <section class="mb-10">
+        <div class="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
+            <div>
+                <span class="section-label" data-i18n="stu_news_tag">Latest Updates</span>
+                <h2 class="text-2xl sm:text-3xl font-black text-p655c mt-2" data-i18n="stu_news_title">Campus News &amp; Events</h2>
+            </div>
+            <a href="#" class="text-xs font-black uppercase tracking-widest text-p254c hover:text-p655c transition flex items-center gap-2">
+                <span data-i18n="stu_btn_archive">View Archive</span> <i class="fas fa-chevron-right text-[10px]"></i>
+            </a>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="loan-table">
-                <thead>
-                    <tr>
-                        <th data-i18n="th_ref">Reference</th>
-                        <th data-i18n="th_equipment">Equipment</th>
-                        <th data-i18n="th_qty">Qty</th>
-                        <th data-i18n="th_dates">Borrow → Return</th>
-                        <th data-i18n="th_status">Status</th>
-                        <th class="text-right" data-i18n="th_action">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="historyBody"></tbody>
-            </table>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <article class="news-card group">
+                <div class="news-img">
+                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800" alt="Academic">
+                    <div class="news-badge badge-academic">Academic</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">March 15, 2026</div>
+                    <h3 class="text-base font-bold text-p655c mb-3 leading-snug group-hover:text-p254c transition" data-i18n="stu_news_1_title">
+                        Final Examination Timetable Released for Semester 2.
+                    </h3>
+                    <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p130c mt-2 inline-block">Read More</a>
+                </div>
+            </article>
 
-        <div id="historyEmpty" class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <p class="text-xs font-bold uppercase tracking-widest" data-i18n="hist_empty">No loan requests yet</p>
-            <p class="text-[11px] font-medium mt-2" data-i18n="hist_empty_sub">Submit your first request using the form above.</p>
+            <article class="news-card group">
+                <div class="news-img">
+                    <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800" alt="Event">
+                    <div class="news-badge badge-research">Event</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">March 10, 2026</div>
+                    <h3 class="text-base font-bold text-p655c mb-3 leading-snug group-hover:text-p254c transition" data-i18n="stu_news_2_title">
+                        ChemE Career Fair 2026: Meet 30+ Industry Partners.
+                    </h3>
+                    <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p130c mt-2 inline-block">Read More</a>
+                </div>
+            </article>
+
+            <article class="news-card group">
+                <div class="news-img">
+                    <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=800" alt="Scholarship">
+                    <div class="news-badge badge-industry">Scholarship</div>
+                </div>
+                <div class="p-5">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">March 05, 2026</div>
+                    <h3 class="text-base font-bold text-p655c mb-3 leading-snug group-hover:text-p254c transition" data-i18n="stu_news_3_title">
+                        Yayasan UiTM Scholarship Applications Now Open.
+                    </h3>
+                    <a href="#" class="text-[10px] font-black uppercase tracking-widest text-p130c mt-2 inline-block">Read More</a>
+                </div>
+            </article>
         </div>
     </section>
 
@@ -940,6 +1211,7 @@
 ============================================================= -->
 <footer class="site-footer">
     <div class="footer-inner">
+
         <div class="footer-grid">
             <div>
                 <div class="footer-logo">
@@ -958,11 +1230,11 @@
             <div>
                 <h4 class="footer-heading" data-i18n="footer_quick_links">Quick Links</h4>
                 <ul class="footer-links">
-                    <li><a href="index.html" data-i18n="menu_dashboard">Dashboard</a></li>
-                    <li><a href="pinjaman_alat_radas.html" data-i18n="menu_equipment_loan">Equipment Loan</a></li>
-                    <li><a href="permohonan_bahan_kimia.html" data-i18n="menu_chemical_request">Chemical Request</a></li>
-                    <li><a href="permohonan_peralatan_makmal.html" data-i18n="menu_lab_equipment_request">Lab Equipment Request</a></li>
-                    <li><a href="resume_portal.html" data-i18n="menu_resume">Resume</a></li>
+                    <li><a href="#" data-i18n="footer_student_dir">Student Directory</a></li>
+                    <li><a href="#" data-i18n="footer_exam_unit">Exam Unit</a></li>
+                    <li><a href="#" data-i18n="footer_library">Library</a></li>
+                    <li><a href="#" data-i18n="footer_alumni">Alumni</a></li>
+                    <li><a href="#" data-i18n="footer_contact">Contact</a></li>
                 </ul>
             </div>
 
@@ -992,6 +1264,7 @@
                 <a href="#" data-i18n="footer_terms">Terms of Use</a>
             </div>
         </div>
+
     </div>
 </footer>
 
@@ -1100,314 +1373,235 @@
     </div>
 </div>
 
-<!-- ============================================================
-     SUCCESS MODAL
-============================================================= -->
-<div id="successModal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4">
-    <div class="modal-box bg-white w-full max-w-md shadow-2xl overflow-hidden">
-        <div class="p-8 text-center" style="background:#002D62;">
-            <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4" style="background:#FDB913;">
-                <i class="fas fa-check text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-black text-white uppercase tracking-wide" data-i18n="succ_title">Request Submitted</h3>
-            <p class="text-[11px] font-semibold text-white/70 mt-2 leading-relaxed" data-i18n="succ_sub">
-                Your equipment loan request has been sent to the Laboratory Coordinator.
-            </p>
-        </div>
-        <div class="p-6">
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center mb-5">
-                <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1" data-i18n="succ_ref">Reference Number</p>
-                <p id="succRef" class="text-xl font-black text-p655c tracking-wider">—</p>
-            </div>
-            <div id="succDetails" class="space-y-0 mb-5"></div>
-            <button id="succClose" class="w-full btn-navy py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                <span data-i18n="succ_close">Done</span>
-            </button>
-        </div>
-    </div>
-</div>
-
 <div id="toast" class="toast">
     <i class="fas fa-circle-check"></i>
-    <span id="toastMsg">Saved</span>
+    <span id="toastMsg" data-i18n="toast_saved">Settings Saved</span>
 </div>
 
-<!-- ============================================================
-     AUTH SESSION HELPER (must load before main script)
-============================================================= -->
+<!-- AUTH CHANGE: load cookie session helper BEFORE the main script -->
 <script src="auth.js"></script>
 
 <script>
 (function () {
 
     /* =========================================================
-       AUTH GUARD — student only
+       AUTH CHANGE: GUARD — student only
     ========================================================== */
     const session = FMSAuth.requireAuth(['student']);
     if (!session) return;
 
+    // Keep session alive on user activity
     ['click', 'keydown'].forEach(evt =>
         document.addEventListener(evt, () => FMSAuth.touch(), { passive: true })
     );
+    /* ========================================================= */
 
     /* =========================================================
        CONSTANTS & STATE
     ========================================================== */
+    // AUTH CHANGE: DEFAULT_STUDENT removed — data comes from session.
     const DEMO_PASSWORD = 'student123';
-    const ACTIVITY_KEY  = 'fkkStudentActivityTrail';
-    const LOANS_KEY     = 'fkkEquipmentLoans';
+    const ACTIVITY_KEY = 'fkkStudentActivityTrail';
     const ACTIVITY_LIMIT = 40;
 
     let currentLang = 'en';
     let student = null;
-    let loans = [];
-    let selectedEquipId = null;
-    let activeCategory = 'all';
-    let searchTerm = '';
+    let charts = { grade: null, att: null, cred: null, gpaTrend: null };
+    let activities = [];
 
-    /* =========================================================
-       EQUIPMENT DATA
-    ========================================================== */
-    const EQUIPMENT = [
-        { id:'EQ-001', cat:'analysis',   model:'pH-200',      stock:8,  total:10, icon:'fa-flask',            color:'#002D62',
-          name:{ en:'Digital pH Meter',            ms:'Meter pH Digital' } },
-        { id:'EQ-002', cat:'analysis',   model:'UV-1800',     stock:3,  total:4,  icon:'fa-lightbulb',        color:'#9B26B6',
-          name:{ en:'UV-Vis Spectrophotometer',    ms:'Spektrofotometer UV-Vis' } },
-        { id:'EQ-003', cat:'instrument', model:'MS-H280',     stock:12, total:15, icon:'fa-temperature-high', color:'#FDB913',
-          name:{ en:'Hot Plate Magnetic Stirrer',  ms:'Pengaduk Magnetik Hot Plate' } },
-        { id:'EQ-004', cat:'instrument', model:'BA-2204',     stock:4,  total:5,  icon:'fa-scale-balanced',   color:'#002D62',
-          name:{ en:'Analytical Balance (0.1 mg)', ms:'Neraca Analitik (0.1 mg)' } },
-        { id:'EQ-005', cat:'instrument', model:'MF-1200',     stock:2,  total:2,  icon:'fa-fire',             color:'#9B26B6',
-          name:{ en:'Muffle Furnace 1200°C',       ms:'Relau Muffel 1200°C' } },
-        { id:'EQ-006', cat:'instrument', model:'RE-201',      stock:2,  total:3,  icon:'fa-rotate',           color:'#FDB913',
-          name:{ en:'Rotary Evaporator',           ms:'Penyejat Berputar' } },
-        { id:'EQ-007', cat:'analysis',   model:'DV2T',        stock:3,  total:4,  icon:'fa-gauge-high',       color:'#002D62',
-          name:{ en:'Brookfield Viscometer',       ms:'Viscometer Brookfield' } },
-        { id:'EQ-008', cat:'instrument', model:'C-400',       stock:5,  total:6,  icon:'fa-fan',              color:'#9B26B6',
-          name:{ en:'Laboratory Centrifuge',       ms:'Emparan Makmal' } },
-        { id:'EQ-009', cat:'general',    model:'DM-200',      stock:15, total:18, icon:'fa-bolt',             color:'#FDB913',
-          name:{ en:'Digital Multimeter',          ms:'Multimeter Digital' } },
-        { id:'EQ-010', cat:'glassware',  model:'BR-50',       stock:20, total:24, icon:'fa-vial',             color:'#002D62',
-          name:{ en:'Burette Set 50 mL',           ms:'Set Buret 50 mL' } },
-        { id:'EQ-011', cat:'glassware',  model:'DA-KIT',      stock:6,  total:8,  icon:'fa-flask-vial',       color:'#9B26B6',
-          name:{ en:'Distillation Apparatus Kit',  ms:'Kit Radas Penyulingan' } },
-        { id:'EQ-012', cat:'analysis',   model:'GC-2010',     stock:1,  total:1,  icon:'fa-chart-simple',     color:'#FDB913',
-          name:{ en:'Gas Chromatography Unit',     ms:'Unit Kromatografi Gas' } },
-        { id:'EQ-013', cat:'analysis',   model:'CM-30',       stock:7,  total:9,  icon:'fa-wave-square',      color:'#002D62',
-          name:{ en:'Conductivity Meter',          ms:'Meter Kekonduksian' } },
-        { id:'EQ-014', cat:'instrument', model:'WB-10',       stock:9,  total:12, icon:'fa-water',            color:'#9B26B6',
-          name:{ en:'Water Bath (Digital)',        ms:'Mandian Air (Digital)' } },
-        { id:'EQ-015', cat:'safety',     model:'FH-PORT',     stock:4,  total:6,  icon:'fa-shield-halved',    color:'#FDB913',
-          name:{ en:'Portable Fume Hood Kit',      ms:'Kit Tudung Wasap Mudah Alih' } },
-        { id:'EQ-016', cat:'safety',     model:'PPE-SET',     stock:25, total:30, icon:'fa-helmet-safety',    color:'#002D62',
-          name:{ en:'PPE Set (Goggles & Gloves)',  ms:'Set PPE (Gogal & Sarung Tangan)' } }
+    /* Static quick links (read-only) — 3 SOLID colours only */
+    const QUICK_LINKS = [
+        { href: 'https://elearning.uitm.edu.my',  icon: 'fa-graduation-cap',      color: 'ql-navy',   labelKey: 'stu_link_elearning' },
+        { href: 'https://istudent.uitm.edu.my',   icon: 'fa-user-graduate',       color: 'ql-purple', labelKey: 'stu_link_istudent' },
+        { href: 'https://library.uitm.edu.my',    icon: 'fa-book-open',           color: 'ql-gold',   labelKey: 'stu_link_library' },
+        { href: 'https://exam.uitm.edu.my',       icon: 'fa-file-pen',            color: 'ql-navy',   labelKey: 'stu_link_exam' },
+        { href: 'https://ir.uitm.edu.my',         icon: 'fa-file-lines',          color: 'ql-purple', labelKey: 'stu_link_results' },
+        { href: 'https://finance.uitm.edu.my',    icon: 'fa-file-invoice-dollar', color: 'ql-gold',   labelKey: 'stu_link_fees' },
+        { href: 'https://library.uitm.edu.my',    icon: 'fa-database',            color: 'ql-navy',   labelKey: 'stu_link_repository' },
+        { href: 'https://helpdesk.uitm.edu.my',   icon: 'fa-headset',             color: 'ql-purple', labelKey: 'stu_link_helpdesk' }
     ];
+
+    /* Activity type meta — SOLID colours */
+    const ACTIVITY_TYPES = {
+        login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
+        link_click:      { icon: 'fa-arrow-up-right-from-square', bg: '#002D62', en: 'Opened quick link',      ms: 'Buka pautan pantas' },
+        profile_update:  { icon: 'fa-user-pen',                   bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
+        password_change: { icon: 'fa-key',                        bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
+        settings_open:   { icon: 'fa-gear',                       bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
+        activity_clear:  { icon: 'fa-broom',                      bg: '#002D62', en: 'Cleared activity trail', ms: 'Kosongkan jejak aktiviti' }
+    };
 
     /* =========================================================
        i18n
     ========================================================== */
     const i18n = {
         en: {
-            nav_faculty:"FAKULTI", nav_dept:"KEJURUTERAAN KIMIA", ph_search:"Search portal...",
-            menu_dashboard:"Dashboard", menu_settings:"Settings", menu_logout:"Sign Out",
-            bc_home:"Home", bc_portal:"Student Portal", bc_loan:"Pinjaman Alat Radas",
-            loan_hero_tag:"Laboratory Services", loan_hero_title:"Equipment Loan",
-            loan_hero_sub:"Borrow laboratory apparatus, tools and instruments for teaching, research and final year projects.",
-            loan_back:"Back to Portal", loan_today:"Today",
-            stat_live:"Live", stat_mine:"Mine", stat_wait:"Wait", stat_all:"All",
-            stat_available:"Items Available", stat_active:"Active Loans",
-            stat_pending:"Pending Approval", stat_total:"Total Requests",
-            catalog_title:"Equipment Catalog", catalog_sub:"Select an item to start your request",
-            catalog_items:"items", catalog_search_ph:"Search equipment, model or code...",
-            catalog_empty:"No equipment matches your search",
-            cat_all:"All", cat_analysis:"Analysis", cat_instrument:"Instruments",
-            cat_glassware:"Glassware", cat_safety:"Safety", cat_general:"General",
-            avail_in_stock:"In Stock", avail_low:"Low Stock", avail_out:"Out of Stock",
-            avail_units:"units", btn_select:"Select", btn_selected:"Selected",
-            form_tag:"Loan Application", form_title:"Equipment Loan Form",
-            form_sub:"Complete all required fields marked with *",
-            fld_equipment:"Equipment / Apparatus", opt_select_equipment:"— Select equipment —",
-            fld_equipment_hint:"Tip: click any card in the catalog above to auto-select.",
-            fld_qty:"Quantity", fld_course:"Course Code", fld_course_ph:"e.g. CHE423",
-            fld_lab:"Laboratory / Venue", opt_select_lab:"— Select laboratory —",
-            fld_supervisor:"Supervising Lecturer", fld_supervisor_ph:"e.g. Dr. Ahmad bin Ismail",
-            fld_date_borrow:"Borrow Date", fld_date_return:"Expected Return Date",
-            fld_purpose:"Purpose / Justification",
-            fld_purpose_ph:"Briefly explain how the equipment will be used...",
-            chk_terms:"I agree to return the equipment in good condition before the due date and accept liability for any loss or damage.",
-            btn_reset:"Reset", btn_submit:"Submit Loan Request",
-            side_summary_tag:"Live Preview", side_summary_title:"Request Summary",
-            sum_equipment:"Equipment", sum_code:"Item Code", sum_qty:"Quantity",
-            sum_lab:"Laboratory", sum_dates:"Borrow → Return", sum_duration:"Duration",
-            side_summary_note:"Requests are reviewed by the Laboratory Coordinator within 1–2 working days.",
-            side_guide_tag:"Read First", side_guide_title:"Loan Guidelines",
-            guide_1:"A valid student ID card must be presented when collecting the equipment.",
-            guide_2:"Standard loan period is a maximum of 14 days. Extensions require written approval.",
-            guide_3:"Fragile glassware and calibrated instruments must be handled by trained students only.",
-            guide_4:"Any damage or loss must be reported to the laboratory technician immediately.",
-            guide_5:"Late returns may affect your eligibility for future laboratory loans.",
-            hist_tag:"Records", hist_title:"My Loan History",
-            hist_sub:"All equipment loan requests submitted from this account",
-            hist_records:"records",
-            th_ref:"Reference", th_equipment:"Equipment", th_qty:"Qty",
-            th_dates:"Borrow → Return", th_status:"Status", th_action:"Action",
-            hist_empty:"No loan requests yet",
-            hist_empty_sub:"Submit your first request using the form above.",
-            st_pending:"Pending", st_approved:"Approved", st_returned:"Returned", st_rejected:"Rejected",
-            confirm_cancel:"Cancel this loan request?",
-            days:"days", day:"day",
-            succ_title:"Request Submitted",
-            succ_sub:"Your equipment loan request has been sent to the Laboratory Coordinator.",
-            succ_ref:"Reference Number", succ_close:"Done",
-            err_fix:"Please fix the following before submitting:",
-            err_equipment:"Please select a piece of equipment.",
-            err_qty:"Quantity must be at least 1.",
-            err_qty_max:"Quantity exceeds available stock (max {n}).",
-            err_course:"Course code is required.",
-            err_lab:"Please select a laboratory.",
-            err_supervisor:"Supervising lecturer is required.",
-            err_purpose:"Please provide a purpose of at least 10 characters.",
-            err_dates:"Borrow and return dates are required.",
-            err_date_past:"Borrow date cannot be in the past.",
-            err_date_order:"Return date must be after the borrow date.",
-            err_max_days:"Loan period cannot exceed 14 days.",
-            err_terms:"You must accept the loan terms and conditions.",
-            toast_submitted:"Loan Request Submitted",
-            toast_reset:"Form Reset",
-            toast_cancelled:"Request Cancelled",
-            toast_saved:"Settings Saved", toast_pwd:"Password Updated",
-            settings_title:"Profile Settings", settings_sub:"Update your profile information",
-            settings_tab_profile:"Profile", settings_tab_security:"Security",
-            settings_avatar_hint:"Avatar initials auto-generated",
-            settings_avatar_sub:"Based on your full name below",
-            settings_name:"Full Name", settings_program:"Programme",
-            settings_email:"Email", settings_semester:"Current Semester",
-            settings_studentid:"Student ID (Read-only)",
-            settings_cancel:"Cancel", settings_save:"Save Changes",
-            pwd_info_title:"Change Your Password",
-            pwd_info_sub:"Choose a strong password you don't use anywhere else.",
-            settings_current_pwd:"Current Password", settings_new_pwd:"New Password",
-            settings_confirm_pwd:"Confirm New Password",
-            pwd_strength_label:"Strength", pwd_strength_none:"—",
-            pwd_strength_weak:"Weak", pwd_strength_medium:"Medium", pwd_strength_strong:"Strong",
-            pwd_hint:"Minimum 8 characters · at least 1 uppercase · 1 lowercase · 1 number",
-            btn_update_pwd:"Update Password",
-            err_current_wrong:"Current password is incorrect.",
-            err_pwd_short:"Password must be at least 8 characters.",
-            err_pwd_upper:"Password must contain an uppercase letter.",
-            err_pwd_lower:"Password must contain a lowercase letter.",
-            err_pwd_number:"Password must contain a number.",
-            err_pwd_match:"New password and confirmation do not match.",
-            err_pwd_same:"New password must be different from the current one.",
-            err_pwd_empty:"Please fill in all password fields.",
-            footer_desc:"Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.",
-            footer_quick_links:"Quick Links", footer_contact_heading:"UiTM Cawangan Johor",
-            footer_address:"Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
-            footer_copyright:"© 2026 FKK UiTM Johor. All Rights Reserved.",
-            footer_privacy:"Privacy Policy", footer_terms:"Terms of Use"
+            nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Search portal...",
+            menu_settings: "Settings", menu_logout: "Sign Out",
+            stu_dash_online: "Semester Active", stu_dash_welcome: "Welcome back,",
+            stu_dash_today: "Today", stu_dash_lastlogin: "Last Login",
+            stu_stat_cgpa: "Current CGPA", stu_stat_courses: "Enrolled Courses",
+            stu_stat_credits: "Total Credits", stu_stat_assignments: "Pending Assignments",
+            stu_stat_sem: "This Sem", stu_stat_due: "Due",
+            stu_quick_links_label: "Quick Menu", stu_quick_links_title: "Student Quick Links", stu_quick_links_hint: "Opens in new tab",
+            stu_link_elearning: "E-Learning", stu_link_istudent: "iStudent",
+            stu_link_library: "Library", stu_link_exam: "Exam Unit",
+            stu_link_results: "Results", stu_link_fees: "Fees",
+            stu_link_repository: "Repository", stu_link_helpdesk: "IT Helpdesk",
+            stu_ach_tag: "Academic Performance", stu_ach_title: "My Progress",
+            stu_ach_sub: "Grades, attendance & credit progress · FKK Johor", stu_ach_trend: "Improving",
+            stu_grades: "Grades", stu_grades_sub: "Current CGPA (out of 4.00)",
+            stu_grade_a: "A / A-", stu_grade_b: "B+ / B", stu_grade_c: "B- / C+", stu_grade_d: "C & below",
+            stu_attendance: "Attendance", stu_attendance_sub: "Overall attendance rate",
+            stu_att_present: "Present", stu_att_mc: "Medical / Leave",
+            stu_att_absent: "Absent", stu_att_total: "Total Sessions",
+            stu_credits: "Credits", stu_credits_sub: "Credits completed / required",
+            stu_cred_core: "Core", stu_cred_elect: "Electives",
+            stu_cred_mpu: "MPU", stu_cred_remaining: "Remaining",
+            stu_cred_progress: "Degree Progress",
+            stu_yearly_label: "GPA Trend", stu_yearly_title: "Semester GPA (Sem 1 – Sem 6)",
+            stu_legend_gpa: "GPA", stu_legend_cgpa: "CGPA",
+            stu_sched_label: "Schedule", stu_sched_title: "Today's Classes",
+            stu_view_all: "View All",
+            stu_sched_lecture: "Lecture", stu_sched_lab: "Lab", stu_sched_practical: "Practical",
+            stu_sched_office: "Supervisor Office", stu_sched_meeting: "Meeting",
+            stu_sched_lecturer: "Lecturer",
+            stu_deadline_label: "Due Soon", stu_deadline_title: "Upcoming Deadlines",
+            stu_dl_1: "CHE423 Lab Report 3", stu_dl_2: "CHE215 Midterm Exam",
+            stu_dl_3: "CHE499 FYP Progress Report", stu_dl_days: "days left",
+            activity_label: "Jejak Aktiviti", activity_title: "Activity Trail",
+            stu_activity_sub: "Recent actions on your account",
+            activity_clear: "Clear", activity_records: "records",
+            activity_empty: "No activity recorded yet",
+            activity_confirm_clear: "Clear the entire activity trail?",
+            stu_news_tag: "Latest Updates", stu_news_title: "Campus News & Events",
+            stu_btn_archive: "View Archive",
+            stu_news_1_title: "Final Examination Timetable Released for Semester 2.",
+            stu_news_2_title: "ChemE Career Fair 2026: Meet 30+ Industry Partners.",
+            stu_news_3_title: "Yayasan UiTM Scholarship Applications Now Open.",
+            settings_title: "Profile Settings", settings_sub: "Update your profile information",
+            settings_tab_profile: "Profile", settings_tab_security: "Security",
+            settings_avatar_hint: "Avatar initials auto-generated",
+            settings_avatar_sub: "Based on your full name below",
+            settings_name: "Full Name", settings_program: "Programme",
+            settings_email: "Email", settings_semester: "Current Semester",
+            settings_studentid: "Student ID (Read-only)",
+            settings_cancel: "Cancel", settings_save: "Save Changes",
+            toast_saved: "Settings Saved",
+            pwd_info_title: "Change Your Password",
+            pwd_info_sub: "Choose a strong password you don't use anywhere else.",
+            settings_current_pwd: "Current Password",
+            settings_new_pwd: "New Password", settings_confirm_pwd: "Confirm New Password",
+            pwd_strength_label: "Strength", pwd_strength_none: "—",
+            pwd_strength_weak: "Weak", pwd_strength_medium: "Medium", pwd_strength_strong: "Strong",
+            pwd_hint: "Minimum 8 characters · at least 1 uppercase · 1 lowercase · 1 number",
+            btn_update_pwd: "Update Password", toast_pwd: "Password Updated",
+            toast_activity_cleared: "Activity Cleared",
+            err_current_wrong: "Current password is incorrect.",
+            err_pwd_short: "Password must be at least 8 characters.",
+            err_pwd_upper: "Password must contain an uppercase letter.",
+            err_pwd_lower: "Password must contain a lowercase letter.",
+            err_pwd_number: "Password must contain a number.",
+            err_pwd_match: "New password and confirmation do not match.",
+            err_pwd_same: "New password must be different from the current one.",
+            err_pwd_empty: "Please fill in all password fields.",
+            footer_desc: "Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Dedicated to academic excellence and industrial innovation.",
+            footer_quick_links: "Quick Links",
+            footer_student_dir: "Student Directory",
+            footer_exam_unit: "Exam Unit",
+            footer_library: "Library",
+            footer_alumni: "Alumni",
+            footer_contact: "Contact",
+            footer_contact_heading: "UiTM Cawangan Johor",
+            footer_address: "Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
+            footer_copyright: "© 2026 FKK UiTM Johor. All Rights Reserved.",
+            footer_privacy: "Privacy Policy",
+            footer_terms: "Terms of Use"
         },
         ms: {
-            nav_faculty:"FAKULTI", nav_dept:"KEJURUTERAAN KIMIA", ph_search:"Cari dalam portal...",
-            menu_dashboard:"Papan Pemuka", menu_settings:"Tetapan", menu_logout:"Log Keluar",
-            bc_home:"Utama", bc_portal:"Portal Pelajar", bc_loan:"Pinjaman Alat Radas",
-            loan_hero_tag:"Perkhidmatan Makmal", loan_hero_title:"Pinjaman Alat Radas",
-            loan_hero_sub:"Pinjam alat radas, perkakas dan instrumen makmal untuk pengajaran, penyelidikan dan projek tahun akhir.",
-            loan_back:"Kembali ke Portal", loan_today:"Hari Ini",
-            stat_live:"Semasa", stat_mine:"Saya", stat_wait:"Tunggu", stat_all:"Semua",
-            stat_available:"Item Tersedia", stat_active:"Pinjaman Aktif",
-            stat_pending:"Menunggu Kelulusan", stat_total:"Jumlah Permohonan",
-            catalog_title:"Katalog Peralatan", catalog_sub:"Pilih item untuk mula memohon",
-            catalog_items:"item", catalog_search_ph:"Cari peralatan, model atau kod...",
-            catalog_empty:"Tiada peralatan sepadan dengan carian anda",
-            cat_all:"Semua", cat_analysis:"Analisis", cat_instrument:"Instrumen",
-            cat_glassware:"Alat Kaca", cat_safety:"Keselamatan", cat_general:"Am",
-            avail_in_stock:"Ada Stok", avail_low:"Stok Rendah", avail_out:"Tiada Stok",
-            avail_units:"unit", btn_select:"Pilih", btn_selected:"Dipilih",
-            form_tag:"Permohonan Pinjaman", form_title:"Borang Pinjaman Alat Radas",
-            form_sub:"Lengkapkan semua medan wajib bertanda *",
-            fld_equipment:"Alat Radas / Perkakas", opt_select_equipment:"— Pilih peralatan —",
-            fld_equipment_hint:"Petua: klik mana-mana kad dalam katalog di atas untuk pilih automatik.",
-            fld_qty:"Kuantiti", fld_course:"Kod Kursus", fld_course_ph:"cth. CHE423",
-            fld_lab:"Makmal / Lokasi", opt_select_lab:"— Pilih makmal —",
-            fld_supervisor:"Pensyarah Penyelia", fld_supervisor_ph:"cth. Dr. Ahmad bin Ismail",
-            fld_date_borrow:"Tarikh Pinjam", fld_date_return:"Tarikh Pulang Dijangka",
-            fld_purpose:"Tujuan / Justifikasi",
-            fld_purpose_ph:"Terangkan secara ringkas bagaimana peralatan akan digunakan...",
-            chk_terms:"Saya bersetuju memulangkan peralatan dalam keadaan baik sebelum tarikh akhir dan menerima liabiliti atas sebarang kehilangan atau kerosakan.",
-            btn_reset:"Set Semula", btn_submit:"Hantar Permohonan",
-            side_summary_tag:"Pratonton Langsung", side_summary_title:"Ringkasan Permohonan",
-            sum_equipment:"Peralatan", sum_code:"Kod Item", sum_qty:"Kuantiti",
-            sum_lab:"Makmal", sum_dates:"Pinjam → Pulang", sum_duration:"Tempoh",
-            side_summary_note:"Permohonan disemak oleh Penyelaras Makmal dalam 1–2 hari bekerja.",
-            side_guide_tag:"Baca Dahulu", side_guide_title:"Garis Panduan Pinjaman",
-            guide_1:"Kad pelajar yang sah mesti ditunjukkan semasa mengambil peralatan.",
-            guide_2:"Tempoh pinjaman standard ialah maksimum 14 hari. Lanjutan memerlukan kelulusan bertulis.",
-            guide_3:"Alat kaca rapuh dan instrumen tertentukur hanya boleh dikendalikan oleh pelajar terlatih.",
-            guide_4:"Sebarang kerosakan atau kehilangan mesti dilaporkan kepada juruteknik makmal dengan segera.",
-            guide_5:"Pemulangan lewat boleh menjejaskan kelayakan pinjaman makmal anda pada masa hadapan.",
-            hist_tag:"Rekod", hist_title:"Sejarah Pinjaman Saya",
-            hist_sub:"Semua permohonan pinjaman peralatan yang dihantar dari akaun ini",
-            hist_records:"rekod",
-            th_ref:"Rujukan", th_equipment:"Peralatan", th_qty:"Kuantiti",
-            th_dates:"Pinjam → Pulang", th_status:"Status", th_action:"Tindakan",
-            hist_empty:"Tiada permohonan pinjaman lagi",
-            hist_empty_sub:"Hantar permohonan pertama anda menggunakan borang di atas.",
-            st_pending:"Menunggu", st_approved:"Diluluskan", st_returned:"Dipulangkan", st_rejected:"Ditolak",
-            confirm_cancel:"Batalkan permohonan pinjaman ini?",
-            days:"hari", day:"hari",
-            succ_title:"Permohonan Dihantar",
-            succ_sub:"Permohonan pinjaman peralatan anda telah dihantar kepada Penyelaras Makmal.",
-            succ_ref:"Nombor Rujukan", succ_close:"Selesai",
-            err_fix:"Sila betulkan perkara berikut sebelum menghantar:",
-            err_equipment:"Sila pilih peralatan.",
-            err_qty:"Kuantiti mestilah sekurang-kurangnya 1.",
-            err_qty_max:"Kuantiti melebihi stok tersedia (maks {n}).",
-            err_course:"Kod kursus diperlukan.",
-            err_lab:"Sila pilih makmal.",
-            err_supervisor:"Pensyarah penyelia diperlukan.",
-            err_purpose:"Sila berikan tujuan sekurang-kurangnya 10 aksara.",
-            err_dates:"Tarikh pinjam dan pulang diperlukan.",
-            err_date_past:"Tarikh pinjam tidak boleh sebelum hari ini.",
-            err_date_order:"Tarikh pulang mestilah selepas tarikh pinjam.",
-            err_max_days:"Tempoh pinjaman tidak boleh melebihi 14 hari.",
-            err_terms:"Anda mesti menerima terma dan syarat pinjaman.",
-            toast_submitted:"Permohonan Dihantar",
-            toast_reset:"Borang Ditetapkan Semula",
-            toast_cancelled:"Permohonan Dibatalkan",
-            toast_saved:"Tetapan Disimpan", toast_pwd:"Kata Laluan Dikemas Kini",
-            settings_title:"Tetapan Profil", settings_sub:"Kemas kini maklumat profil anda",
-            settings_tab_profile:"Profil", settings_tab_security:"Keselamatan",
-            settings_avatar_hint:"Inisial avatar dijana automatik",
-            settings_avatar_sub:"Berdasarkan nama penuh anda di bawah",
-            settings_name:"Nama Penuh", settings_program:"Program",
-            settings_email:"E-mel", settings_semester:"Semester Semasa",
-            settings_studentid:"ID Pelajar (Baca sahaja)",
-            settings_cancel:"Batal", settings_save:"Simpan Perubahan",
-            pwd_info_title:"Tukar Kata Laluan Anda",
-            pwd_info_sub:"Pilih kata laluan yang kukuh dan tidak digunakan di tempat lain.",
-            settings_current_pwd:"Kata Laluan Semasa", settings_new_pwd:"Kata Laluan Baharu",
-            settings_confirm_pwd:"Sahkan Kata Laluan Baharu",
-            pwd_strength_label:"Kekuatan", pwd_strength_none:"—",
-            pwd_strength_weak:"Lemah", pwd_strength_medium:"Sederhana", pwd_strength_strong:"Kukuh",
-            pwd_hint:"Minimum 8 aksara · sekurang-kurangnya 1 huruf besar · 1 huruf kecil · 1 nombor",
-            btn_update_pwd:"Kemas Kini Kata Laluan",
-            err_current_wrong:"Kata laluan semasa tidak betul.",
-            err_pwd_short:"Kata laluan mestilah sekurang-kurangnya 8 aksara.",
-            err_pwd_upper:"Kata laluan mesti mengandungi huruf besar.",
-            err_pwd_lower:"Kata laluan mesti mengandungi huruf kecil.",
-            err_pwd_number:"Kata laluan mesti mengandungi nombor.",
-            err_pwd_match:"Kata laluan baharu dan pengesahan tidak sepadan.",
-            err_pwd_same:"Kata laluan baharu mestilah berbeza daripada kata laluan semasa.",
-            err_pwd_empty:"Sila isi semua medan kata laluan.",
-            footer_desc:"Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Berdedikasi untuk kecemerlangan akademik dan inovasi industri.",
-            footer_quick_links:"Pautan Pantas", footer_contact_heading:"UiTM Cawangan Johor",
-            footer_address:"Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
-            footer_copyright:"© 2026 FKK UiTM Johor. Hak Cipta Terpelihara.",
-            footer_privacy:"Dasar Privasi", footer_terms:"Terma Penggunaan"
+            nav_faculty: "FAKULTI", nav_dept: "KEJURUTERAAN KIMIA", ph_search: "Cari dalam portal...",
+            menu_settings: "Tetapan", menu_logout: "Log Keluar",
+            stu_dash_online: "Semester Aktif", stu_dash_welcome: "Selamat kembali,",
+            stu_dash_today: "Hari Ini", stu_dash_lastlogin: "Log Masuk Terakhir",
+            stu_stat_cgpa: "PNGK Semasa", stu_stat_courses: "Kursus Berdaftar",
+            stu_stat_credits: "Jumlah Kredit", stu_stat_assignments: "Tugasan Tertunggak",
+            stu_stat_sem: "Sem Ini", stu_stat_due: "Perlu",
+            stu_quick_links_label: "Menu Pantas", stu_quick_links_title: "Pautan Pantas Pelajar", stu_quick_links_hint: "Buka dalam tab baharu",
+            stu_link_elearning: "E-Pembelajaran", stu_link_istudent: "iStudent",
+            stu_link_library: "Perpustakaan", stu_link_exam: "Unit Peperiksaan",
+            stu_link_results: "Keputusan", stu_link_fees: "Yuran",
+            stu_link_repository: "Repositori", stu_link_helpdesk: "Helpdesk IT",
+            stu_ach_tag: "Prestasi Akademik", stu_ach_title: "Kemajuan Saya",
+            stu_ach_sub: "Gred, kehadiran & kemajuan kredit · FKK Johor", stu_ach_trend: "Meningkat",
+            stu_grades: "Gred", stu_grades_sub: "PNGK semasa (daripada 4.00)",
+            stu_grade_a: "A / A-", stu_grade_b: "B+ / B", stu_grade_c: "B- / C+", stu_grade_d: "C & ke bawah",
+            stu_attendance: "Kehadiran", stu_attendance_sub: "Kadar kehadiran keseluruhan",
+            stu_att_present: "Hadir", stu_att_mc: "Cuti Sakit / Rehat",
+            stu_att_absent: "Tidak Hadir", stu_att_total: "Jumlah Sesi",
+            stu_credits: "Kredit", stu_credits_sub: "Kredit selesai / diperlukan",
+            stu_cred_core: "Teras", stu_cred_elect: "Elektif",
+            stu_cred_mpu: "MPU", stu_cred_remaining: "Baki",
+            stu_cred_progress: "Kemajuan Ijazah",
+            stu_yearly_label: "Trend PNGK", stu_yearly_title: "PNGK Semester (Sem 1 – Sem 6)",
+            stu_legend_gpa: "GPA", stu_legend_cgpa: "PNGK",
+            stu_sched_label: "Jadual", stu_sched_title: "Kelas Hari Ini",
+            stu_view_all: "Lihat Semua",
+            stu_sched_lecture: "Kuliah", stu_sched_lab: "Makmal", stu_sched_practical: "Amali",
+            stu_sched_office: "Pejabat Penyelia", stu_sched_meeting: "Mesyuarat",
+            stu_sched_lecturer: "Pensyarah",
+            stu_deadline_label: "Akan Tiba", stu_deadline_title: "Tarikh Akhir Akan Datang",
+            stu_dl_1: "CHE423 Laporan Makmal 3", stu_dl_2: "CHE215 Peperiksaan Pertengahan",
+            stu_dl_3: "CHE499 Laporan Kemajuan FYP", stu_dl_days: "hari lagi",
+            activity_label: "Jejak Aktiviti", activity_title: "Jejak Aktiviti",
+            stu_activity_sub: "Tindakan terkini pada akaun anda",
+            activity_clear: "Kosongkan", activity_records: "rekod",
+            activity_empty: "Tiada aktiviti direkodkan lagi",
+            activity_confirm_clear: "Kosongkan keseluruhan jejak aktiviti?",
+            stu_news_tag: "Terkini", stu_news_title: "Berita & Acara Kampus",
+            stu_btn_archive: "Lihat Arkib",
+            stu_news_1_title: "Jadual Peperiksaan Akhir Semester 2 Dikeluarkan.",
+            stu_news_2_title: "Karnival Kerjaya ChemE 2026: Temui 30+ Rakan Industri.",
+            stu_news_3_title: "Permohonan Biasiswa Yayasan UiTM Kini Dibuka.",
+            settings_title: "Tetapan Profil", settings_sub: "Kemas kini maklumat profil anda",
+            settings_tab_profile: "Profil", settings_tab_security: "Keselamatan",
+            settings_avatar_hint: "Inisial avatar dijana automatik",
+            settings_avatar_sub: "Berdasarkan nama penuh anda di bawah",
+            settings_name: "Nama Penuh", settings_program: "Program",
+            settings_email: "E-mel", settings_semester: "Semester Semasa",
+            settings_studentid: "ID Pelajar (Baca sahaja)",
+            settings_cancel: "Batal", settings_save: "Simpan Perubahan",
+            toast_saved: "Tetapan Disimpan",
+            pwd_info_title: "Tukar Kata Laluan Anda",
+            pwd_info_sub: "Pilih kata laluan yang kukuh dan tidak digunakan di tempat lain.",
+            settings_current_pwd: "Kata Laluan Semasa",
+            settings_new_pwd: "Kata Laluan Baharu", settings_confirm_pwd: "Sahkan Kata Laluan Baharu",
+            pwd_strength_label: "Kekuatan", pwd_strength_none: "—",
+            pwd_strength_weak: "Lemah", pwd_strength_medium: "Sederhana", pwd_strength_strong: "Kukuh",
+            pwd_hint: "Minimum 8 aksara · sekurang-kurangnya 1 huruf besar · 1 huruf kecil · 1 nombor",
+            btn_update_pwd: "Kemas Kini Kata Laluan", toast_pwd: "Kata Laluan Dikemas Kini",
+            toast_activity_cleared: "Aktiviti Dikosongkan",
+            err_current_wrong: "Kata laluan semasa tidak betul.",
+            err_pwd_short: "Kata laluan mestilah sekurang-kurangnya 8 aksara.",
+            err_pwd_upper: "Kata laluan mesti mengandungi huruf besar.",
+            err_pwd_lower: "Kata laluan mesti mengandungi huruf kecil.",
+            err_pwd_number: "Kata laluan mesti mengandungi nombor.",
+            err_pwd_match: "Kata laluan baharu dan pengesahan tidak sepadan.",
+            err_pwd_same: "Kata laluan baharu mestilah berbeza daripada kata laluan semasa.",
+            err_pwd_empty: "Sila isi semua medan kata laluan.",
+            footer_desc: "Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang. Berdedikasi untuk kecemerlangan akademik dan inovasi industri.",
+            footer_quick_links: "Pautan Pantas",
+            footer_student_dir: "Direktori Pelajar",
+            footer_exam_unit: "Unit Peperiksaan",
+            footer_library: "Perpustakaan",
+            footer_alumni: "Alumni",
+            footer_contact: "Hubungi",
+            footer_contact_heading: "UiTM Cawangan Johor",
+            footer_address: "Kampus Pasir Gudang, Jalan Purnama<br>81750 Masai, Johor",
+            footer_copyright: "© 2026 FKK UiTM Johor. Hak Cipta Terpelihara.",
+            footer_privacy: "Dasar Privasi",
+            footer_terms: "Terma Penggunaan"
         }
     };
-
-    const T = () => i18n[currentLang];
 
     /* =========================================================
        UTILITIES
@@ -1426,27 +1620,18 @@
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    function fmtDate(iso) {
-        if (!iso) return '—';
-        return new Date(iso).toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
-            { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-
-    function fmtDateShort(iso) {
-        if (!iso) return '—';
+    function relativeTime(iso) {
+        const diff = Date.now() - new Date(iso).getTime();
+        const sec = Math.max(0, Math.floor(diff / 1000));
+        if (sec < 45) return currentLang === 'ms' ? 'Baru sahaja' : 'Just now';
+        const min = Math.floor(sec / 60);
+        if (min < 60) return min + (currentLang === 'ms' ? ' min lalu' : 'm ago');
+        const hr = Math.floor(min / 60);
+        if (hr < 24) return hr + (currentLang === 'ms' ? ' jam lalu' : 'h ago');
+        const day = Math.floor(hr / 24);
+        if (day < 7) return day + (currentLang === 'ms' ? ' hari lalu' : 'd ago');
         return new Date(iso).toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
             { day: '2-digit', month: 'short' });
-    }
-
-    function todayISO() {
-        const d = new Date();
-        d.setHours(0,0,0,0);
-        return d.toISOString().slice(0, 10);
-    }
-
-    function daysBetween(a, b) {
-        const d1 = new Date(a); const d2 = new Date(b);
-        return Math.round((d2 - d1) / 86400000);
     }
 
     /* =========================================================
@@ -1454,7 +1639,6 @@
     ========================================================== */
     window.switchLanguage = function (lang) {
         currentLang = lang;
-
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (i18n[lang] && i18n[lang][key] !== undefined) el.innerHTML = i18n[lang][key];
@@ -1463,15 +1647,12 @@
             const key = el.getAttribute('data-i18n-ph');
             if (i18n[lang] && i18n[lang][key]) el.setAttribute('placeholder', i18n[lang][key]);
         });
-
         document.getElementById('btn-en').classList.toggle('active', lang === 'en');
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (student) fillStudent(student);
-        renderCatalog();
-        renderHistory();
-        updateSummary();
-        updateQtyHint();
+        renderQuickLinks();
+        renderActivities();
         updateStrength();
     };
 
@@ -1481,15 +1662,18 @@
     function fillStudent(s) {
         const initials = s.initials || makeInitials(s.name);
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-        set('navName', s.name);
-        set('navRole', s.semester || '');
-        set('navAvatar', initials);
-        set('ddName', s.name);
-        set('ddEmail', s.email || '');
-        set('heroStudentId', s.id || '—');
-        set('heroProgram', s.program || '—');
+        set('navName', s.name); set('navRole', s.semester || ''); set('navAvatar', initials);
+        set('ddName', s.name); set('ddEmail', s.email || ''); set('bannerName', s.name);
+        set('studentIdChip', s.id || '');
+        set('studentProgramChip', s.program || '');
 
-        const todayEl = document.getElementById('heroToday');
+        const loginEl = document.getElementById('lastLogin');
+        if (loginEl) {
+            const d = new Date(s.loginAt || Date.now());
+            loginEl.textContent = d.toLocaleString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
+                { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        const todayEl = document.getElementById('todayDate');
         if (todayEl) {
             todayEl.textContent = new Date().toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB',
                 { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
@@ -1498,555 +1682,236 @@
         if (sAvatar) sAvatar.textContent = initials;
     }
 
-    function persistStudent() {
-        FMSAuth.saveSession(student, 'student');
-    }
-
     /* =========================================================
-       ACTIVITY TRAIL (shared with dashboard)
+       QUICK LINKS
     ========================================================== */
-    function logActivity(type, entity, detail) {
-        let list = [];
-        try {
-            const raw = localStorage.getItem(ACTIVITY_KEY);
-            if (raw) { const p = JSON.parse(raw); if (Array.isArray(p)) list = p; }
-        } catch (e) {}
-
-        list.unshift({
-            id: 'a_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            type: type,
-            entity: entity || '',
-            detail: detail || '',
-            timestamp: new Date().toISOString()
-        });
-
-        if (list.length > ACTIVITY_LIMIT) list = list.slice(0, ACTIVITY_LIMIT);
-        try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(list)); } catch (e) {}
-    }
-
-    /* =========================================================
-       LOAN STORAGE
-    ========================================================== */
-    function loadLoans() {
-        try {
-            const raw = localStorage.getItem(LOANS_KEY);
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed)) { loans = parsed; return; }
-            }
-        } catch (e) {}
-        loans = [];
-    }
-
-    function saveLoans() {
-        try { localStorage.setItem(LOANS_KEY, JSON.stringify(loans)); } catch (e) {}
-    }
-
-    function makeRef() {
-        const yr = new Date().getFullYear();
-        const seq = String(loans.length + 1).padStart(4, '0');
-        return 'PR-' + yr + '-' + seq;
-    }
-
-    /* =========================================================
-       CATALOG RENDER
-    ========================================================== */
-    function getEquip(id) {
-        return EQUIPMENT.find(e => e.id === id) || null;
-    }
-
-    function stockLabel(item) {
-        if (item.stock <= 0) return { cls: 'chip-red', text: T().avail_out };
-        if (item.stock <= 3)  return { cls: 'chip-gold', text: T().avail_low };
-        return { cls: 'chip-green', text: T().avail_in_stock };
-    }
-
-    function renderCatalog() {
-        const grid = document.getElementById('equipGrid');
-        const emptyEl = document.getElementById('equipEmpty');
-        const countEl = document.getElementById('catalogCount');
+    function renderQuickLinks() {
+        const grid = document.getElementById('quickLinksGrid');
         if (!grid) return;
 
-        const term = searchTerm.trim().toLowerCase();
-
-        const filtered = EQUIPMENT.filter(item => {
-            const catOk = activeCategory === 'all' || item.cat === activeCategory;
-            if (!catOk) return false;
-            if (!term) return true;
-            const hay = [
-                item.id, item.model,
-                item.name.en, item.name.ms
-            ].join(' ').toLowerCase();
-            return hay.includes(term);
-        });
-
-        if (countEl) countEl.textContent = filtered.length;
-
-        if (!filtered.length) {
-            grid.innerHTML = '';
-            emptyEl.classList.remove('hidden');
-            return;
-        }
-        emptyEl.classList.add('hidden');
-
-        grid.innerHTML = filtered.map(item => {
-            const out = item.stock <= 0;
-            const sel = selectedEquipId === item.id;
-            const sl = stockLabel(item);
+        grid.innerHTML = QUICK_LINKS.map(link => {
+            const label = i18n[currentLang][link.labelKey] || link.labelKey;
             return `
-                <div class="equip-card ${sel ? 'selected' : ''} ${out ? 'is-out' : ''}"
-                     data-id="${item.id}" ${out ? 'aria-disabled="true"' : 'role="button" tabindex="0"'}>
-                    <div class="equip-icon" style="background:${item.color}1A; color:${item.color};">
-                        <i class="fas ${item.icon}"></i>
-                    </div>
-                    <p class="text-[9px] font-black uppercase tracking-[0.16em] text-slate-400 mb-1">${escapeHtml(item.id)} · ${escapeHtml(item.model)}</p>
-                    <h4 class="text-[13px] font-black text-p655c leading-snug mb-3 flex-1">${escapeHtml(item.name[currentLang] || item.name.en)}</h4>
-                    <div class="flex items-center justify-between gap-2 pt-3 border-t border-dashed border-slate-200">
-                        <span class="chip ${sl.cls}"><i class="fas fa-cubes"></i> ${sl.text}</span>
-                        <span class="text-[10px] font-black text-slate-500">${item.stock}/${item.total} <span class="font-bold text-slate-400">${T().avail_units}</span></span>
-                    </div>
-                </div>`;
+                <a href="${escapeHtml(link.href)}" target="_blank" rel="noopener"
+                   class="quick-link ${link.color}"
+                   data-label-key="${escapeHtml(link.labelKey)}"
+                   data-href="${escapeHtml(link.href)}">
+                    <i class="fas ${escapeHtml(link.icon)}"></i>
+                    <span>${escapeHtml(label)}</span>
+                </a>`;
         }).join('');
 
-        grid.querySelectorAll('.equip-card').forEach(card => {
-            if (card.classList.contains('is-out')) return;
-            card.addEventListener('click', () => selectEquipment(card.dataset.id, true));
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectEquipment(card.dataset.id, true); }
+        grid.querySelectorAll('.quick-link').forEach(a => {
+            a.addEventListener('click', () => {
+                const labelKey = a.dataset.labelKey;
+                const href = a.dataset.href;
+                const label = i18n[currentLang][labelKey] || labelKey;
+                logActivity('link_click', label, href);
             });
         });
     }
 
-    function selectEquipment(id, scroll) {
-        const item = getEquip(id);
-        if (!item || item.stock <= 0) return;
-        selectedEquipId = id;
-
-        const sel = document.getElementById('fldEquipment');
-        if (sel) sel.value = id;
-
-        const qty = document.getElementById('fldQty');
-        if (qty) { qty.max = item.stock; if (Number(qty.value) > item.stock || Number(qty.value) < 1) qty.value = 1; }
-
-        renderCatalog();
-        updateQtyHint();
-        updateSummary();
-
-        if (scroll) {
-            document.getElementById('fldQty').focus({ preventScroll: true });
-            document.getElementById('loanForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-
     /* =========================================================
-       FORM: equipment <select>
+       ACTIVITY TRAIL
     ========================================================== */
-    function populateEquipmentSelect() {
-        const sel = document.getElementById('fldEquipment');
-        if (!sel) return;
-        const current = sel.value;
-
-        sel.innerHTML = `<option value="">${escapeHtml(T().opt_select_equipment)}</option>` +
-            EQUIPMENT.map(item => {
-                const dis = item.stock <= 0 ? ' disabled' : '';
-                const label = `${item.name[currentLang] || item.name.en} (${item.id}) — ${item.stock} ${T().avail_units}`;
-                return `<option value="${item.id}"${dis}>${escapeHtml(label)}</option>`;
-            }).join('');
-
-        if (current && getEquip(current)) sel.value = current;
-        else if (selectedEquipId) sel.value = selectedEquipId;
-    }
-
-    /* =========================================================
-       QUANTITY HINT
-    ========================================================== */
-    function updateQtyHint() {
-        const hint = document.getElementById('qtyHint');
-        const item = getEquip(selectedEquipId);
-        if (!hint) return;
-        if (!item) {
-            hint.textContent = '—';
-            hint.className = 'text-[9px] font-bold text-slate-400 mt-2';
-            return;
-        }
-        hint.innerHTML = `<i class="fas fa-cubes mr-1"></i> ${escapeHtml(String(item.stock))} ${escapeHtml(T().avail_units)} ${currentLang === 'ms' ? 'tersedia' : 'available'}`;
-        hint.className = 'text-[9px] font-bold text-purple-600 mt-2';
-    }
-
-    /* =========================================================
-       LIVE SUMMARY
-    ========================================================== */
-    function setSum(id, value, muted) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = value || '—';
-        el.classList.toggle('muted', !!muted || !value);
-    }
-
-    function updateSummary() {
-        const item = getEquip(selectedEquipId);
-        const qty = document.getElementById('fldQty').value;
-        const lab = document.getElementById('fldLab').value;
-        const db = document.getElementById('fldDateBorrow').value;
-        const dr = document.getElementById('fldDateReturn').value;
-
-        if (!item) {
-            setSum('sumEquipment', '—', true);
-            setSum('sumCode', '—', true);
-        } else {
-            setSum('sumEquipment', item.name[currentLang] || item.name.en, false);
-            setSum('sumCode', item.id + ' · ' + item.model, false);
-        }
-
-        setSum('sumQty', (item && qty) ? (qty + ' ' + T().avail_units) : '—', !(item && qty));
-        setSum('sumLab', lab || '—', !lab);
-
-        if (db && dr) {
-            setSum('sumDates', fmtDateShort(db) + ' → ' + fmtDateShort(dr), false);
-            const n = daysBetween(db, dr);
-            if (n > 0) {
-                setSum('sumDuration', n + ' ' + (n === 1 ? T().day : T().days), false);
-            } else {
-                setSum('sumDuration', '—', true);
+    function loadActivities() {
+        try {
+            const raw = localStorage.getItem(ACTIVITY_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) { activities = parsed; return; }
             }
-        } else {
-            setSum('sumDates', '—', true);
-            setSum('sumDuration', '—', true);
-        }
+        } catch (e) {}
+        activities = [];
     }
 
-    /* =========================================================
-       STATS
-    ========================================================== */
-    function renderStats() {
-        const totalStock = EQUIPMENT.reduce((a, b) => a + b.stock, 0);
-        const pending = loans.filter(l => l.status === 'pending').length;
-        const active  = loans.filter(l => l.status === 'approved').length;
-
-        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        set('statAvailable', totalStock);
-        set('statActive', active);
-        set('statPending', pending);
-        set('statTotal', loans.length);
+    function saveActivities() {
+        try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activities)); } catch (e) {}
     }
 
-    /* =========================================================
-       HISTORY
-    ========================================================== */
-    const STATUS_META = {
-        pending:  { cls: 'st-pending',  icon: 'fa-hourglass-half' },
-        approved: { cls: 'st-approved', icon: 'fa-circle-check' },
-        returned: { cls: 'st-returned', icon: 'fa-rotate-left' },
-        rejected: { cls: 'st-rejected', icon: 'fa-circle-xmark' }
-    };
-
-    function statusLabel(st) {
-        const map = { pending: 'st_pending', approved: 'st_approved', returned: 'st_returned', rejected: 'st_rejected' };
-        return T()[map[st]] || st;
-    }
-
-    function renderHistory() {
-        const body = document.getElementById('historyBody');
-        const emptyEl = document.getElementById('historyEmpty');
-        const countEl = document.getElementById('histCount');
-        if (!body) return;
-
-        if (countEl) countEl.textContent = loans.length;
-
-        if (!loans.length) {
-            body.innerHTML = '';
-            emptyEl.classList.remove('hidden');
-            return;
-        }
-        emptyEl.classList.add('hidden');
-
-        body.innerHTML = loans.map(l => {
-            const meta = STATUS_META[l.status] || STATUS_META.pending;
-            const item = getEquip(l.equipmentId);
-            const eqName = item ? (item.name[currentLang] || item.name.en) : (l.equipmentName || l.equipmentId);
-            const canCancel = l.status === 'pending';
-            return `
-                <tr>
-                    <td data-label="${escapeHtml(T().th_ref)}">
-                        <span class="font-black text-p655c text-[11px] tracking-wide">${escapeHtml(l.ref)}</span>
-                    </td>
-                    <td data-label="${escapeHtml(T().th_equipment)}">
-                        <span class="font-bold text-p655c">${escapeHtml(eqName)}</span>
-                        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">${escapeHtml(l.equipmentId)}${l.course ? ' · ' + escapeHtml(l.course) : ''}</span>
-                    </td>
-                    <td data-label="${escapeHtml(T().th_qty)}">
-                        <span class="font-black text-p254c">${escapeHtml(String(l.qty))}</span>
-                    </td>
-                    <td data-label="${escapeHtml(T().th_dates)}">
-                        <span class="font-semibold text-slate-600 text-[11px]">${escapeHtml(fmtDate(l.dateBorrow))}</span>
-                        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">→ ${escapeHtml(fmtDate(l.dateReturn))}</span>
-                    </td>
-                    <td data-label="${escapeHtml(T().th_status)}">
-                        <span class="status-pill ${meta.cls}"><i class="fas ${meta.icon}"></i> ${escapeHtml(statusLabel(l.status))}</span>
-                    </td>
-                    <td data-label="${escapeHtml(T().th_action)}" class="text-right">
-                        ${canCancel
-                            ? `<button class="tbl-btn cancel-btn" data-id="${escapeHtml(l.id)}" title="${escapeHtml(T().confirm_cancel)}"><i class="fas fa-xmark"></i></button>`
-                            : `<span class="text-[10px] font-bold text-slate-300">—</span>`}
-                    </td>
-                </tr>`;
-        }).join('');
-
-        body.querySelectorAll('.cancel-btn').forEach(btn => {
-            btn.addEventListener('click', () => cancelLoan(btn.dataset.id));
-        });
-    }
-
-    function cancelLoan(id) {
-        const idx = loans.findIndex(l => l.id === id);
-        if (idx === -1) return;
-        if (!confirm(T().confirm_cancel)) return;
-        const removed = loans.splice(idx, 1)[0];
-        saveLoans();
-        renderHistory();
-        renderStats();
-        showToast(T().toast_cancelled, true);
-        logActivity('link_click', 'Pinjaman Alat Radas',
-            'Cancelled request ' + removed.ref + ' (' + removed.equipmentId + ')');
-    }
-
-    /* =========================================================
-       FORM VALIDATION + SUBMIT
-    ========================================================== */
-    const form = document.getElementById('loanForm');
-    const formError = document.getElementById('formError');
-
-    function showFormError(messages) {
-        formError.innerHTML = '<p class="mb-1 font-black">' + escapeHtml(T().err_fix) + '</p><ul>' +
-            messages.map(m => `<li>${escapeHtml(m)}</li>`).join('') + '</ul>';
-        formError.classList.add('show');
-        formError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    function hideFormError() { formError.classList.remove('show'); }
-
-    function markInvalid(el, bad) {
-        if (!el) return;
-        el.classList.toggle('is-invalid', !!bad);
-    }
-
-    function validateForm() {
-        const errors = [];
-        const fEquip = document.getElementById('fldEquipment');
-        const fQty = document.getElementById('fldQty');
-        const fCourse = document.getElementById('fldCourse');
-        const fLab = document.getElementById('fldLab');
-        const fSup = document.getElementById('fldSupervisor');
-        const fPurpose = document.getElementById('fldPurpose');
-        const fDB = document.getElementById('fldDateBorrow');
-        const fDR = document.getElementById('fldDateReturn');
-        const fTerms = document.getElementById('fldTerms');
-
-        [fEquip, fQty, fCourse, fLab, fSup, fPurpose, fDB, fDR].forEach(el => markInvalid(el, false));
-
-        const item = getEquip(fEquip.value);
-
-        if (!fEquip.value || !item) { errors.push(T().err_equipment); markInvalid(fEquip, true); }
-
-        const qty = Number(fQty.value);
-        if (!qty || qty < 1) { errors.push(T().err_qty); markInvalid(fQty, true); }
-        else if (item && qty > item.stock) {
-            errors.push(T().err_qty_max.replace('{n}', item.stock));
-            markInvalid(fQty, true);
-        }
-
-        if (!fCourse.value.trim()) { errors.push(T().err_course); markInvalid(fCourse, true); }
-        if (!fLab.value) { errors.push(T().err_lab); markInvalid(fLab, true); }
-        if (!fSup.value.trim()) { errors.push(T().err_supervisor); markInvalid(fSup, true); }
-        if (fPurpose.value.trim().length < 10) { errors.push(T().err_purpose); markInvalid(fPurpose, true); }
-
-        const db = fDB.value, dr = fDR.value;
-        if (!db || !dr) {
-            errors.push(T().err_dates);
-            if (!db) markInvalid(fDB, true);
-            if (!dr) markInvalid(fDR, true);
-        } else {
-            if (db < todayISO()) { errors.push(T().err_date_past); markInvalid(fDB, true); }
-            const n = daysBetween(db, dr);
-            if (n <= 0) { errors.push(T().err_date_order); markInvalid(fDR, true); }
-            else if (n > 14) { errors.push(T().err_max_days); markInvalid(fDR, true); }
-        }
-
-        if (!fTerms.checked) { errors.push(T().err_terms); }
-
-        return errors;
-    }
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        hideFormError();
-
-        const errors = validateForm();
-        if (errors.length) { showFormError(errors); return; }
-
-        const item = getEquip(document.getElementById('fldEquipment').value);
-        const qty = Number(document.getElementById('fldQty').value);
-
-        const record = {
-            id: 'L_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            ref: makeRef(),
-            studentId: student.id,
-            equipmentId: item.id,
-            equipmentName: item.name.en,
-            qty: qty,
-            course: document.getElementById('fldCourse').value.trim(),
-            lab: document.getElementById('fldLab').value,
-            supervisor: document.getElementById('fldSupervisor').value.trim(),
-            purpose: document.getElementById('fldPurpose').value.trim(),
-            dateBorrow: document.getElementById('fldDateBorrow').value,
-            dateReturn: document.getElementById('fldDateReturn').value,
-            status: 'pending',
-            submittedAt: new Date().toISOString()
+    function logActivity(type, entity, detail) {
+        const entry = {
+            id: 'a_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            type, entity: entity || '', detail: detail || '',
+            timestamp: new Date().toISOString()
         };
-
-        loans.unshift(record);
-        saveLoans();
-
-        // Reduce local stock display (simulated reservation)
-        item.stock = Math.max(0, item.stock - qty);
-
-        renderHistory();
-        renderStats();
-        renderCatalog();
-        showSuccess(record);
-        resetForm(false);
-
-        logActivity('link_click', 'Pinjaman Alat Radas',
-            'Submitted ' + record.ref + ' — ' + item.id + ' × ' + qty);
-
-        showToast(T().toast_submitted, false);
-    });
-
-    function resetForm(showMsg) {
-        form.reset();
-        selectedEquipId = null;
-        document.getElementById('fldQty').value = 1;
-        document.getElementById('fldQty').removeAttribute('max');
-        [ 'fldEquipment','fldQty','fldCourse','fldLab','fldSupervisor','fldPurpose','fldDateBorrow','fldDateReturn' ]
-            .forEach(id => markInvalid(document.getElementById(id), false));
-        hideFormError();
-        renderCatalog();
-        updateQtyHint();
-        updateSummary();
-        if (showMsg) showToast(T().toast_reset, true);
+        activities.unshift(entry);
+        if (activities.length > ACTIVITY_LIMIT) activities = activities.slice(0, ACTIVITY_LIMIT);
+        saveActivities();
+        renderActivities();
     }
 
-    document.getElementById('resetBtn').addEventListener('click', () => resetForm(true));
+    function renderActivities() {
+        const tl = document.getElementById('activityTimeline');
+        const countEl = document.getElementById('activityCount');
+        if (countEl) countEl.textContent = activities.length;
+        if (!tl) return;
 
-    /* =========================================================
-       SUCCESS MODAL
-    ========================================================== */
-    const successModal = document.getElementById('successModal');
-
-    function showSuccess(rec) {
-        document.getElementById('succRef').textContent = rec.ref;
-        const item = getEquip(rec.equipmentId);
-
-        document.getElementById('succDetails').innerHTML = `
-            <div class="summary-row">
-                <span class="summary-label">${escapeHtml(T().sum_equipment)}</span>
-                <span class="summary-value">${escapeHtml(item ? (item.name[currentLang] || item.name.en) : rec.equipmentId)}</span>
-            </div>
-            <div class="summary-row">
-                <span class="summary-label">${escapeHtml(T().sum_qty)}</span>
-                <span class="summary-value">${escapeHtml(String(rec.qty))}</span>
-            </div>
-            <div class="summary-row">
-                <span class="summary-label">${escapeHtml(T().sum_lab)}</span>
-                <span class="summary-value">${escapeHtml(rec.lab)}</span>
-            </div>
-            <div class="summary-row">
-                <span class="summary-label">${escapeHtml(T().sum_dates)}</span>
-                <span class="summary-value">${escapeHtml(fmtDateShort(rec.dateBorrow))} → ${escapeHtml(fmtDateShort(rec.dateReturn))}</span>
-            </div>`;
-
-        successModal.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeSuccess() {
-        successModal.classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    document.getElementById('succClose').addEventListener('click', closeSuccess);
-    successModal.addEventListener('click', e => { if (e.target === successModal) closeSuccess(); });
-
-    /* =========================================================
-       FILTERS / SEARCH
-    ========================================================== */
-    document.getElementById('equipSearch').addEventListener('input', function () {
-        searchTerm = this.value;
-        renderCatalog();
-    });
-
-    document.querySelectorAll('#filterBar .filter-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('#filterBar .filter-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            activeCategory = this.dataset.cat;
-            renderCatalog();
-        });
-    });
-
-    /* =========================================================
-       FORM FIELD LISTENERS
-    ========================================================== */
-    document.getElementById('fldEquipment').addEventListener('change', function () {
-        if (!this.value) {
-            selectedEquipId = null;
-            document.getElementById('fldQty').removeAttribute('max');
-        } else {
-            selectEquipment(this.value, false);
+        if (!activities.length) {
+            tl.innerHTML = `
+                <div class="activity-empty">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <p class="text-xs font-bold uppercase tracking-widest">${escapeHtml(i18n[currentLang].activity_empty)}</p>
+                </div>`;
+            return;
         }
-        renderCatalog();
-        updateQtyHint();
-        updateSummary();
-    });
 
-    ['fldQty', 'fldLab', 'fldDateBorrow', 'fldDateReturn'].forEach(id => {
-        const el = document.getElementById(id);
-        el.addEventListener('input', updateSummary);
-        el.addEventListener('change', updateSummary);
-    });
+        tl.innerHTML = activities.map(a => {
+            const meta = ACTIVITY_TYPES[a.type] || ACTIVITY_TYPES.login;
+            const label = currentLang === 'ms' ? meta.ms : meta.en;
+            const entityHtml = a.entity
+                ? ` <span class="activity-entity">· ${escapeHtml(a.entity)}</span>`
+                : '';
+            const detailHtml = a.detail
+                ? `<p class="activity-detail">${escapeHtml(a.detail)}</p>`
+                : '';
+            return `
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: ${meta.bg};">
+                        <i class="fas ${meta.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-title">${escapeHtml(label)}${entityHtml}</p>
+                        ${detailHtml}
+                        <p class="activity-time"><i class="far fa-clock"></i> ${escapeHtml(relativeTime(a.timestamp))}</p>
+                    </div>
+                </div>`;
+        }).join('');
+    }
 
-    /* Date defaults + constraints */
-    (function initDates() {
-        const db = document.getElementById('fldDateBorrow');
-        const dr = document.getElementById('fldDateReturn');
-        const t = todayISO();
-        db.min = t;
-        dr.min = t;
-        db.value = t;
+    function clearActivities() {
+        if (!activities.length) return;
+        if (!confirm(i18n[currentLang].activity_confirm_clear)) return;
+        activities = [];
+        logActivity('activity_clear', student ? student.name : '', '');
+        showToast(i18n[currentLang].toast_activity_cleared, true);
+    }
 
-        const plus3 = new Date();
-        plus3.setDate(plus3.getDate() + 3);
-        dr.value = plus3.toISOString().slice(0, 10);
+    document.getElementById('clearActivityBtn').addEventListener('click', clearActivities);
 
-        db.addEventListener('change', function () {
-            dr.min = this.value || t;
-            if (dr.value && dr.value <= this.value) {
-                const nd = new Date(this.value);
-                nd.setDate(nd.getDate() + 1);
-                dr.value = nd.toISOString().slice(0, 10);
-            }
-            updateSummary();
-        });
-        updateSummary();
-    })();
+    /* =========================================================
+       CHART.JS — SOLID colours only
+    ========================================================== */
+    function initCharts() {
+        if (typeof Chart === 'undefined') return;
+
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.font.weight = '700';
+        Chart.defaults.color = '#64748B';
+
+        /* Grades — horizontal bar */
+        const gradeCtx = document.getElementById('gradeChart');
+        if (gradeCtx) {
+            charts.grade = new Chart(gradeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['A / A-', 'B+ / B', 'B- / C+', 'C & below'],
+                    datasets: [{
+                        data: [14, 8, 3, 1],
+                        backgroundColor: ['#002D62', '#9B26B6', '#FDB913', '#002D62'],
+                        borderRadius: 8, borderSkipped: false, barThickness: 22
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 1200, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#002D62', padding: 10, cornerRadius: 8, titleFont: { size: 11, weight: '800' }, bodyFont: { size: 11, weight: '600' } } },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false }, ticks: { display: false }, max: 16 },
+                        y: { grid: { display: false, drawBorder: false }, ticks: { color: '#475569', font: { size: 10, weight: '800' } } }
+                    }
+                }
+            });
+        }
+
+        /* Attendance — doughnut */
+        const attCtx = document.getElementById('attChart');
+        if (attCtx) {
+            charts.att = new Chart(attCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Medical / Leave', 'Absent'],
+                    datasets: [{
+                        data: [142, 6, 3],
+                        backgroundColor: ['#9B26B6', '#002D62', '#FDB913'],
+                        borderWidth: 3, borderColor: '#fff', hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '62%',
+                    animation: { duration: 1200, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#002D62', padding: 10, cornerRadius: 8, titleFont: { size: 11, weight: '800' }, bodyFont: { size: 11, weight: '600' } } }
+                }
+            });
+        }
+
+        /* Credits — vertical bar */
+        const credCtx = document.getElementById('credChart');
+        if (credCtx) {
+            charts.cred = new Chart(credCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Core', 'Electives', 'MPU', 'Remaining'],
+                    datasets: [{
+                        data: [62, 18, 10, 27],
+                        backgroundColor: ['#002D62', '#9B26B6', '#FDB913', '#002D62'],
+                        borderRadius: 8, borderSkipped: false, barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 1200, easing: 'easeOutQuart', delay: (ctx) => ctx.dataIndex * 120 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#002D62', padding: 10, cornerRadius: 8,
+                            titleFont: { size: 11, weight: '800' }, bodyFont: { size: 11, weight: '600' },
+                            callbacks: { label: (ctx) => ctx.parsed.y + ' credits' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#F1F5F9', drawBorder: false },
+                            ticks: { color: '#94A3B8', font: { size: 9, weight: '700' } }
+                        },
+                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#475569', font: { size: 10, weight: '800' } } }
+                    }
+                }
+            });
+        }
+
+        /* GPA Trend — line, solid colours */
+        const gpaCtx = document.getElementById('gpaTrendChart');
+        if (gpaCtx) {
+            charts.gpaTrend = new Chart(gpaCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6'],
+                    datasets: [
+                        { label: 'GPA',  data: [3.42, 3.58, 3.65, 3.55, 3.70, 3.72], borderColor: '#002D62', backgroundColor: 'rgba(0, 45, 98, 0.08)', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#002D62', pointBorderWidth: 3, pointRadius: 6, pointHoverRadius: 9, fill: false, tension: 0.4 },
+                        { label: 'CGPA', data: [3.42, 3.50, 3.55, 3.55, 3.60, 3.72], borderColor: '#9B26B6', backgroundColor: 'rgba(155, 38, 182, 0.08)', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#9B26B6', pointBorderWidth: 3, pointRadius: 6, pointHoverRadius: 9, fill: false, tension: 0.4, borderDash: [6, 4] }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    animation: { duration: 1400, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#002D62', padding: 12, cornerRadius: 10, titleFont: { size: 12, weight: '800' }, bodyFont: { size: 11, weight: '600' }, bodySpacing: 6 } },
+                    scales: {
+                        y: { beginAtZero: false, min: 3.0, max: 4.0, grid: { color: '#F1F5F9', drawBorder: false }, ticks: { color: '#94A3B8', font: { size: 10, weight: '700' }, callback: (v) => v.toFixed(2) }, title: { display: true, text: 'GPA / CGPA', color: '#94A3B8', font: { size: 9, weight: '800' } } },
+                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#475569', font: { size: 11, weight: '800' } } }
+                    }
+                }
+            });
+        }
+    }
 
     /* =========================================================
        DROPDOWN
     ========================================================== */
     const profileToggle = document.getElementById('profileToggle');
     const profileDropdown = document.getElementById('profileDropdown');
-
     function closeDropdown() { profileDropdown.classList.remove('open'); }
-
     profileToggle.addEventListener('click', function (e) {
         e.stopPropagation();
         profileDropdown.classList.toggle('open');
@@ -2072,7 +1937,6 @@
         document.getElementById('footerProfile').classList.toggle('hidden', tabName !== 'profile');
         document.getElementById('footerSecurity').classList.toggle('hidden', tabName !== 'security');
     }
-
     document.querySelectorAll('.settings-tab').forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
@@ -2090,38 +1954,47 @@
         hidePwdError();
         settingsModal.classList.add('open');
         document.body.style.overflow = 'hidden';
+        logActivity('settings_open', student.name, '');
     }
-
     function closeSettings() {
         settingsModal.classList.remove('open');
         document.body.style.overflow = '';
     }
-
     document.getElementById('settingsBtn').addEventListener('click', openSettings);
     document.getElementById('settingsClose').addEventListener('click', closeSettings);
     document.getElementById('settingsCancel').addEventListener('click', closeSettings);
     document.getElementById('pwdCancel').addEventListener('click', closeSettings);
-    settingsModal.addEventListener('click', e => { if (e.target === settingsModal) closeSettings(); });
-
+    settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
     setName.addEventListener('input', function () {
         settingsAvatar.textContent = makeInitials(this.value) || '--';
     });
 
     document.getElementById('settingsSave').addEventListener('click', function () {
         const newName = setName.value.trim();
+        const newProg = setProgram.value.trim();
+        const newMail = setEmail.value.trim();
+        const newSem  = setSemester.value.trim();
         if (!newName) { setName.focus(); return; }
 
-        student.name = newName;
-        student.program = setProgram.value.trim();
-        student.email = setEmail.value.trim();
-        student.semester = setSemester.value.trim();
+        const oldName = student.name;
+        const oldProg = student.program;
+        const oldMail = student.email;
+        const oldSem  = student.semester;
+
+        student.name = newName; student.program = newProg;
+        student.email = newMail; student.semester = newSem;
         student.initials = makeInitials(newName);
 
-        persistStudent();
-        fillStudent(student);
-        closeSettings();
-        showToast(T().toast_saved, false);
-        logActivity('profile_update', newName, 'Profile saved from loan module');
+        persistStudent(); fillStudent(student); closeSettings();
+        showToast(i18n[currentLang].toast_saved, false);
+
+        const changes = [];
+        if (oldName !== newName) changes.push('name');
+        if (oldProg !== newProg) changes.push('programme');
+        if (oldMail !== newMail) changes.push('email');
+        if (oldSem  !== newSem)  changes.push('semester');
+        const detail = changes.length ? 'Changed: ' + changes.join(', ') : 'Profile saved';
+        logActivity('profile_update', newName, detail);
     });
 
     /* =========================================================
@@ -2131,13 +2004,6 @@
     const newPwd = document.getElementById('newPwd');
     const confirmPwd = document.getElementById('confirmPwd');
     const pwdError = document.getElementById('pwdError');
-    const strengthText = document.getElementById('strengthText');
-    const segs = [
-        document.getElementById('seg1'),
-        document.getElementById('seg2'),
-        document.getElementById('seg3'),
-        document.getElementById('seg4')
-    ];
 
     function clearPwdFields() {
         [currentPwd, newPwd, confirmPwd].forEach(f => {
@@ -2160,6 +2026,9 @@
         });
     });
 
+    const strengthText = document.getElementById('strengthText');
+    const segs = [document.getElementById('seg1'), document.getElementById('seg2'), document.getElementById('seg3'), document.getElementById('seg4')];
+
     function scorePassword(pwd) {
         if (!pwd) return 0;
         let s = 0;
@@ -2175,18 +2044,15 @@
         const pwd = newPwd ? newPwd.value : '';
         const score = scorePassword(pwd);
         segs.forEach(s => s.className = 'strength-seg');
-        if (!strengthText) return;
-
         if (!pwd) {
             strengthText.className = 'strength-text';
-            strengthText.textContent = T().pwd_strength_none;
+            strengthText.textContent = i18n[currentLang].pwd_strength_none;
             return;
         }
         let level, label;
-        if (score <= 1) { level = 'weak'; label = T().pwd_strength_weak; }
-        else if (score <= 3) { level = 'medium'; label = T().pwd_strength_medium; }
-        else { level = 'strong'; label = T().pwd_strength_strong; }
-
+        if (score <= 1) { level = 'weak'; label = i18n[currentLang].pwd_strength_weak; }
+        else if (score <= 3) { level = 'medium'; label = i18n[currentLang].pwd_strength_medium; }
+        else { level = 'strong'; label = i18n[currentLang].pwd_strength_strong; }
         for (let i = 0; i < score; i++) segs[i].classList.add('on-' + level);
         strengthText.className = 'strength-text ' + level;
         strengthText.textContent = label;
@@ -2201,7 +2067,7 @@
     });
 
     function showPwdError(messages) {
-        pwdError.innerHTML = '<ul>' + messages.map(m => `<li>${escapeHtml(m)}</li>`).join('') + '</ul>';
+        pwdError.innerHTML = '<ul>' + messages.map(m => `<li>${m}</li>`).join('') + '</ul>';
         pwdError.classList.add('show');
     }
     function hidePwdError() { pwdError.classList.remove('show'); }
@@ -2209,11 +2075,11 @@
     document.getElementById('pwdUpdate').addEventListener('click', function () {
         hidePwdError();
         const cur = currentPwd.value, np = newPwd.value, cp = confirmPwd.value;
-        const L = T();
+        const T = i18n[currentLang];
         [currentPwd, newPwd, confirmPwd].forEach(f => f.classList.remove('is-invalid'));
 
         if (!cur || !np || !cp) {
-            showPwdError([L.err_pwd_empty]);
+            showPwdError([T.err_pwd_empty]);
             if (!cur) currentPwd.classList.add('is-invalid');
             if (!np) newPwd.classList.add('is-invalid');
             if (!cp) confirmPwd.classList.add('is-invalid');
@@ -2221,20 +2087,25 @@
         }
 
         const errors = [];
-        if (cur !== DEMO_PASSWORD) { errors.push(L.err_current_wrong); currentPwd.classList.add('is-invalid'); }
-        if (np.length < 8) { errors.push(L.err_pwd_short); newPwd.classList.add('is-invalid'); }
-        if (!/[A-Z]/.test(np)) { errors.push(L.err_pwd_upper); newPwd.classList.add('is-invalid'); }
-        if (!/[a-z]/.test(np)) { errors.push(L.err_pwd_lower); newPwd.classList.add('is-invalid'); }
-        if (!/[0-9]/.test(np)) { errors.push(L.err_pwd_number); newPwd.classList.add('is-invalid'); }
-        if (np === cur && cur) { errors.push(L.err_pwd_same); newPwd.classList.add('is-invalid'); }
-        if (np !== cp) { errors.push(L.err_pwd_match); confirmPwd.classList.add('is-invalid'); }
+        if (cur !== DEMO_PASSWORD) { errors.push(T.err_current_wrong); currentPwd.classList.add('is-invalid'); }
+        if (np.length < 8) { errors.push(T.err_pwd_short); newPwd.classList.add('is-invalid'); }
+        if (!/[A-Z]/.test(np)) { errors.push(T.err_pwd_upper); newPwd.classList.add('is-invalid'); }
+        if (!/[a-z]/.test(np)) { errors.push(T.err_pwd_lower); newPwd.classList.add('is-invalid'); }
+        if (!/[0-9]/.test(np)) { errors.push(T.err_pwd_number); newPwd.classList.add('is-invalid'); }
+        if (np === cur && cur) { errors.push(T.err_pwd_same); newPwd.classList.add('is-invalid'); }
+        if (np !== cp) { errors.push(T.err_pwd_match); confirmPwd.classList.add('is-invalid'); }
 
-        if (errors.length) { showPwdError(errors); return; }
+        if (errors.length > 0) { showPwdError(errors); return; }
 
-        closeSettings();
-        showToast(T().toast_pwd, true);
+        persistStudent(); closeSettings();
+        showToast(i18n[currentLang].toast_pwd, true);
         logActivity('password_change', student.name, 'Password successfully updated');
     });
+
+    /* AUTH CHANGE: persist student into session cookie */
+    function persistStudent() {
+        FMSAuth.saveSession(student, 'student');
+    }
 
     /* =========================================================
        TOAST
@@ -2242,17 +2113,16 @@
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
     let toastTimer = null;
-
-    function showToast(message, blue) {
-        toastMsg.innerHTML = escapeHtml(message);
-        toast.classList.toggle('toast-blue', !!blue);
+    function showToast(message, purple) {
+        toastMsg.innerHTML = message;
+        toast.classList.toggle('toast-blue', !!purple);
         toast.classList.add('show');
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
     }
 
     /* =========================================================
-       LOGOUT
+       LOGOUT — AUTH CHANGE
     ========================================================== */
     document.getElementById('logoutBtn').addEventListener('click', function () {
         FMSAuth.clearSession();
@@ -2260,26 +2130,9 @@
     });
 
     /* =========================================================
-       GLOBAL SEARCH → focuses catalog search
-    ========================================================== */
-    const globalSearch = document.getElementById('globalSearch');
-    if (globalSearch) {
-        globalSearch.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && this.value.trim()) {
-                const cat = document.getElementById('equipSearch');
-                cat.value = this.value.trim();
-                searchTerm = this.value.trim();
-                renderCatalog();
-                document.getElementById('equipGrid').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        });
-    }
-
-    /* =========================================================
-       INIT
+       INIT — AUTH CHANGE
     ========================================================== */
     document.addEventListener('DOMContentLoaded', function () {
-
         student = {
             id:       session.user.id       || '—',
             name:     session.user.name     || '—',
@@ -2290,25 +2143,18 @@
             loginAt:  new Date(session.loginAt).toISOString()
         };
 
-        loadLoans();
+        loadActivities();
 
         switchLanguage('en');
         fillStudent(student);
 
-        populateEquipmentSelect();
-        renderCatalog();
-        renderHistory();
-        renderStats();
-        updateQtyHint();
-        updateSummary();
+        setTimeout(initCharts, 150);
 
-        // Log page visit once per browser session
-        if (!sessionStorage.getItem('fkkLoanPageLogged')) {
-            sessionStorage.setItem('fkkLoanPageLogged', '1');
+        if (!sessionStorage.getItem('fkkStudentLoginLogged')) {
+            sessionStorage.setItem('fkkStudentLoginLogged', '1');
             setTimeout(() => {
-                logActivity('link_click', 'Pinjaman Alat Radas',
-                    'Opened equipment loan module');
-            }, 500);
+                if (student) logActivity('login', student.name, student.email || '');
+            }, 600);
         }
     });
 
