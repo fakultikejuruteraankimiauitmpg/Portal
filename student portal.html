@@ -150,31 +150,95 @@
         background-size: 26px 26px; opacity: .35;
     }
 
-    .quick-link {
-        position: relative; overflow: hidden;
-        border-radius: 14px; color: #fff;
-        transition: all .28s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 8px 20px -10px rgba(0,0,0,.25);
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-        padding: 20px 12px; text-align: center; text-decoration: none;
+    /* --- PORTAL MENU STYLES --- */
+    .portal-menu-card {
+        border-radius: 20px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 10px 30px -10px rgba(0,45,98,.15);
+        border: 1px solid rgba(226,232,240,.8);
+        margin-bottom: 24px;
     }
-    .quick-link::before {
-        content: ''; position: absolute;
-        top: -30px; right: -30px;
-        width: 90px; height: 90px; border-radius: 50%;
-        background: rgba(255,255,255,0.14); transition: transform .35s;
+    .portal-menu-header {
+        background: #002D62;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #fff;
     }
-    .quick-link:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 34px -14px rgba(0,0,0,.35); }
-    .quick-link:hover::before { transform: scale(1.4); }
-    .quick-link i { font-size: 22px; position: relative; z-index: 1; }
-    .quick-link span {
-        font-size: 10px; font-weight: 800; letter-spacing: .1em;
-        text-transform: uppercase; line-height: 1.25; position: relative; z-index: 1;
-        word-break: break-word;
+    .portal-menu-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
-    .ql-navy   { background: #002D62; }
-    .ql-purple { background: #9B26B6; }
-    .ql-gold   { background: #FDB913; }
+    .portal-menu-icon-box {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        background: #FDB913;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 20px;
+    }
+    .portal-menu-title {
+        font-size: 16px; font-weight: 900;
+        letter-spacing: .05em; text-transform: uppercase;
+        line-height: 1.2;
+    }
+    .portal-menu-sub {
+        font-size: 10px; font-weight: 700;
+        letter-spacing: .15em; text-transform: uppercase;
+        color: rgba(255,255,255,.7); margin-top: 2px;
+    }
+    .portal-menu-badge {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        padding: 6px 14px; border-radius: 9999px;
+        font-size: 10px; font-weight: 800;
+        letter-spacing: .1em; text-transform: uppercase;
+        display: flex; align-items: center; gap: 6px;
+        color: #FDB913;
+    }
+    .portal-menu-body {
+        padding: 20px 24px;
+    }
+    .portal-category-label {
+        font-size: 10px; font-weight: 800;
+        letter-spacing: .18em; text-transform: uppercase;
+        color: #9B26B6; margin-bottom: 8px;
+        border-bottom: 2px solid #FDB913;
+        display: inline-block; padding-bottom: 2px;
+    }
+    .portal-list {
+        list-style: none; padding: 0; margin: 0 0 20px 0;
+    }
+    .portal-list:last-child { margin-bottom: 0; }
+    .portal-item {
+        display: flex; align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #F1F5F9;
+        cursor: pointer;
+        transition: all .2s ease;
+        text-decoration: none; color: inherit;
+    }
+    .portal-item:last-child { border-bottom: none; }
+    .portal-item:hover { background: #F8FAFC; padding-left: 8px; padding-right: 8px; border-radius: 8px; }
+    .portal-item-icon {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        background: #F3E8FF; /* light purple */
+        color: #9B26B6;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0; margin-right: 16px;
+    }
+    .portal-item-text {
+        flex: 1; font-size: 13px; font-weight: 700; color: #002D62;
+    }
+    .portal-item-arrow {
+        color: #CBD5E1; font-size: 12px;
+        transition: color .2s;
+    }
+    .portal-item:hover .portal-item-arrow { color: #9B26B6; }
+    /* --------------------------- */
 
     .activity-timeline { position: relative; }
     .activity-timeline::before {
@@ -793,18 +857,60 @@
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="card p-6 mb-6 anim-up rounded-3xl">
-        <div class="mb-5 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <span class="section-label" data-i18n="stu_quick_links_label">Quick Menu</span>
-                <h3 class="text-lg font-black text-p655c mt-1" data-i18n="stu_quick_links_title">Student Quick Links</h3>
+    <!-- ============================================================
+         PORTAL MENU (NEW SECTION)
+    ============================================================ -->
+    <div class="portal-menu-card anim-up">
+        <div class="portal-menu-header">
+            <div class="portal-menu-header-left">
+                <div class="portal-menu-icon-box">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <div>
+                    <h2 class="portal-menu-title" data-i18n="portal_menu_title">PORTAL MENU</h2>
+                    <p class="portal-menu-sub" data-i18n="portal_menu_sub">QUICK ACCESS TO ALL SYSTEMS</p>
+                </div>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="stu_quick_links_hint">Opens in new tab</span>
+            <div class="portal-menu-badge">
+                <i class="fas fa-circle-check"></i> <span data-i18n="portal_menu_badge">UPDATED 2026</span>
+            </div>
         </div>
 
-        <div id="quickLinksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- rendered by JS -->
+        <div class="portal-menu-body">
+            <!-- Category 1: Administration -->
+            <div class="portal-category-label" data-i18n="portal_cat_admin">ADMINISTRATION</div>
+            <ul class="portal-list">
+                <a href="resume_portal.html" class="portal-item">
+                    <div class="portal-item-icon"><i class="fas fa-file-lines"></i></div>
+                    <span class="portal-item-text" data-i18n="portal_item_resume">Resume</span>
+                    <i class="fas fa-chevron-right portal-item-arrow"></i>
+                </a>
+                <a href="#" id="portalAccountSettings" class="portal-item">
+                    <div class="portal-item-icon"><i class="fas fa-user-gear"></i></div>
+                    <span class="portal-item-text" data-i18n="portal_item_account">Account Settings</span>
+                    <i class="fas fa-chevron-right portal-item-arrow"></i>
+                </a>
+            </ul>
+
+            <!-- Category 2: Laboratory Services -->
+            <div class="portal-category-label" data-i18n="portal_cat_lab">LABORATORY SERVICES</div>
+            <ul class="portal-list">
+                <a href="pinjaman_alat_radas.html" class="portal-item">
+                    <div class="portal-item-icon"><i class="fas fa-tools"></i></div>
+                    <span class="portal-item-text" data-i18n="portal_item_borrow">Borrow Laboratory Apparatus</span>
+                    <i class="fas fa-chevron-right portal-item-arrow"></i>
+                </a>
+                <a href="#" class="portal-item">
+                    <div class="portal-item-icon"><i class="fas fa-flask"></i></div>
+                    <span class="portal-item-text" data-i18n="portal_item_chemical">Chemical Materials Application</span>
+                    <i class="fas fa-chevron-right portal-item-arrow"></i>
+                </a>
+                <a href="#" class="portal-item">
+                    <div class="portal-item-icon"><i class="fas fa-microscope"></i></div>
+                    <span class="portal-item-text" data-i18n="portal_item_equipment">Laboratory Equipment Application</span>
+                    <i class="fas fa-chevron-right portal-item-arrow"></i>
+                </a>
+            </ul>
         </div>
     </div>
 
@@ -1409,26 +1515,13 @@
     let charts = { grade: null, att: null, cred: null, gpaTrend: null };
     let activities = [];
 
-    /* Static quick links (read-only) — 3 SOLID colours only */
-    const QUICK_LINKS = [
-        { href: 'https://elearning.uitm.edu.my',  icon: 'fa-graduation-cap',      color: 'ql-navy',   labelKey: 'stu_link_elearning' },
-        { href: 'https://istudent.uitm.edu.my',   icon: 'fa-user-graduate',       color: 'ql-purple', labelKey: 'stu_link_istudent' },
-        { href: 'https://library.uitm.edu.my',    icon: 'fa-book-open',           color: 'ql-gold',   labelKey: 'stu_link_library' },
-        { href: 'https://exam.uitm.edu.my',       icon: 'fa-file-pen',            color: 'ql-navy',   labelKey: 'stu_link_exam' },
-        { href: 'https://ir.uitm.edu.my',         icon: 'fa-file-lines',          color: 'ql-purple', labelKey: 'stu_link_results' },
-        { href: 'https://finance.uitm.edu.my',    icon: 'fa-file-invoice-dollar', color: 'ql-gold',   labelKey: 'stu_link_fees' },
-        { href: 'https://library.uitm.edu.my',    icon: 'fa-database',            color: 'ql-navy',   labelKey: 'stu_link_repository' },
-        { href: 'https://helpdesk.uitm.edu.my',   icon: 'fa-headset',             color: 'ql-purple', labelKey: 'stu_link_helpdesk' }
-    ];
-
     /* Activity type meta — SOLID colours */
     const ACTIVITY_TYPES = {
-        login:           { icon: 'fa-right-to-bracket',           bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
-        link_click:      { icon: 'fa-arrow-up-right-from-square', bg: '#002D62', en: 'Opened quick link',      ms: 'Buka pautan pantas' },
-        profile_update:  { icon: 'fa-user-pen',                   bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
-        password_change: { icon: 'fa-key',                        bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
-        settings_open:   { icon: 'fa-gear',                       bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
-        activity_clear:  { icon: 'fa-broom',                      bg: '#002D62', en: 'Cleared activity trail', ms: 'Kosongkan jejak aktiviti' }
+        login:           { icon: 'fa-right-to-bracket', bg: '#002D62', en: 'Signed in to portal',    ms: 'Log masuk ke portal' },
+        profile_update:  { icon: 'fa-user-pen',         bg: '#9B26B6', en: 'Updated profile',        ms: 'Kemas kini profil' },
+        password_change: { icon: 'fa-key',              bg: '#9B26B6', en: 'Changed password',       ms: 'Tukar kata laluan' },
+        settings_open:   { icon: 'fa-gear',             bg: '#FDB913', en: 'Opened settings',        ms: 'Buka tetapan' },
+        activity_clear:  { icon: 'fa-broom',            bg: '#002D62', en: 'Cleared activity trail', ms: 'Kosongkan jejak aktiviti' }
     };
 
     /* =========================================================
@@ -1443,11 +1536,16 @@
             stu_stat_cgpa: "Current CGPA", stu_stat_courses: "Enrolled Courses",
             stu_stat_credits: "Total Credits", stu_stat_assignments: "Pending Assignments",
             stu_stat_sem: "This Sem", stu_stat_due: "Due",
-            stu_quick_links_label: "Quick Menu", stu_quick_links_title: "Student Quick Links", stu_quick_links_hint: "Opens in new tab",
-            stu_link_elearning: "E-Learning", stu_link_istudent: "iStudent",
-            stu_link_library: "Library", stu_link_exam: "Exam Unit",
-            stu_link_results: "Results", stu_link_fees: "Fees",
-            stu_link_repository: "Repository", stu_link_helpdesk: "IT Helpdesk",
+            portal_menu_title: "PORTAL MENU",
+            portal_menu_sub: "QUICK ACCESS TO ALL SYSTEMS",
+            portal_menu_badge: "UPDATED 2026",
+            portal_cat_admin: "ADMINISTRATION",
+            portal_cat_lab: "LABORATORY SERVICES",
+            portal_item_resume: "Resume",
+            portal_item_account: "Account Settings",
+            portal_item_borrow: "Borrow Laboratory Apparatus",
+            portal_item_chemical: "Chemical Materials Application",
+            portal_item_equipment: "Laboratory Equipment Application",
             stu_ach_tag: "Academic Performance", stu_ach_title: "My Progress",
             stu_ach_sub: "Grades, attendance & credit progress · FKK Johor", stu_ach_trend: "Improving",
             stu_grades: "Grades", stu_grades_sub: "Current CGPA (out of 4.00)",
@@ -1526,11 +1624,16 @@
             stu_stat_cgpa: "PNGK Semasa", stu_stat_courses: "Kursus Berdaftar",
             stu_stat_credits: "Jumlah Kredit", stu_stat_assignments: "Tugasan Tertunggak",
             stu_stat_sem: "Sem Ini", stu_stat_due: "Perlu",
-            stu_quick_links_label: "Menu Pantas", stu_quick_links_title: "Pautan Pantas Pelajar", stu_quick_links_hint: "Buka dalam tab baharu",
-            stu_link_elearning: "E-Pembelajaran", stu_link_istudent: "iStudent",
-            stu_link_library: "Perpustakaan", stu_link_exam: "Unit Peperiksaan",
-            stu_link_results: "Keputusan", stu_link_fees: "Yuran",
-            stu_link_repository: "Repositori", stu_link_helpdesk: "Helpdesk IT",
+            portal_menu_title: "MENU PORTAL",
+            portal_menu_sub: "AKSES PANTAS KE SEMUA SISTEM",
+            portal_menu_badge: "DIKEMASKINI 2026",
+            portal_cat_admin: "PENTADBIRAN",
+            portal_cat_lab: "PERKHIDMATAN MAKMAL",
+            portal_item_resume: "Resume",
+            portal_item_account: "Tetapan Akaun",
+            portal_item_borrow: "Pinjaman Alat Radas",
+            portal_item_chemical: "Permohonan Bahan Kimia",
+            portal_item_equipment: "Permohonan Peralatan Makmal",
             stu_ach_tag: "Prestasi Akademik", stu_ach_title: "Kemajuan Saya",
             stu_ach_sub: "Gred, kehadiran & kemajuan kredit · FKK Johor", stu_ach_trend: "Meningkat",
             stu_grades: "Gred", stu_grades_sub: "PNGK semasa (daripada 4.00)",
@@ -1651,7 +1754,6 @@
         document.getElementById('btn-ms').classList.toggle('active', lang === 'ms');
 
         if (student) fillStudent(student);
-        renderQuickLinks();
         renderActivities();
         updateStrength();
     };
@@ -1680,35 +1782,6 @@
         }
         const sAvatar = document.getElementById('settingsAvatar');
         if (sAvatar) sAvatar.textContent = initials;
-    }
-
-    /* =========================================================
-       QUICK LINKS
-    ========================================================== */
-    function renderQuickLinks() {
-        const grid = document.getElementById('quickLinksGrid');
-        if (!grid) return;
-
-        grid.innerHTML = QUICK_LINKS.map(link => {
-            const label = i18n[currentLang][link.labelKey] || link.labelKey;
-            return `
-                <a href="${escapeHtml(link.href)}" target="_blank" rel="noopener"
-                   class="quick-link ${link.color}"
-                   data-label-key="${escapeHtml(link.labelKey)}"
-                   data-href="${escapeHtml(link.href)}">
-                    <i class="fas ${escapeHtml(link.icon)}"></i>
-                    <span>${escapeHtml(label)}</span>
-                </a>`;
-        }).join('');
-
-        grid.querySelectorAll('.quick-link').forEach(a => {
-            a.addEventListener('click', () => {
-                const labelKey = a.dataset.labelKey;
-                const href = a.dataset.href;
-                const label = i18n[currentLang][labelKey] || labelKey;
-                logActivity('link_click', label, href);
-            });
-        });
     }
 
     /* =========================================================
@@ -1967,6 +2040,14 @@
     settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
     setName.addEventListener('input', function () {
         settingsAvatar.textContent = makeInitials(this.value) || '--';
+    });
+
+    /* =========================================================
+       PORTAL MENU — Account Settings link
+    ========================================================== */
+    document.getElementById('portalAccountSettings').addEventListener('click', function (e) {
+        e.preventDefault();
+        openSettings();
     });
 
     document.getElementById('settingsSave').addEventListener('click', function () {
