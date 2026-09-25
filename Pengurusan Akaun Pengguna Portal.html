@@ -203,6 +203,7 @@
     /* ===== ROLE BADGES ===== */
     .role-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:9999px; font-size:9px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
     .role-badge-admin { background:#F3E8FF; color:#6B21A8; border:1px solid #D8B4FE; }
+    .role-badge-admin-system { background:#F5F3FF; color:#4C1D95; border:1px solid #DDD6FE; }
     .role-badge-admin-obe { background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; }
     .role-badge-admin-sumber { background:#ECFDF5; color:#047857; border:1px solid #A7F3D0; }
     .role-badge-admin-lic { background:#FFF7ED; color:#C2410C; border:1px solid #FED7AA; }
@@ -218,8 +219,20 @@
     .identity-student { background:#F1F5F9; color:#475569; }
     .identity-admin { background:#FEF3C7; color:#B45309; }
 
+    /* ===== ROLE COUNT CARDS ===== */
+    .role-count-card { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px 16px; transition:all .2s ease; }
+    .role-count-card:hover { border-color:#9B26B6; background:#fff; box-shadow:0 8px 20px -12px rgba(155,38,182,.5); }
+    .role-count-card .rc-label { font-size:9px; font-weight:900; color:#64748B; text-transform:uppercase; letter-spacing:.14em; line-height:1.3; }
+    .role-count-card .rc-value { font-size:20px; font-weight:900; color:var(--navy); line-height:1; }
+    .role-count-card .rc-dot { width:8px; height:8px; border-radius:9999px; flex-shrink:0; }
+    .group-divider { display:flex; align-items:center; gap:10px; margin-top:6px; }
+    .group-divider .gd-line { flex:1; height:1px; background:#E2E8F0; }
+    .group-divider .gd-total { font-size:10px; font-weight:900; color:#94A3B8; letter-spacing:.1em; }
+
     /* ===== CLASS CHIP (Penasihat Akademik) ===== */
     .class-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:6px; font-size:9px; font-weight:900; letter-spacing:.05em; font-family:'Courier New',monospace; background:#FDF2F8; color:#BE185D; border:1px solid #FBCFE8; margin-top:4px; }
+    .class-chip-lg { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:8px; font-size:10px; font-weight:900; letter-spacing:.06em; font-family:'Courier New',monospace; background:#FDF2F8; color:#BE185D; border:1px solid #FBCFE8; margin:2px 3px 2px 0; }
+    .class-chip-empty { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing:.06em; background:#F8FAFC; color:#94A3B8; border:1px dashed #CBD5E1; font-style:italic; }
     .quick-pick { padding:7px 12px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing:.05em; font-family:'Courier New',monospace; cursor:pointer; transition:all .15s; border:1px solid #E2E8F0; background:#fff; color:#64748B; }
     .quick-pick:hover { border-color:#BE185D; color:#BE185D; background:#FDF2F8; transform:translateY(-1px); }
     .quick-pick.active { background:#BE185D; color:#fff; border-color:#BE185D; }
@@ -256,6 +269,10 @@
     .skeleton-row td { padding:14px !important; }
     .activity-skel { display:flex; gap:16px; padding:12px 0; position:relative; }
     .activity-skel .icon-sk { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(90deg,#EEF2F7 0%,#F8FAFC 20%,#EEF2F7 40%,#EEF2F7 100%); background-size:200% 100%; animation:shimmer 1.3s linear infinite; }
+
+    /* ===== PA EMPTY STATE ===== */
+    .pa-empty { text-align:center; padding:40px 20px; color:#94A3B8; }
+    .pa-empty i { font-size:32px; margin-bottom:14px; display:block; opacity:.4; color:#BE185D; }
 </style>
 </head>
 <body class="text-slate-900">
@@ -372,7 +389,7 @@
     </div>
 
     <!-- ============================================================
-         PORTAL ACCOUNTS  ←  THE SECTION YOU ASKED ABOUT
+         PORTAL ACCOUNTS
     ============================================================= -->
     <section class="card p-5 sm:p-6 rounded-3xl mb-6 anim-up">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
@@ -409,8 +426,9 @@
                         <option value="penolong_jurutera_kanan">Senior Assistant Engineer</option>
                     </optgroup>
                     <optgroup label="Administrator">
-                        <option value="admin">AJK Safety</option>
-                        <option value="ajk_obe">AJK OBE</option>
+                        <option value="admin">Admin Safety</option>
+                        <option value="admin_system">Admin System</option>
+                        <option value="ajk_obe">Admin OBE</option>
                         <option value="pensyarah_sumber">Pensyarah Sumber</option>
                         <option value="lecturer_in_charge">Lecturer in Charge</option>
                         <option value="penasihat_akademik">Penasihat Akademik</option>
@@ -467,28 +485,8 @@
             </span>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">AJK Safety</p>
-                <p id="count-ajk" class="text-xl font-black text-p655c">0</p>
-            </div>
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">AJK OBE</p>
-                <p id="count-obe" class="text-xl font-black text-p655c">0</p>
-            </div>
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Pensyarah Sumber</p>
-                <p id="count-sumber" class="text-xl font-black text-p655c">0</p>
-            </div>
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Lec. in Charge</p>
-                <p id="count-lic" class="text-xl font-black text-p655c">0</p>
-            </div>
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Penasihat Akademik</p>
-                <p id="count-pa" class="text-xl font-black text-p655c">0</p>
-            </div>
-        </div>
+        <!-- DYNAMIC ROLE COUNTS (ALL ROLES) -->
+        <div id="roleCountsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-5"></div>
 
         <div class="info-box-purple rounded-xl p-5 mb-5">
             <h4 class="text-sm font-black text-purple-900 mb-3 flex items-center gap-2">
@@ -497,7 +495,7 @@
             <ul class="space-y-1.5 text-[11px] font-semibold text-purple-800">
                 <li><strong>Level 1 — Auth Identity:</strong> Lecturer · Lab Staff · Student · Admin (set by login system)</li>
                 <li><strong>Level 2 — System Role / Jawatan:</strong> Student · staff positions · administrator positions</li>
-                <li><strong>Administrator roles:</strong> AJK Safety · AJK OBE · Pensyarah Sumber · Lecturer in Charge · Penasihat Akademik</li>
+                <li><strong>Administrator roles:</strong> Admin Safety · Admin System · Admin OBE · Pensyarah Sumber · Lecturer in Charge · Penasihat Akademik</li>
                 <li><strong>Penasihat Akademik</strong> requires a class assignment (e.g. DKA5A).</li>
             </ul>
         </div>
@@ -524,6 +522,39 @@
                     </tr>
                 </thead>
                 <tbody id="rolesTbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         PENASIHAT AKADEMIK SECTION  ←  NEW SECTION
+    ============================================================= -->
+    <section class="card p-5 sm:p-6 rounded-3xl mb-6 anim-up">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+                <span class="section-label">Academic Advisory</span>
+                <h3 class="text-lg font-black text-p655c mt-1">Penasihat Akademik</h3>
+                <p class="text-xs text-slate-500 font-medium mt-1">Academic advisors with their assigned classes · students in these classes will see them as their advisor</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="chip chip-purple"><i class="fas fa-chalkboard-user"></i> <span id="paCount">0</span> advisors</span>
+                <span class="chip chip-navy"><i class="fas fa-graduation-cap"></i> <span id="paClassesCount">0</span> classes</span>
+                <span class="chip chip-gold"><i class="fas fa-users"></i> <span id="paStudentsCount">0</span> students</span>
+            </div>
+        </div>
+
+        <div class="tbl-scroll">
+            <table class="tbl" style="min-width: 900px;">
+                <thead>
+                    <tr>
+                        <th>USER</th>
+                        <th>AUTH IDENTITY</th>
+                        <th>SYSTEM ROLE / JAWATAN</th>
+                        <th>CLASS</th>
+                        <th style="text-align:right;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="paTbody"></tbody>
             </table>
         </div>
     </section>
@@ -798,7 +829,7 @@
                 <div>
                     <p class="text-[11px] font-black uppercase tracking-wider text-purple-800 mb-2">Excel Column Format</p>
                     <p class="text-[10px] font-mono font-bold text-purple-700">User ID | User Name | Role Detected | Password | Status | Email | Program</p>
-                    <p class="text-[10px] font-medium text-purple-700 mt-2">Role Detected: STUDENT, AJK SAFETY, AJK OBE, PENSYARAH SUMBER, LECTURER IN CHARGE, PENASIHAT AKADEMIK, PEGAWAI SAINS, PENOLONG PEGAWAI SAINS, PEMBANTU MAKMAL, PEMBANTU MAKMAL KANAN, PENOLONG JURUTERA, PENOLONG JURUTERA KANAN, JURUTERA, PENSYARAH, PENSYARAH KANAN, PROFESOR, PROFESOR MADYA</p>
+                    <p class="text-[10px] font-medium text-purple-700 mt-2">Role Detected: STUDENT, ADMIN SAFETY, ADMIN SYSTEM, ADMIN OBE, PENSYARAH SUMBER, LECTURER IN CHARGE, PENASIHAT AKADEMIK, PEGAWAI SAINS, PENOLONG PEGAWAI SAINS, PEMBANTU MAKMAL, PEMBANTU MAKMAL KANAN, PENOLONG JURUTERA, PENOLONG JURUTERA KANAN, JURUTERA, PENSYARAH, PENSYARAH KANAN, PROFESOR, PROFESOR MADYA</p>
                 </div>
             </div>
             <div class="flex flex-wrap gap-3">
@@ -855,8 +886,8 @@
                     <i class="fas fa-chalkboard-user text-white text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-black leading-none">Assign Class</h3>
-                    <p class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Penasihat Akademik Setup</p>
+                    <h3 id="classModalTitle" class="text-base font-black leading-none">Assign Class</h3>
+                    <p id="classModalSub" class="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-1">Penasihat Akademik Setup</p>
                 </div>
             </div>
             <button id="classModalClose" class="text-white/70 hover:text-white transition text-lg"><i class="fas fa-xmark"></i></button>
@@ -896,7 +927,7 @@
         <div class="flex gap-3 px-6 py-5 border-t border-slate-100 shrink-0 bg-slate-50">
             <button id="classCancel" type="button" class="flex-1 py-3 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-p655c transition">Cancel</button>
             <button id="classSave" type="button" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
-                <i class="fas fa-check"></i> <span>Assign Class</span>
+                <i class="fas fa-check"></i> <span id="classSaveLabel">Assign Class</span>
             </button>
         </div>
     </div>
@@ -1076,11 +1107,12 @@
         penolong_jurutera_kanan: { i18n:'role_penolong_jurutera_kanan', bg:'#002D62', chip:'chip-navy', prefix:'PJT', system:'Staff', identity:'lab' },
 
         // Administrator
-        admin: { i18n:'role_admin', bg:'#002D62', chip:'chip-navy', prefix:'ADM', system:'AJK Safety', identity:'admin' },
-        ajk_obe: { i18n:'role_ajk_obe', bg:'#1E40AF', chip:'chip-navy', prefix:'OBE', system:'AJK OBE', identity:'admin' },
-        pensyarah_sumber: { i18n:'role_pensyarah_sumber', bg:'#047857', chip:'chip-gold', prefix:'PSM', system:'Pensyarah Sumber', identity:'admin' },
-        lecturer_in_charge: { i18n:'role_lecturer_in_charge', bg:'#C2410C', chip:'chip-gold', prefix:'LIC', system:'Lecturer in Charge', identity:'admin' },
-        penasihat_akademik: { i18n:'role_penasihat_akademik', bg:'#BE185D', chip:'chip-purple', prefix:'PA', system:'Penasihat Akademik', identity:'admin' },
+        admin:         { i18n:'role_admin',         bg:'#002D62', chip:'chip-navy',  prefix:'ADM', system:'Admin Safety',        identity:'admin' },
+        admin_system:  { i18n:'role_admin_system',  bg:'#4C1D95', chip:'chip-purple', prefix:'SYS', system:'Admin System',        identity:'admin' },
+        ajk_obe:       { i18n:'role_ajk_obe',       bg:'#1E40AF', chip:'chip-navy',  prefix:'OBE', system:'Admin OBE',           identity:'admin' },
+        pensyarah_sumber:     { i18n:'role_pensyarah_sumber',     bg:'#047857', chip:'chip-gold',   prefix:'PSM', system:'Pensyarah Sumber',   identity:'admin' },
+        lecturer_in_charge:   { i18n:'role_lecturer_in_charge',   bg:'#C2410C', chip:'chip-gold',   prefix:'LIC', system:'Lecturer in Charge', identity:'admin' },
+        penasihat_akademik:   { i18n:'role_penasihat_akademik',   bg:'#BE185D', chip:'chip-purple', prefix:'PA',  system:'Penasihat Akademik', identity:'admin' },
 
         // Legacy
         academic_staff: { i18n:'role_academic', bg:'#9B26B6', chip:'chip-purple', prefix:'ACA', system:'Staff', identity:'lecturer' },
@@ -1094,7 +1126,7 @@
         'jurutera','penolong_jurutera','penolong_jurutera_kanan',
         'academic_staff','lab_staff','coordinator'
     ];
-    const ADMIN_ROLES = ['admin','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'];
+    const ADMIN_ROLES = ['admin','admin_system','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'];
     const LEGACY_ROLES = ['academic_staff','lab_staff','coordinator'];
 
     const ROLE_GROUPS = [
@@ -1102,7 +1134,7 @@
         { labelKey:'group_academic', roles:['pensyarah','pensyarah_kanan','profesor','profesor_madya'] },
         { labelKey:'group_science', roles:['pegawai_sains','penolong_pegawai_sains','pembantu_makmal','pembantu_makmal_kanan'] },
         { labelKey:'group_engineering', roles:['jurutera','penolong_jurutera','penolong_jurutera_kanan'] },
-        { labelKey:'group_admin', roles:['admin','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'] }
+        { labelKey:'group_admin', roles:['admin','admin_system','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'] }
     ];
 
     function isStaffRole(role) { return STAFF_ROLES.indexOf(role) !== -1; }
@@ -1130,22 +1162,35 @@
     function detectRole(raw) {
         const r = String(raw == null ? '' : raw).toLowerCase().replace(/[_\-.]+/g, ' ').trim();
         if (!r) return 'student';
-        if (r.indexOf('ajk obe') !== -1 || r.indexOf('obe') !== -1) return 'ajk_obe';
+
+        // Administrator — order matters (most specific first)
+        if (r.indexOf('admin system') !== -1 || r.indexOf('system admin') !== -1 || r.indexOf('admin sistem') !== -1) return 'admin_system';
+        if (r.indexOf('admin safety') !== -1 || r.indexOf('ajk safety') !== -1 || r.indexOf('admin keselamatan') !== -1) return 'admin';
+        if (r.indexOf('admin obe') !== -1 || r.indexOf('ajk obe') !== -1 || r.indexOf('obe') !== -1) return 'ajk_obe';
         if (r.indexOf('pensyarah sumber') !== -1) return 'pensyarah_sumber';
         if (r.indexOf('lecturer in charge') !== -1 || r.indexOf('lic') !== -1) return 'lecturer_in_charge';
         if (r.indexOf('penasihat akademik') !== -1 || r.indexOf('academic advisor') !== -1) return 'penasihat_akademik';
-        if (r.indexOf('admin') !== -1 || r.indexOf('ajk safety') !== -1) return 'admin';
+
+        // Science & Lab
         if (r.indexOf('penolong pegawai sains') !== -1) return 'penolong_pegawai_sains';
         if (r.indexOf('pegawai sains') !== -1) return 'pegawai_sains';
         if (r.indexOf('pembantu makmal kanan') !== -1) return 'pembantu_makmal_kanan';
         if (r.indexOf('pembantu makmal') !== -1) return 'pembantu_makmal';
+
+        // Engineering
         if (r.indexOf('penolong jurutera kanan') !== -1) return 'penolong_jurutera_kanan';
         if (r.indexOf('penolong jurutera') !== -1) return 'penolong_jurutera';
         if (r.indexOf('jurutera') !== -1) return 'jurutera';
+
+        // Academic
         if (r.indexOf('profesor madya') !== -1 || r.indexOf('associate professor') !== -1) return 'profesor_madya';
         if (r.indexOf('profesor') !== -1 || r.indexOf('professor') !== -1) return 'profesor';
         if (r.indexOf('pensyarah kanan') !== -1 || r.indexOf('senior lecturer') !== -1) return 'pensyarah_kanan';
         if (r.indexOf('pensyarah') !== -1 || r.indexOf('lecturer') !== -1) return 'pensyarah';
+
+        // Generic admin fallback
+        if (r.indexOf('admin') !== -1) return 'admin';
+
         if (r.indexOf('coordinator') !== -1) return 'coordinator';
         if (r.indexOf('lab') !== -1) return 'lab_staff';
         if (r.indexOf('academic') !== -1) return 'academic_staff';
@@ -1161,7 +1206,8 @@
         password_view: { icon:'fa-eye', bg:'#9B26B6', en:'Viewed user password', ms:'Lihat kata laluan pengguna' },
         bulk_import: { icon:'fa-file-excel', bg:'#002D62', en:'Imported users from Excel', ms:'Import pengguna dari Excel' },
         activity_clear: { icon:'fa-broom', bg:'#002D62', en:'Cleared activity log', ms:'Kosongkan log aktiviti' },
-        role_change: { icon:'fa-user-shield', bg:'#9B26B6', en:'Changed system role', ms:'Tukar peranan sistem' }
+        role_change: { icon:'fa-user-shield', bg:'#9B26B6', en:'Changed system role', ms:'Tukar peranan sistem' },
+        class_assigned: { icon:'fa-chalkboard-user', bg:'#BE185D', en:'Assigned class', ms:'Tetapkan kelas' }
     };
 
     /* =========================================================
@@ -1176,7 +1222,7 @@
             role_pembantu_makmal:"Laboratory Assistant", role_pembantu_makmal_kanan:"Senior Laboratory Assistant",
             role_jurutera:"Engineer", role_penolong_jurutera:"Assistant Engineer",
             role_penolong_jurutera_kanan:"Senior Assistant Engineer",
-            role_admin:"AJK Safety", role_ajk_obe:"AJK OBE",
+            role_admin:"Admin Safety", role_admin_system:"Admin System", role_ajk_obe:"Admin OBE",
             role_pensyarah_sumber:"Pensyarah Sumber",
             role_lecturer_in_charge:"Lecturer in Charge",
             role_penasihat_akademik:"Penasihat Akademik",
@@ -1184,7 +1230,7 @@
             group_student:"Student", group_academic:"Academic Positions",
             group_science:"Science & Laboratory Positions", group_engineering:"Engineering Positions",
             group_admin:"Administrator", group_legacy:"Legacy Role",
-            sysrole_student:"Student", sysrole_staff:"Staff", sysrole_ajk:"AJK Safety",
+            sysrole_student:"Student", sysrole_staff:"Staff", sysrole_ajk:"Admin Safety",
             audit_actor:"Performed by"
         },
         ms: {
@@ -1195,7 +1241,7 @@
             role_pembantu_makmal:"Pembantu Makmal", role_pembantu_makmal_kanan:"Pembantu Makmal Kanan",
             role_jurutera:"Jurutera", role_penolong_jurutera:"Penolong Jurutera",
             role_penolong_jurutera_kanan:"Penolong Jurutera Kanan",
-            role_admin:"AJK Keselamatan", role_ajk_obe:"AJK OBE",
+            role_admin:"Admin Keselamatan", role_admin_system:"Admin Sistem", role_ajk_obe:"Admin OBE",
             role_pensyarah_sumber:"Pensyarah Sumber",
             role_lecturer_in_charge:"Pensyarah Bertanggungjawab",
             role_penasihat_akademik:"Penasihat Akademik",
@@ -1203,7 +1249,7 @@
             group_student:"Pelajar", group_academic:"Jawatan Akademik",
             group_science:"Jawatan Sains & Makmal", group_engineering:"Jawatan Kejuruteraan",
             group_admin:"Pentadbir", group_legacy:"Peranan Lama",
-            sysrole_student:"Pelajar", sysrole_staff:"Staf", sysrole_ajk:"AJK Keselamatan",
+            sysrole_student:"Pelajar", sysrole_staff:"Staf", sysrole_ajk:"Admin Keselamatan",
             audit_actor:"Dilakukan oleh"
         }
     };
@@ -1293,6 +1339,23 @@
         }
         return html;
     }
+    function skeletonPaRows(count) {
+        count = count || 3;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += '<tr class="skeleton-row">'
+                + '<td><div class="tbl-user"><span class="skel skel-avatar"></span><div style="flex:1;min-width:0;">'
+                +   '<div class="skel skel-line w-60" style="margin-bottom:6px;"></div>'
+                +   '<div class="skel skel-line sm w-80"></div>'
+                + '</div></div></td>'
+                + '<td><span class="skel skel-pill"></span></td>'
+                + '<td><span class="skel skel-badge" style="width:140px;"></span></td>'
+                + '<td><span class="skel skel-chip" style="width:90px;"></span></td>'
+                + '<td style="text-align:right;"><span class="skel skel-badge"></span></td>'
+                + '</tr>';
+        }
+        return html;
+    }
     function skeletonActivity(count) {
         count = count || 4;
         let html = '';
@@ -1311,9 +1374,11 @@
     function showSkeletons() {
         const usersTbody = document.getElementById('usersTbody');
         const rolesTbody = document.getElementById('rolesTbody');
+        const paTbody = document.getElementById('paTbody');
         const activityTl = document.getElementById('activityTimeline');
         if (usersTbody) usersTbody.innerHTML = skeletonUsersRows(6);
         if (rolesTbody) rolesTbody.innerHTML = skeletonRolesRows(5);
+        if (paTbody) paTbody.innerHTML = skeletonPaRows(3);
         if (activityTl) activityTl.innerHTML = skeletonActivity(4);
     }
 
@@ -1336,6 +1401,7 @@
                 renderUsers();
                 renderActivity();
                 renderRoleManagement();
+                renderPenasihatAkademik();
             } else {
                 showSkeletons();
                 showLoadingOverlay('Loading users…', 'Fetching from server');
@@ -1386,6 +1452,7 @@
             renderUsers();
             renderActivity();
             renderRoleManagement();
+            renderPenasihatAkademik();
             hideLoadingOverlay();
             clearTimeout(slowTimer);
             endRequest();
@@ -1507,6 +1574,63 @@
     });
 
     /* =========================================================
+       RENDER ROLE COUNTS (ALL ROLES, GROUPED)
+    ========================================================== */
+    function renderRoleCounts() {
+        const grid = document.getElementById('roleCountsGrid');
+        if (!grid) return;
+
+        const users = appState.users || [];
+        let html = '';
+
+        ROLE_GROUPS.forEach(function(g){
+            const groupTotal = users.filter(function(u){ return g.roles.indexOf(u.role) !== -1; }).length;
+
+            html += '<div class="col-span-full group-divider">'
+                 +   '<span class="section-label">' + escapeHtml(t(g.labelKey)) + '</span>'
+                 +   '<span class="gd-line"></span>'
+                 +   '<span class="gd-total">' + groupTotal + ' TOTAL</span>'
+                 + '</div>';
+
+            g.roles.forEach(function(r){
+                const meta = roleMeta(r);
+                const count = users.filter(function(u){ return u.role === r; }).length;
+                html += '<div class="role-count-card">'
+                     +   '<div class="flex items-center justify-between gap-2 mb-2">'
+                     +     '<p class="rc-label">' + escapeHtml(roleLabel(r)) + '</p>'
+                     +     '<span class="rc-dot" style="background:' + meta.bg + ';"></span>'
+                     +   '</div>'
+                     +   '<p class="rc-value">' + count + '</p>'
+                     + '</div>';
+            });
+        });
+
+        // Legacy roles (only shown when they exist in data)
+        const legacyPresent = LEGACY_ROLES.filter(function(r){
+            return users.some(function(u){ return u.role === r; });
+        });
+        if (legacyPresent.length) {
+            html += '<div class="col-span-full group-divider">'
+                 +   '<span class="section-label">' + escapeHtml(t('group_legacy')) + '</span>'
+                 +   '<span class="gd-line"></span>'
+                 + '</div>';
+            legacyPresent.forEach(function(r){
+                const meta = roleMeta(r);
+                const count = users.filter(function(u){ return u.role === r; }).length;
+                html += '<div class="role-count-card">'
+                     +   '<div class="flex items-center justify-between gap-2 mb-2">'
+                     +     '<p class="rc-label">' + escapeHtml(roleLabel(r)) + '</p>'
+                     +     '<span class="rc-dot" style="background:' + meta.bg + ';"></span>'
+                     +   '</div>'
+                     +   '<p class="rc-value">' + count + '</p>'
+                     + '</div>';
+            });
+        }
+
+        grid.innerHTML = html;
+    }
+
+    /* =========================================================
        RENDER ROLE MANAGEMENT
     ========================================================== */
     function mapAuthIdentity(role) {
@@ -1518,12 +1642,13 @@
     }
     function mapSystemRole(role) {
         const sys = roleMeta(role).system;
-        if (sys === 'AJK Safety') return { label: sys, cls: 'role-badge-admin' };
-        if (sys === 'AJK OBE') return { label: sys, cls: 'role-badge-admin-obe' };
-        if (sys === 'Pensyarah Sumber') return { label: sys, cls: 'role-badge-admin-sumber' };
-        if (sys === 'Lecturer in Charge') return { label: sys, cls: 'role-badge-admin-lic' };
-        if (sys === 'Penasihat Akademik') return { label: sys, cls: 'role-badge-admin-pa' };
-        if (sys === 'Staff') return { label: sys, cls: 'role-badge-staff' };
+        if (sys === 'Admin Safety')        return { label: sys, cls: 'role-badge-admin' };
+        if (sys === 'Admin System')        return { label: sys, cls: 'role-badge-admin-system' };
+        if (sys === 'Admin OBE')           return { label: sys, cls: 'role-badge-admin-obe' };
+        if (sys === 'Pensyarah Sumber')    return { label: sys, cls: 'role-badge-admin-sumber' };
+        if (sys === 'Lecturer in Charge')  return { label: sys, cls: 'role-badge-admin-lic' };
+        if (sys === 'Penasihat Akademik')  return { label: sys, cls: 'role-badge-admin-pa' };
+        if (sys === 'Staff')               return { label: sys, cls: 'role-badge-staff' };
         return { label: sys, cls: 'role-badge-student' };
     }
 
@@ -1533,18 +1658,7 @@
 
         const users = appState.users || [];
 
-        const counts = {
-            ajk: users.filter(function(u){ return u.role === 'admin'; }).length,
-            obe: users.filter(function(u){ return u.role === 'ajk_obe'; }).length,
-            sumber: users.filter(function(u){ return u.role === 'pensyarah_sumber'; }).length,
-            lic: users.filter(function(u){ return u.role === 'lecturer_in_charge'; }).length,
-            pa: users.filter(function(u){ return u.role === 'penasihat_akademik'; }).length
-        };
-        const cAjk = document.getElementById('count-ajk'); if (cAjk) cAjk.textContent = counts.ajk;
-        const cObe = document.getElementById('count-obe'); if (cObe) cObe.textContent = counts.obe;
-        const cSumber = document.getElementById('count-sumber'); if (cSumber) cSumber.textContent = counts.sumber;
-        const cLic = document.getElementById('count-lic'); if (cLic) cLic.textContent = counts.lic;
-        const cPa = document.getElementById('count-pa'); if (cPa) cPa.textContent = counts.pa;
+        renderRoleCounts();
 
         const searchInput = document.getElementById('roleSearch');
         const searchQ = (searchInput ? searchInput.value : '').trim().toLowerCase();
@@ -1605,6 +1719,188 @@
     if (roleSearchEl) roleSearchEl.addEventListener('input', debounce(renderRoleManagement, 180));
 
     /* =========================================================
+       RENDER PENASIHAT AKADEMIK SECTION  ←  NEW
+    ========================================================== */
+    function renderPenasihatAkademik() {
+        const tbody = document.getElementById('paTbody');
+        if (!tbody) return;
+
+        const advisors = (appState.users || []).filter(function(u){
+            return u.role === 'penasihat_akademik';
+        });
+
+        // Stats
+        const paCountEl = document.getElementById('paCount');
+        const paClassesEl = document.getElementById('paClassesCount');
+        const paStudentsEl = document.getElementById('paStudentsCount');
+
+        if (paCountEl) paCountEl.textContent = advisors.length;
+
+        const classSet = {};
+        advisors.forEach(function(u){
+            if (u.assignedClass) {
+                String(u.assignedClass).split(',').forEach(function(c){
+                    const t2 = c.trim().toUpperCase();
+                    if (t2) classSet[t2] = true;
+                });
+            }
+        });
+        if (paClassesEl) paClassesEl.textContent = Object.keys(classSet).length;
+
+        // Count students in those classes (based on program/class codes if available)
+        const classCodes = Object.keys(classSet);
+        const studentCount = (appState.users || []).filter(function(u){
+            if (u.role !== 'student') return false;
+            const program = String(u.program || '').toUpperCase();
+            const sessionId = String(u.sessionId || '').toUpperCase();
+            return classCodes.some(function(c){
+                return program.indexOf(c) !== -1 || sessionId.indexOf(c) !== -1;
+            });
+        }).length;
+        if (paStudentsEl) paStudentsEl.textContent = studentCount;
+
+        if (!advisors.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:0;">'
+                + '<div class="pa-empty">'
+                +   '<i class="fas fa-chalkboard-user"></i>'
+                +   '<p class="text-xs font-bold uppercase tracking-widest mb-1">No Penasihat Akademik assigned yet</p>'
+                +   '<p class="text-[11px] font-medium">Go to Role Management above and set a user\'s role to "Penasihat Akademik" to assign a class.</p>'
+                + '</div></td></tr>';
+            return;
+        }
+
+        // Sort by name
+        const sorted = advisors.slice().sort(function(a,b){
+            return String(a.name || '').localeCompare(String(b.name || ''));
+        });
+
+        tbody.innerHTML = sorted.map(function(u){
+            const auth = mapAuthIdentity(u.role);
+            const sys = mapSystemRole(u.role);
+            const meta = roleMeta(u.role);
+            const initials = makeInitials(u.name);
+
+            // Class chips
+            let classHtml = '';
+            if (u.assignedClass && String(u.assignedClass).trim()) {
+                const parts = String(u.assignedClass).split(',').map(function(c){ return c.trim().toUpperCase(); }).filter(Boolean);
+                classHtml = parts.map(function(c){
+                    return '<span class="class-chip-lg"><i class="fas fa-chalkboard"></i> ' + escapeHtml(c) + '</span>';
+                }).join('');
+            } else {
+                classHtml = '<span class="class-chip-empty"><i class="fas fa-triangle-exclamation"></i> No class assigned</span>';
+            }
+
+            return '<tr class="content-in">'
+                + '<td>'
+                +   '<div class="flex items-center gap-3">'
+                +     '<div class="tbl-avatar" style="background:' + meta.bg + ';">' + escapeHtml(initials) + '</div>'
+                +     '<div class="min-w-0">'
+                +       '<p class="text-xs font-black text-p655c">' + escapeHtml(u.name) + '</p>'
+                +       '<p class="text-[10px] font-semibold text-slate-400 truncate">' + escapeHtml(u.email || '') + '</p>'
+                +     '</div>'
+                +   '</div>'
+                + '</td>'
+                + '<td><span class="identity-pill ' + auth.cls + '">' + auth.label + '</span></td>'
+                + '<td><span class="role-badge ' + sys.cls + '">' + sys.label + '</span></td>'
+                + '<td style="max-width:320px;">' + classHtml + '</td>'
+                + '<td style="text-align:right;white-space:nowrap;">'
+                +   '<button type="button" class="mini-btn mini-purple" data-pa-edit="' + escapeHtml(String(u.id)) + '" style="padding:6px 11px;">'
+                +     '<i class="fas fa-pen"></i> <span>Edit Class</span>'
+                +   '</button>'
+                + '</td>'
+                + '</tr>';
+        }).join('');
+
+        tbody.querySelectorAll('button[data-pa-edit]').forEach(function(btn){
+            btn.addEventListener('click', function(){
+                const uid = this.getAttribute('data-pa-edit');
+                openEditClassModal(uid);
+            });
+        });
+    }
+
+    /* =========================================================
+       EDIT CLASS MODAL (for PA section)
+    ========================================================== */
+    let editingPaClassUserId = null;
+
+    function openEditClassModal(userId) {
+        const u = appState.users.find(function(x){ return String(x.id) === String(userId); });
+        if (!u) return;
+        if (u.role !== 'penasihat_akademik') {
+            showToast('This user is not a Penasihat Akademik', true);
+            return;
+        }
+        editingPaClassUserId = userId;
+
+        // Set modal title
+        const titleEl = document.getElementById('classModalTitle');
+        const subEl = document.getElementById('classModalSub');
+        const saveLabel = document.getElementById('classSaveLabel');
+        if (titleEl) titleEl.textContent = 'Edit Class Assignment';
+        if (subEl) subEl.textContent = 'Penasihat Akademik · Update Class';
+        if (saveLabel) saveLabel.textContent = 'Save Class';
+
+        // Open modal with current class preloaded
+        openClassModal(u, function(newClass) {
+            savePaClass(userId, newClass);
+        });
+    }
+
+    async function savePaClass(userId, assignedClass) {
+        const u = appState.users.find(function(x){ return String(x.id) === String(userId); });
+        if (!u) return;
+        const previousClass = u.assignedClass || '';
+
+        u.assignedClass = assignedClass;
+        cacheWrite(CACHE_KEY_USERS, appState.users);
+        renderUsers();
+        renderRoleManagement();
+        renderPenasihatAkademik();
+
+        setServerStatus('loading', 'Saving…');
+        beginRequest();
+        try {
+            const res = await apiPost({
+                action: 'editUser',
+                id: u.id,
+                name: u.name,
+                email: u.email,
+                role: u.role,
+                program: u.program || '',
+                status: u.status || 'Aktif',
+                password: '',
+                assignedClass: assignedClass
+            });
+            if (!res || !res.success) {
+                u.assignedClass = previousClass;
+                cacheWrite(CACHE_KEY_USERS, appState.users);
+                renderUsers();
+                renderRoleManagement();
+                renderPenasihatAkademik();
+                showToast((res && res.message) || 'Failed to save class', true);
+                setServerStatus('err', 'Error');
+                return;
+            }
+            showToast('Class assigned · ' + assignedClass, false);
+            setServerStatus('ok', 'Online');
+            logActivity('class_assigned', u.name, 'Class → ' + assignedClass);
+        } catch (err) {
+            console.error('savePaClass error:', err);
+            u.assignedClass = previousClass;
+            cacheWrite(CACHE_KEY_USERS, appState.users);
+            renderUsers();
+            renderRoleManagement();
+            renderPenasihatAkademik();
+            showToast('Network error. Class not saved.', true);
+            setServerStatus('err', 'Error');
+        } finally {
+            endRequest();
+        }
+    }
+
+    /* =========================================================
        ROLE CHANGE FLOW (Role Management table)
     ========================================================== */
     function handleSystemRoleChange(userId, newRole, selectEl) {
@@ -1613,7 +1909,7 @@
         const previousRole = user.role;
         if (newRole === previousRole) return;
 
-        // ⭐ Penasihat Akademik needs class assignment
+        // Penasihat Akademik needs class assignment
         if (newRole === 'penasihat_akademik') {
             pendingRoleChange = { userId: userId, newRole: newRole, previousRole: previousRole, selectEl: selectEl };
             openClassModal(user, function(assignedClass) {
@@ -1678,6 +1974,7 @@
             endRequest();
             renderUsers();
             renderRoleManagement();
+            renderPenasihatAkademik();
         }
     }
 
@@ -1741,6 +2038,14 @@
         document.body.style.overflow = '';
         classModalCallback = null;
         pendingRoleChange = null;
+        editingPaClassUserId = null;
+        // Reset modal titles back to default
+        const titleEl = document.getElementById('classModalTitle');
+        const subEl = document.getElementById('classModalSub');
+        const saveLabel = document.getElementById('classSaveLabel');
+        if (titleEl) titleEl.textContent = 'Assign Class';
+        if (subEl) subEl.textContent = 'Penasihat Akademik Setup';
+        if (saveLabel) saveLabel.textContent = 'Assign Class';
     }
     function showClassError(msg) {
         classError.innerHTML = '<ul><li>' + escapeHtml(msg) + '</li></ul>';
@@ -2006,13 +2311,11 @@
         if (role === 'penasihat_akademik') {
             assignedClass = (uClass.value || '').trim().toUpperCase();
             if (!assignedClass) {
-                // Open class modal in "attach to form" mode
                 const draftUser = { name: name, email: email, assignedClass: '' };
                 pendingUserFormClass = true;
                 openClassModal(draftUser, function(cls){
                     uClass.value = cls;
                     pendingUserFormClass = null;
-                    // Re-trigger save
                     document.getElementById('userSave').click();
                 });
                 return;
@@ -2044,7 +2347,7 @@
                 }
                 logActivity('user_edit', name, 'Role: ' + roleLabel(role));
                 closeUserModal();
-                renderUsers(); renderRoleManagement();
+                renderUsers(); renderRoleManagement(); renderPenasihatAkademik();
                 showToast('User Updated', false);
             } else {
                 const res = await apiPost({
@@ -2061,7 +2364,7 @@
                 }
                 logActivity('user_add', name, 'Role: ' + roleLabel(role));
                 closeUserModal();
-                renderUsers(); renderRoleManagement();
+                renderUsers(); renderRoleManagement(); renderPenasihatAkademik();
                 showToast('User Created', false);
             }
         } catch (err) {
@@ -2084,7 +2387,7 @@
             appState.users = appState.users.filter(function(x){ return String(x.id) !== String(id); });
             cacheWrite(CACHE_KEY_USERS, appState.users);
             logActivity('user_delete', u.name, u.email || '');
-            renderUsers(); renderRoleManagement();
+            renderUsers(); renderRoleManagement(); renderPenasihatAkademik();
             showToast('User Deleted', true);
         } catch (e) {
             console.error(e);
@@ -2443,6 +2746,7 @@
         renderUsers();
         renderActivity();
         renderRoleManagement();
+        renderPenasihatAkademik();
     };
 
     /* =========================================================
