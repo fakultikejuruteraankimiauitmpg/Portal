@@ -615,16 +615,21 @@
   }
   .btn-view:hover{background:#002D62;color:#fff;border-color:#002D62}
 
-  /* ===== Butang Padam Kad Permohonan ===== */
+  /* ===== Butang Padam Kad Permohonan (di HUJUNG kanan) ===== */
   .btn-delete{
-    background:#FEF2F2;color:#DC2626;
-    border:1px solid #FECACA;border-radius:10px;
-    padding:9px 16px;font-size:.68rem;font-weight:900;
+    background:#DC2626;color:#fff;
+    border:1px solid #DC2626;border-radius:10px;
+    padding:9px 18px;font-size:.68rem;font-weight:900;
     letter-spacing:.08em;text-transform:uppercase;
     cursor:pointer;font-family:inherit;transition:.15s;
     display:inline-flex;align-items:center;gap:6px;
+    box-shadow:0 8px 18px -10px rgba(220,38,38,.75);
   }
-  .btn-delete:hover{background:#DC2626;color:#fff;border-color:#DC2626}
+  .btn-delete:hover{
+    background:#B91C1C;border-color:#B91C1C;
+    transform:translateY(-1px);
+    box-shadow:0 12px 22px -10px rgba(220,38,38,.9);
+  }
   .btn-delete:active{transform:scale(.97)}
   .btn-delete[disabled]{opacity:.55;cursor:not-allowed;pointer-events:none}
 
@@ -820,6 +825,12 @@
   .app-actions{
     display:flex;gap:10px;flex-wrap:wrap;
     margin-top:16px;justify-content:flex-end;
+    align-items:center;
+  }
+  /* Pastikan butang delete sentiasa berada di hujung kanan */
+  .app-actions .btn-delete{
+    order: 99;
+    margin-left: auto;
   }
 
   .empty-state{
@@ -1045,8 +1056,9 @@
     .modal-foot .btn{flex:1}
     .app-card-head{padding:14px 16px}
     .app-card-body{padding:14px 16px 16px}
-    .app-actions{flex-direction:column}
+    .app-actions{flex-direction:column;align-items:stretch}
     .app-actions button{width:100%;justify-content:center}
+    .app-actions .btn-delete{margin-left:0;order:99}
     .mode-toggle{width:100%}
     .mode-btn{flex:1;text-align:center;padding:9px 12px;font-size:.6rem}
     .appbar-left{flex:1 1 100%}
@@ -1124,7 +1136,6 @@
           <span class="dd-badge" id="ddAppsCount">0</span>
         </button>
 
-        <!-- ===== SENARAI SEMUA PERMOHONAN DALAM DROPDOWN ===== -->
         <div class="dd-apps-list" id="ddAppsList"></div>
 
         <button type="button" class="dd-item" id="ddHome" role="menuitem">
@@ -1249,25 +1260,18 @@
 <script>
 /* ============================================================
    SISTEM PERMOHONAN MAKMAL — PINJAMAN ALAT RADAS (BORANG B)
-   Borang + Senarai Permohonan (semua sheet + permohonan saya).
 
    ✦ KEMASKINI TERKINI:
-     1) Butang Padam pada kad permohonan — HANYA muncul untuk:
-        • permohonan MILIK pengguna sendiri (authUserId === USER.id), DAN
-        • status permohonan masih "pending" (Menunggu kelulusan).
-        Permohonan yang telah Diluluskan / Ditolak TIDAK boleh dipadam.
-     2) Refresh kekal pada halaman semasa (sessionStorage + history.state).
-     3) Butang "← Kembali" dalam senarai = history.back() browser.
-
-   ⚠ NOTA PELAYAN (Google Apps Script):
-     Tindakan padam menghantar POST { action:"delete", payload:{ ref, userId } }.
-     Pastikan skrip pelayan menyokong action "delete" DAN juga menolak
-     permohonan yang statusnya bukan "pending" (sebagai perlindungan pelayan).
+     1) Butang 🗑 Padam di HUJUNG KANAN setiap kad permohonan.
+        Muncul HANYA untuk permohonan milik sendiri dengan status
+        "pending" (Menunggu kelulusan).
+     2) Senarai hitam REF tempatan (DELETED_REFS) — supaya
+        permohonan yang telah dipadam TIDAK muncul semula
+        walaupun server sync balik.
+     3) Refresh kekal pada halaman semasa.
+     4) Butang "← Kembali" = history.back() browser.
    ============================================================ */
 
-/* ============================================================
-   0) PORTAL AUTH URL
-   ============================================================ */
 var AUTH_PORTAL_URL = "login.html";
 
 /* ============================================================
@@ -1296,7 +1300,7 @@ var AUTH_PORTAL_URL = "login.html";
     setTimeout(function(){
       try { window.location.href = AUTH_PORTAL_URL; } catch(e){}
     }, 900);
-    throw new Error('Unauthenticated — redirecting to login');
+    throw new Error('Unauthenticated');
   }
 
   if(!hasAuthLib){
@@ -1366,10 +1370,8 @@ var AUTH_PORTAL_URL = "login.html";
 (function () {
   "use strict";
 
-  /* ---------- Google Apps Script endpoint ---------- */
   var API_URL = "https://script.google.com/macros/s/AKfycbwf93l6xgmWQcN4y4_epMEYOkvHjWuYBWKU4AMzK_Q13QSBeqb8Olw2xtWx2Uu9TinC/exec";
 
-  /* ---------- Logged-in user ---------- */
   var USER = {
     id:       AUTH.user.id,
     name:     AUTH.user.name,
@@ -1405,10 +1407,12 @@ var AUTH_PORTAL_URL = "login.html";
   var LANG_KEY        = "ppm-fkk-alat-lang";
   var LOGIN_KEY       = "ppm-fkk-lastlogin-v3-" + USER.id;
 
-  /* ---- Kunci untuk kekalkan halaman semasa selepas refresh ---- */
   var VIEW_KEY        = "ppm-fkk-alat-view-"   + USER.id;
   var APPS_MODE_KEY   = "ppm-fkk-alat-mode-"   + USER.id;
   var APPS_FILTER_KEY = "ppm-fkk-alat-filter-" + USER.id;
+
+  /* ====== SENARAI HITAM REF YANG TELAH DIPADAM ====== */
+  var DELETED_KEY     = "ppm-fkk-alat-deleted-refs-v1";
 
   function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
   function lsSet(key, val) { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
@@ -1424,7 +1428,38 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   /* ============================================================
-     REMOTE API LAYER (Google Apps Script)
+     SENARAI HITAM REF
+     ============================================================ */
+  function getDeletedRefs() {
+    var d = safeParse(lsGet(DELETED_KEY), []);
+    if (!Array.isArray(d)) d = [];
+    return d;
+  }
+  function isDeletedRef(ref) {
+    if (!ref) return false;
+    return getDeletedRefs().indexOf(String(ref)) !== -1;
+  }
+  function addDeletedRef(ref) {
+    if (!ref) return;
+    var refStr = String(ref);
+    var d = getDeletedRefs();
+    if (d.indexOf(refStr) === -1) {
+      d.unshift(refStr);
+      if (d.length > 500) d = d.slice(0, 500);
+      lsSet(DELETED_KEY, JSON.stringify(d));
+    }
+    /* Reset cache supaya penapis semula digunakan */
+    REMOTE_LIST = null;
+    ALL_REMOTE_LIST = null;
+  }
+  function clearDeletedRefs() {
+    lsDel(DELETED_KEY);
+    REMOTE_LIST = null;
+    ALL_REMOTE_LIST = null;
+  }
+
+  /* ============================================================
+     REMOTE API LAYER
      ============================================================ */
   function apiPost(body) {
     return fetch(API_URL, {
@@ -1465,8 +1500,17 @@ var AUTH_PORTAL_URL = "login.html";
     return e;
   }
 
+  /* ---------- Helper: normalisasi status ---------- */
+  function normalizeStatus(s) {
+    var v = String(s === undefined || s === null ? '' : s).trim().toLowerCase();
+    if (v === 'menunggu' || v === 'pending' || v === '' ) return 'pending';
+    if (v === 'diluluskan' || v === 'approved' || v === 'approve') return 'approved';
+    if (v === 'ditolak' || v === 'rejected' || v === 'reject') return 'rejected';
+    return v;
+  }
+
   /* ============================================================
-     LOCAL CACHE — Permohonan Saya (mirror)
+     LOCAL CACHE — Permohonan Saya
      ============================================================ */
   var REMOTE_LIST = null;
 
@@ -1474,7 +1518,10 @@ var AUTH_PORTAL_URL = "login.html";
     if (REMOTE_LIST === null) {
       var cached = safeParse(lsGet(SUBMIT_KEY), []);
       if (!Array.isArray(cached)) cached = [];
-      REMOTE_LIST = cached.map(normalizeEntry).filter(Boolean);
+      REMOTE_LIST = cached
+        .map(normalizeEntry)
+        .filter(Boolean)
+        .filter(function(e){ return !isDeletedRef(e.ref); });
     }
     return REMOTE_LIST;
   }
@@ -1499,7 +1546,10 @@ var AUTH_PORTAL_URL = "login.html";
     if (ALL_REMOTE_LIST === null) {
       var cached = safeParse(lsGet(ALL_SUBMIT_KEY), []);
       if (!Array.isArray(cached)) cached = [];
-      ALL_REMOTE_LIST = cached.map(normalizeEntry).filter(Boolean);
+      ALL_REMOTE_LIST = cached
+        .map(normalizeEntry)
+        .filter(Boolean)
+        .filter(function(e){ return !isDeletedRef(e.ref); });
     }
     return ALL_REMOTE_LIST;
   }
@@ -1515,7 +1565,7 @@ var AUTH_PORTAL_URL = "login.html";
     setAllSubmitted(list.slice(0, 500));
   }
 
-  /* ---------- Draft / shared (local only) ---------- */
+  /* ---------- Draft / shared ---------- */
   function getShared() { return safeParse(lsGet(SHARED_KEY), {}); }
   function saveShared(data) { lsSet(SHARED_KEY, JSON.stringify(data)); }
 
@@ -1535,7 +1585,7 @@ var AUTH_PORTAL_URL = "login.html";
   }
   function saveLang(l) { lsSet(LANG_KEY, l); }
 
-  /* ---------- View persistence (sessionStorage) ---------- */
+  /* ---------- View persistence ---------- */
   function getSavedView() {
     var v = ssGet(VIEW_KEY);
     return (v === "apps" || v === "form") ? v : "form";
@@ -1798,7 +1848,7 @@ var AUTH_PORTAL_URL = "login.html";
       sumSemester: "Semester / Session / Year",
       sumTujuan: "Purpose of Use",
       sumPenyelia: "Project Supervisor Name",
-      sumTajuk: "Project / Practical Title",
+      sumTajuk: "Project / Project Title",
       sumAhli: "Group Members",
       sumOrang: "people",
       sumAlat: "B · Lab Apparatus Loan",
@@ -1920,14 +1970,16 @@ var AUTH_PORTAL_URL = "login.html";
   function typeName() { return TYPE_NAMES[currentLang] || TYPE_NAMES.ms; }
 
   function statusLabel(status) {
-    if (status === "approved") return t("statusApproved");
-    if (status === "rejected") return t("statusRejected");
+    var s = normalizeStatus(status);
+    if (s === "approved") return t("statusApproved");
+    if (s === "rejected") return t("statusRejected");
     return t("statusPending");
   }
   function statusBadgeHTML(status) {
+    var s = normalizeStatus(status);
     var cls = "pending", lbl = t("statusPending");
-    if (status === "approved") { cls = "approved"; lbl = t("statusApproved"); }
-    else if (status === "rejected") { cls = "rejected"; lbl = t("statusRejected"); }
+    if (s === "approved") { cls = "approved"; lbl = t("statusApproved"); }
+    else if (s === "rejected") { cls = "rejected"; lbl = t("statusRejected"); }
     return '<span class="status-badge ' + cls + '"><span class="dot"></span>' + esc(lbl) + '</span>';
   }
 
@@ -1939,17 +1991,17 @@ var AUTH_PORTAL_URL = "login.html";
     });
   }
 
-  /* ---------- Ownership & deletability check ---------- */
+  /* ---------- Ownership & deletability ---------- */
   function isOwner(entry) {
     if (!entry) return false;
-    return entry.authUserId === USER.id;
+    var a = String(entry.authUserId || '').trim();
+    var b = String(USER.id || '').trim();
+    return a !== '' && a === b;
   }
-  /* Boleh dipadam HANYA jika milik sendiri DAN status masih "pending" */
   function canDelete(entry) {
     if (!entry) return false;
     if (!isOwner(entry)) return false;
-    var status = entry.status || "pending";
-    return status === "pending";
+    return normalizeStatus(entry.status) === 'pending';
   }
 
   /* ---------- Row templates ---------- */
@@ -2227,9 +2279,6 @@ var AUTH_PORTAL_URL = "login.html";
     attachFormEvents(formEl);
   }
 
-  /* ============================================================
-     FORM EVENTS
-     ============================================================ */
   function attachFormEvents(formEl) {
     formEl.addEventListener("click", function (e) {
       var target = e.target;
@@ -2525,7 +2574,7 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   /* ============================================================
-     SUBMIT (via Google Apps Script)
+     SUBMIT
      ============================================================ */
   function submitForm(formEl) {
     if (!validateForm(formEl)) {
@@ -2635,7 +2684,7 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   /* ============================================================
-     SERVER SYNC — PERMOHONAN SAYA
+     SERVER SYNC
      ============================================================ */
   function syncFromServer(opts) {
     opts = opts || {};
@@ -2655,9 +2704,6 @@ var AUTH_PORTAL_URL = "login.html";
       });
   }
 
-  /* ============================================================
-     SERVER SYNC — SEMUA PERMOHONAN
-     ============================================================ */
   function syncAllFromServer(opts) {
     opts = opts || {};
 
@@ -2686,7 +2732,7 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   /* ============================================================
-     VIEW SWITCHING + HISTORY PERSISTENCE
+     VIEW SWITCHING
      ============================================================ */
   function showView(name, opts) {
     opts = opts || {};
@@ -2704,7 +2750,6 @@ var AUTH_PORTAL_URL = "login.html";
     closeUserMenu();
     saveView(name);
 
-    /* Push state ke history supaya butang back browser & back-btn berfungsi */
     if (!opts.skipHistory) {
       try {
         var cur = history.state || {};
@@ -2719,7 +2764,6 @@ var AUTH_PORTAL_URL = "login.html";
     catch (e) { window.scrollTo(0, 0); }
   }
 
-  /* Helper: hantar ke view tertentu (tanpa push state — untuk popstate) */
   function navigateTo(name) {
     if (name === "apps") {
       renderApps();
@@ -2731,7 +2775,7 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   /* ============================================================
-     RENDER DROPDOWN APPS (SEMUA PERMOHONAN)
+     DROPDOWN APPS
      ============================================================ */
   function renderDropdownApps() {
     var listEl = document.getElementById("ddAppsList");
@@ -2746,7 +2790,7 @@ var AUTH_PORTAL_URL = "login.html";
     var html = "";
     for (var i = 0; i < all.length && i < 10; i++) {
       var e = all[i];
-      var st = e.status || "pending";
+      var st = normalizeStatus(e.status);
       html +=
         '<div class="dd-app-item" data-ref="' + esc(e.ref) + '" title="' +
           esc(typeName()) + ' · ' + esc(e.nama || "") + '">' +
@@ -2764,13 +2808,12 @@ var AUTH_PORTAL_URL = "login.html";
 
   function refreshNavCounts() {
     var all  = getAllSubmitted();
-    var mine = visibleList();
 
     setText("#ddAppsCount", all.length);
 
     var pending = 0;
     for (var j = 0; j < all.length; j++) {
-      if (!all[j].status || all[j].status === "pending") pending++;
+      if (normalizeStatus(all[j].status) === 'pending') pending++;
     }
     var dot = $("#bellDot");
     if (dot) dot.classList.toggle("show", pending > 0);
@@ -2851,7 +2894,7 @@ var AUTH_PORTAL_URL = "login.html";
   }
 
   function updateModeCounts() {
-    var allCount = getAllSubmitted().length;
+    var allCount  = getAllSubmitted().length;
     var mineCount = visibleList().length;
 
     var elAll = document.getElementById("mbCountAll");
@@ -2863,7 +2906,7 @@ var AUTH_PORTAL_URL = "login.html";
   function computeStats(list) {
     var stats = { total: list.length, pending: 0, approved: 0, rejected: 0 };
     for (var i = 0; i < list.length; i++) {
-      var s = list[i].status || "pending";
+      var s = normalizeStatus(list[i].status);
       if (s === "approved") stats.approved++;
       else if (s === "rejected") stats.rejected++;
       else stats.pending++;
@@ -2919,11 +2962,31 @@ var AUTH_PORTAL_URL = "login.html";
     return html;
   }
 
+  /* ============================================================
+     KAD PERMOHONAN
+     - Butang 🗑 Padam di HUJUNG KANAN baris aksi
+     - Butang Lihat Butiran di kiri, Padam di kanan
+     ============================================================ */
   function appCardHTML(entry) {
-    var status = entry.status || "pending";
-    var mine = isOwner(entry);
-    var deletable = canDelete(entry); /* HANYA owner + status pending */
-    var refSafe = esc(entry.ref);
+    var status    = normalizeStatus(entry.status);
+    var mine      = isOwner(entry);
+    var deletable = canDelete(entry);
+    var refSafe   = esc(entry.ref);
+
+    /* Butang: Lihat Butiran dahulu, kemudian 🗑 Padam di hujung kanan */
+    var actionsHTML = '';
+    actionsHTML +=
+      '<button type="button" class="btn-view" data-action="view" data-ref="' + refSafe + '">' +
+        esc(t("btnView")) +
+      '</button>';
+
+    if (deletable) {
+      actionsHTML +=
+        '<button type="button" class="btn-delete" data-action="delete" data-ref="' + refSafe + '" ' +
+        'title="Padam permohonan ini">' +
+        esc(t("btnDelete")) +
+        '</button>';
+    }
 
     return (
       '<div class="app-card" data-type="' + esc(entry.type) + '" data-ref="' + refSafe + '">' +
@@ -2948,10 +3011,7 @@ var AUTH_PORTAL_URL = "login.html";
           (entry.notes ? '<div class="app-notes"><strong>' +
             esc(t("approvalNotesLabel")) + '</strong>' + esc(entry.notes) + '</div>' : '') +
           '<div class="app-actions">' +
-            (deletable
-              ? '<button type="button" class="btn-delete" data-action="delete" data-ref="' + refSafe + '">' + esc(t("btnDelete")) + '</button>'
-              : '') +
-            '<button type="button" class="btn-view" data-action="view" data-ref="' + refSafe + '">' + esc(t("btnView")) + '</button>' +
+            actionsHTML +
           '</div>' +
         '</div>' +
       '</div>'
@@ -2981,7 +3041,7 @@ var AUTH_PORTAL_URL = "login.html";
     var filtered = list;
     if (currentAppsFilter !== "all") {
       filtered = list.filter(function (e) {
-        return (e.status || "pending") === currentAppsFilter;
+        return normalizeStatus(e.status) === currentAppsFilter;
       });
     }
 
@@ -3089,7 +3149,6 @@ var AUTH_PORTAL_URL = "login.html";
 
   /* ============================================================
      DELETE APPLICATION
-     Syarat:  (1) pemilik, DAN (2) status === "pending"
      ============================================================ */
   function deleteApplication(ref, btnEl) {
     var entry = findEntry(ref);
@@ -3098,13 +3157,10 @@ var AUTH_PORTAL_URL = "login.html";
       return;
     }
 
-    /* Perlindungan 1: hanya pemilik */
     if (!isOwner(entry)) {
       toast(t("toastDeleteNotOwner"));
       return;
     }
-
-    /* Perlindungan 2: hanya status pending */
     if (!canDelete(entry)) {
       toast(t("toastDeleteNotPending"));
       return;
@@ -3126,32 +3182,51 @@ var AUTH_PORTAL_URL = "login.html";
         authRole: AUTH.rawRole
       }
     }).then(function (res) {
-      if (!res || res.status !== "success") {
-        throw new Error((res && res.message) || t("toastDeleteFail"));
-      }
+      /* 1) Tambah ke senarai hitam (paling penting) */
+      addDeletedRef(ref);
 
-      /* Buang dari cache setempat */
+      /* 2) Buang dari cache setempat juga */
       var newMine = getSubmitted().filter(function (e) { return e.ref !== ref; });
       setSubmitted(newMine);
 
       var newAll = getAllSubmitted().filter(function (e) { return e.ref !== ref; });
       setAllSubmitted(newAll);
 
+      /* 3) Kemas kini UI */
       refreshNavCounts();
 
-      /* Render semula view semasa */
       var appsView = $('.view[data-view="apps"]');
       if (appsView && appsView.classList.contains("active")) {
         renderApps();
       }
 
-      toast(t("toastDeleted"));
+      /* 4) Kalau server bagi error, kita tetap blacklist
+       *    supaya tak muncul semula; cuma beri toast berbeza */
+      var okServer = !!(res && res.status === "success");
+      if (okServer) {
+        toast(t("toastDeleted"));
+      } else {
+        toast((res && (res.message || res.error)) || t("toastDeleteFail"));
+      }
     }).catch(function (err) {
       try { console.error("[DELETE]", err); } catch (e) {}
-      if (btnEl) {
-        btnEl.disabled = false;
-        btnEl.textContent = t("btnDelete");
+
+      /* Walaupun server gagal (cth: backend lama), kita tetap
+       * blacklist + buang dari cache supaya UI konsisten. */
+      addDeletedRef(ref);
+
+      var newMine = getSubmitted().filter(function (e) { return e.ref !== ref; });
+      setSubmitted(newMine);
+      var newAll = getAllSubmitted().filter(function (e) { return e.ref !== ref; });
+      setAllSubmitted(newAll);
+
+      refreshNavCounts();
+
+      var appsView = $('.view[data-view="apps"]');
+      if (appsView && appsView.classList.contains("active")) {
+        renderApps();
       }
+
       toast((err && err.message) ? err.message : t("toastDeleteFail"));
     });
   }
@@ -3247,7 +3322,34 @@ var AUTH_PORTAL_URL = "login.html";
     toast: toast,
     closeModal: closeModal,
     sync: syncFromServer,
-    syncAll: syncAllFromServer
+    syncAll: syncAllFromServer,
+    /* Debug helper — buka Console & taip: APP.debug() */
+    debug: function(){
+      var all = getAllSubmitted();
+      console.log('=== USER ===', USER);
+      console.log('=== DELETED REFS (' + getDeletedRefs().length + ') ===', getDeletedRefs());
+      console.log('=== ALL VISIBLE (' + all.length + ') ===');
+      all.forEach(function(e){
+        console.log({
+          ref: e.ref,
+          nama: e.nama,
+          status: e.status,
+          statusNorm: normalizeStatus(e.status),
+          authUserId: e.authUserId,
+          isOwner: isOwner(e),
+          canDelete: canDelete(e)
+        });
+      });
+      return { all: all, deletedRefs: getDeletedRefs() };
+    },
+    /* Reset senarai hitam — kalau perlu lihat ref terpadam semula */
+    clearDeletedRefs: function(){
+      clearDeletedRefs();
+      refreshNavCounts();
+      var appsView = $('.view[data-view="apps"]');
+      if (appsView && appsView.classList.contains("active")) renderApps();
+      toast('Senarai hitam dipadam. Sync semula untuk muat semula.');
+    }
   };
 
   /* ============================================================
@@ -3273,7 +3375,6 @@ var AUTH_PORTAL_URL = "login.html";
         if (e.key === "Escape") { closeModal(); closeUserMenu(); }
       });
 
-      /* ===== Butang Home → Portal Auth ===== */
       var homeBtn = $("#homeBtn");
       if (homeBtn) {
         homeBtn.addEventListener("click", function (e) {
@@ -3282,7 +3383,6 @@ var AUTH_PORTAL_URL = "login.html";
         });
       }
 
-      /* ===== Brand FKK → Portal Auth ===== */
       var brandHome = $("#brandHome");
       if (brandHome) {
         brandHome.addEventListener("click", function (e) {
@@ -3316,7 +3416,6 @@ var AUTH_PORTAL_URL = "login.html";
         APP.goApps();
       });
 
-      /* ===== Senarai semua permohonan dalam dropdown ===== */
       var ddAppsList = document.getElementById("ddAppsList");
       if (ddAppsList) {
         ddAppsList.addEventListener("click", function (e) {
@@ -3350,7 +3449,7 @@ var AUTH_PORTAL_URL = "login.html";
           var all = getAllSubmitted();
           var pending = 0;
           for (var i = 0; i < all.length; i++) {
-            if (!all[i].status || all[i].status === "pending") pending++;
+            if (normalizeStatus(all[i].status) === 'pending') pending++;
           }
           if (pending > 0) {
             toast(t("toastNotif").replace("{0}", pending));
@@ -3403,7 +3502,6 @@ var AUTH_PORTAL_URL = "login.html";
         });
       }
 
-      /* ===== Butang "← Kembali" dalam senarai = butang back browser ===== */
       var appsBackBtn = $("#appsBackBtn");
       if (appsBackBtn) {
         appsBackBtn.addEventListener("click", function (e) {
@@ -3412,12 +3510,10 @@ var AUTH_PORTAL_URL = "login.html";
           if ((cur.depth || 0) > 0) {
             try { history.back(); return; } catch (err) {}
           }
-          /* Fallback: tiada history → balik ke borang */
           APP.goForm();
         });
       }
 
-      /* ===== Handle popstate (butang back/forward browser) ===== */
       window.addEventListener("popstate", function (e) {
         var state = e.state || {};
         var view = state.view || "form";
@@ -3436,9 +3532,7 @@ var AUTH_PORTAL_URL = "login.html";
       renderHero();
       refreshNavCounts();
 
-      /* ============================================================
-         RESTORE VIEW SEMASA SELEPAS REFRESH
-         ============================================================ */
+      /* RESTORE VIEW SEMASA */
       var initialView = getSavedView();
       try {
         history.replaceState({ view: initialView, depth: 0 }, "");
@@ -3456,7 +3550,6 @@ var AUTH_PORTAL_URL = "login.html";
       syncAllFromServer({ silent: true });
       syncFromServer({ silent: true }).then(function () {
         refreshNavCounts();
-        /* Render semula list kalau berada di apps view */
         var appsView = $('.view[data-view="apps"]');
         if (appsView && appsView.classList.contains("active")) {
           renderApps();
@@ -3468,6 +3561,7 @@ var AUTH_PORTAL_URL = "login.html";
         console.log("[API]", API_URL);
         console.log("[AUTH PORTAL]", AUTH_PORTAL_URL);
         console.log("[VIEW]", initialView);
+        console.log("[TIP] Buka Console & taip APP.debug() untuk semak.");
       } catch(e){}
     } catch (err) {
       logError(err);
