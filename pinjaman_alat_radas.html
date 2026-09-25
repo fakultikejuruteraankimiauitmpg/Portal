@@ -50,6 +50,28 @@
     display:flex;align-items:center;justify-content:space-between;
     gap:14px;flex-wrap:wrap;
   }
+
+  .appbar-left{
+    display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;
+  }
+
+  .home-btn{
+    width:40px;height:40px;border-radius:12px;
+    background:rgba(253,185,19,.14);
+    border:1px solid rgba(253,185,19,.42);
+    color:#FDB913;
+    display:grid;place-items:center;cursor:pointer;
+    transition:.2s;flex:none;font-family:inherit;
+  }
+  .home-btn:hover{
+    background:#FDB913;color:#002D62;
+    border-color:#FDB913;
+    transform:translateY(-1px);
+    box-shadow:0 10px 22px -10px rgba(253,185,19,.75);
+  }
+  .home-btn:active{transform:scale(.95)}
+  .home-btn svg{width:18px;height:18px;stroke:currentColor;fill:none}
+
   .brand{
     display:flex;align-items:center;gap:14px;min-width:0;cursor:pointer;
     user-select:none;transition:.2s;
@@ -568,7 +590,7 @@
   }
   .filter-btn.active .fcount{background:#FDB913;color:#002D62}
 
-  /* ===== MODE TOGGLE (BARU) ===== */
+  /* ===== MODE TOGGLE ===== */
   .mode-toggle{
     display:inline-flex;
     gap:4px;
@@ -947,17 +969,30 @@
     .app-actions button{width:100%;justify-content:center}
     .mode-toggle{width:100%}
     .mode-btn{flex:1;text-align:center;padding:9px 12px;font-size:.6rem}
+    .appbar-left{flex:1 1 100%}
   }
 </style>
 </head>
 <body>
 
 <header class="appbar">
-  <div class="brand" id="brandHome" role="button" tabindex="0" aria-label="Muat semula borang">
-    <div class="logo-bar"></div>
-    <div class="brand-text">
-      <span class="line-small" data-i18n="brandSmall">FAKULTI</span>
-      <span class="line-large" data-i18n="brandLarge">KEJURUTERAAN KIMIA</span>
+  <div class="appbar-left">
+    <button type="button" class="home-btn" id="homeBtn"
+            aria-label="Portal Utama" title="Portal Utama">
+      <svg viewBox="0 0 24 24" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5V20a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 20V9.5z"></path>
+        <polyline points="9 21 9 13 15 13 15 21"></polyline>
+      </svg>
+    </button>
+
+    <div class="brand" id="brandHome" role="button" tabindex="0"
+         aria-label="Kembali ke Portal Utama">
+      <div class="logo-bar"></div>
+      <div class="brand-text">
+        <span class="line-small" data-i18n="brandSmall">FAKULTI</span>
+        <span class="line-large" data-i18n="brandLarge">KEJURUTERAAN KIMIA</span>
+      </div>
     </div>
   </div>
 
@@ -1006,6 +1041,9 @@
         <button type="button" class="dd-item" id="ddApps" role="menuitem">
           <span data-i18n="navApps">Permohonan</span>
           <span class="dd-badge" id="ddAppsCount">0</span>
+        </button>
+        <button type="button" class="dd-item" id="ddHome" role="menuitem">
+          <span data-i18n="navHome">Portal Utama</span>
         </button>
         <button type="button" class="dd-item danger" id="ddLogout" role="menuitem">
           <span data-i18n="navLogout">Log Keluar</span>
@@ -1067,14 +1105,14 @@
 
   <section class="view" data-view="apps">
     <div class="form-header">
-      <button type="button" class="back-btn" onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
+      <button type="button" class="back-btn" id="appsBackBtn"
+              onclick="APP.goForm(); return false;" data-i18n="back">← Kembali</button>
       <div class="form-header-titles">
         <div class="breadcrumb" data-i18n="appsCrumb">Senarai Permohonan</div>
         <h2 data-i18n="appsTitle">Semua Permohonan</h2>
       </div>
     </div>
 
-    <!-- ===== MODE TOGGLE (BARU) ===== -->
     <div class="mode-toggle" id="appsModeToggle">
       <button type="button" class="mode-btn active" data-mode="all">
         <span data-i18n="modeAll">Semua Permohonan</span>
@@ -1131,6 +1169,14 @@
    ============================================================ */
 
 /* ============================================================
+   0) PORTAL AUTH URL
+   ------------------------------------------------------------
+   Tukar nilai ini mengikut lokasi portal auth anda.
+   Contoh: "login.html", "portal.html", "../index.html"
+   ============================================================ */
+var AUTH_PORTAL_URL = "login.html";
+
+/* ============================================================
    1) AUTH GUARD
    ============================================================ */
 (function bootstrapAuth(){
@@ -1154,7 +1200,7 @@
         '</div>' +
       '</div>';
     setTimeout(function(){
-      try { window.location.href = 'login.html'; } catch(e){}
+      try { window.location.href = AUTH_PORTAL_URL; } catch(e){}
     }, 900);
     throw new Error('Unauthenticated — redirecting to login');
   }
@@ -1215,7 +1261,7 @@
     })(),
     logout: function(){
       try { FMSAuth && FMSAuth.clearSession && FMSAuth.clearSession(); } catch(e){}
-      window.location.href = 'login.html';
+      window.location.href = AUTH_PORTAL_URL;
     }
   };
 })();
@@ -1259,7 +1305,7 @@
 
   /* ---------- Storage keys ---------- */
   var SUBMIT_KEY      = "ppm-fkk-alat-submitted-v3-" + USER.id;
-  var ALL_SUBMIT_KEY  = "ppm-fkk-alat-all-submitted-v3";       /* BARU: cache semua permohonan */
+  var ALL_SUBMIT_KEY  = "ppm-fkk-alat-all-submitted-v3";
   var DRAFT_KEY       = "ppm-fkk-alat-draft-v3-"  + USER.id;
   var SHARED_KEY      = "ppm-fkk-alat-shared-v3-" + USER.id;
   var LANG_KEY        = "ppm-fkk-alat-lang";
@@ -1344,7 +1390,7 @@
   }
 
   /* ============================================================
-     LOCAL CACHE — SEMUA Permohonan (BARU)
+     LOCAL CACHE — SEMUA Permohonan
      ============================================================ */
   var ALL_REMOTE_LIST = null;
 
@@ -1424,6 +1470,7 @@
       sessionSignedIn: "Sesi Aktif — Anda telah log masuk",
       sessionDetailTpl: "ID: {id} · {email} · {unit}",
       navApps: "Permohonan",
+      navHome: "Portal Utama",
       navLogout: "Log Keluar",
       back: "← Kembali",
       cardAMaklumat: "Maklumat Pemohon",
@@ -1517,6 +1564,7 @@
       toastLogout: "Sedang log keluar…",
       toastSubmitFail: "Gagal menghantar permohonan. Sila cuba lagi.",
       toastSyncFail: "Ralat memuatkan data dari pelayan.",
+      toastGoingHome: "Kembali ke Portal Utama…",
       confirmPadamDraf: "Padam draf borang ini? Maklumat pemohon yang dikongsi akan dikekalkan.",
       appsCrumb: "Senarai Permohonan",
       appsTitle: "Semua Permohonan",
@@ -1538,7 +1586,6 @@
       statApproved: "Diluluskan",
       statRejected: "Ditolak",
       footer: "© Hak Cipta Terpelihara Fakulti Kejuruteraan Kimia UiTM Pasir Gudang",
-      /* BARU */
       modeAll: "Semua Permohonan",
       modeMine: "Permohonan Saya",
       appsEmptyMine: "Anda belum menghantar sebarang permohonan.",
@@ -1557,6 +1604,7 @@
       sessionSignedIn: "Active Session — You are signed in",
       sessionDetailTpl: "ID: {id} · {email} · {unit}",
       navApps: "Applications",
+      navHome: "Main Portal",
       navLogout: "Log Out",
       back: "← Back",
       cardAMaklumat: "Applicant Information",
@@ -1650,6 +1698,7 @@
       toastLogout: "Logging out…",
       toastSubmitFail: "Failed to submit application. Please try again.",
       toastSyncFail: "Error loading data from server.",
+      toastGoingHome: "Returning to Main Portal…",
       confirmPadamDraf: "Delete this form draft? Shared applicant information will be retained.",
       appsCrumb: "Application List",
       appsTitle: "All Applications",
@@ -1671,7 +1720,6 @@
       statApproved: "Approved",
       statRejected: "Rejected",
       footer: "© Copyright Reserved Faculty of Chemical Engineering UiTM Pasir Gudang",
-      /* BARU */
       modeAll: "All Applications",
       modeMine: "My Applications",
       appsEmptyMine: "You have not submitted any applications yet.",
@@ -2459,19 +2507,16 @@
   }
 
   /* ============================================================
-     SERVER SYNC — SEMUA PERMOHONAN (BARU)
-     Cuba `listAll` dahulu, kemudian fallback `list` tanpa userId.
+     SERVER SYNC — SEMUA PERMOHONAN
      ============================================================ */
   function syncAllFromServer(opts) {
     opts = opts || {};
 
-    // Cuba action: "listAll"
     return apiGet({ action: "listAll" })
       .then(function (res) {
         if (res && res.status === "success" && Array.isArray(res.data)) {
           return res.data;
         }
-        // Fallback: action "list" tanpa userId
         return apiGet({ action: "list" }).then(function (res2) {
           if (res2 && res2.status === "success" && Array.isArray(res2.data)) {
             return res2.data;
@@ -2583,11 +2628,10 @@
   }
 
   /* ============================================================
-     APPS VIEW (Senarai Permohonan)
-     currentAppsMode: "all" | "mine"
+     APPS VIEW
      ============================================================ */
   var currentAppsFilter = "all";
-  var currentAppsMode   = "all";   /* BARU */
+  var currentAppsMode   = "all";
 
   function getActiveList() {
     if (currentAppsMode === "mine") {
@@ -2712,12 +2756,10 @@
     if (fcApproved) fcApproved.textContent = stats.approved;
     if (fcRejected) fcRejected.textContent = stats.rejected;
 
-    /* Mode toggle active state */
     $$("#appsModeToggle .mode-btn").forEach(function (btn) {
       btn.classList.toggle("active", btn.dataset.mode === currentAppsMode);
     });
 
-    /* Filter bar active state */
     $$("#appsFilterBar .filter-btn").forEach(function (btn) {
       btn.classList.toggle("active", btn.dataset.filter === currentAppsFilter);
     });
@@ -2781,7 +2823,6 @@
   }
 
   function findEntry(ref) {
-    /* Cari dalam semua cache dahulu, kemudian dalam milik saya */
     var allList = getAllSubmitted();
     for (var i = 0; i < allList.length; i++) {
       if (allList[i].ref === ref) return allList[i];
@@ -2869,8 +2910,16 @@
   }
 
   /* ============================================================
-     LOGOUT
+     NAVIGASI: PORTAL AUTH & LOGOUT
      ============================================================ */
+  function goAuthPortal() {
+    toast(t("toastGoingHome"));
+    setTimeout(function(){
+      try { window.location.href = AUTH_PORTAL_URL; }
+      catch (e) { try { window.location.assign(AUTH_PORTAL_URL); } catch(e2){} }
+    }, 320);
+  }
+
   function doLogout() {
     toast(t("toastLogout"));
     setTimeout(function(){ AUTH.logout(); }, 350);
@@ -2893,7 +2942,6 @@
       try {
         renderApps();
         showView("apps");
-        /* Muat SEMUA permohonan & permohonan saya secara selari */
         Promise.all([
           syncAllFromServer({ silent: true }),
           syncFromServer({ silent: true })
@@ -2902,6 +2950,7 @@
         });
       } catch (err) { logError(err); }
     },
+    goHome: goAuthPortal,
     logout: doLogout,
     switchLanguage: switchLanguage,
     toast: toast,
@@ -2931,13 +2980,26 @@
         if (e.key === "Escape") { closeModal(); closeUserMenu(); }
       });
 
+      /* ===== Butang Home → Portal Auth ===== */
+      var homeBtn = $("#homeBtn");
+      if (homeBtn) {
+        homeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          goAuthPortal();
+        });
+      }
+
+      /* ===== Brand FKK → Portal Auth ===== */
       var brandHome = $("#brandHome");
       if (brandHome) {
-        brandHome.addEventListener("click", function () { APP.goForm(); });
+        brandHome.addEventListener("click", function (e) {
+          e.preventDefault();
+          goAuthPortal();
+        });
         brandHome.addEventListener("keydown", function (e) {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            APP.goForm();
+            goAuthPortal();
           }
         });
       }
@@ -2956,6 +3018,13 @@
 
       var ddApps = $("#ddApps");
       if (ddApps) ddApps.addEventListener("click", APP.goApps);
+
+      var ddHome = $("#ddHome");
+      if (ddHome) ddHome.addEventListener("click", function (e) {
+        e.preventDefault();
+        closeUserMenu();
+        goAuthPortal();
+      });
 
       var ddLogout = $("#ddLogout");
       if (ddLogout) ddLogout.addEventListener("click", function (e) {
@@ -3001,7 +3070,6 @@
         });
       }
 
-      /* ===== MODE TOGGLE EVENTS (BARU) ===== */
       var modeToggle = $("#appsModeToggle");
       if (modeToggle) {
         modeToggle.addEventListener("click", function (e) {
@@ -3010,9 +3078,8 @@
           var mode = btn.dataset.mode || "all";
           if (mode === currentAppsMode) return;
           currentAppsMode = mode;
-          currentAppsFilter = "all";   /* reset filter */
+          currentAppsFilter = "all";
           renderApps();
-          /* Jika tukar ke "all" dan cache kosong, cuba sync */
           if (mode === "all" && !getAllSubmitted().length) {
             syncAllFromServer({ silent: true }).then(function () {
               updateModeCounts();
@@ -3037,13 +3104,13 @@
       renderForm();
       showView("form");
 
-      /* Tarik data dari pelayan secara selari */
       syncAllFromServer({ silent: true });
       syncFromServer({ silent: true }).then(updateModeCounts);
 
       try {
         console.log("[AUTH] Signed in as", USER.name, "(" + USER.id + ") · role:", AUTH.rawRole, "→ app role:", USER.role);
         console.log("[API]", API_URL);
+        console.log("[AUTH PORTAL]", AUTH_PORTAL_URL);
       } catch(e){}
     } catch (err) {
       logError(err);
