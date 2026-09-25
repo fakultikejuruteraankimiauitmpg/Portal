@@ -190,7 +190,7 @@
 
   .user-dropdown{
     position:absolute;top:calc(100% + 12px);right:0;
-    background:#fff;border-radius:16px;min-width:258px;
+    background:#fff;border-radius:16px;min-width:320px;max-width:380px;
     box-shadow:0 26px 60px -18px rgba(0,45,98,.5);
     border:1px solid #E2E8F0;padding:8px;
     opacity:0;visibility:hidden;transform:translateY(-8px);
@@ -226,6 +226,72 @@
   .dd-item.active .dd-badge{background:#002D62;color:#FDB913}
   .dd-item.danger{color:#DC2626}
   .dd-item.danger:hover{background:#FEF2F2;color:#DC2626}
+
+  /* ===== Dropdown apps list ===== */
+  .dd-apps-list{
+    max-height:260px;
+    overflow-y:auto;
+    margin:4px 0 6px;
+    border-top:1px solid #F1F5F9;
+    border-bottom:1px solid #F1F5F9;
+    padding:4px 0;
+  }
+  .dd-apps-list::-webkit-scrollbar{width:6px}
+  .dd-apps-list::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px}
+  .dd-app-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:.72rem;
+    font-weight:700;
+    color:#334155;
+    transition:.15s;
+  }
+  .dd-app-item:hover{
+    background:#E8EEF6;
+    color:#002D62;
+  }
+  .dd-app-ref{
+    font-family:ui-monospace,Consolas,monospace;
+    font-size:.62rem;
+    color:#002D62;
+    background:#E8EEF6;
+    padding:2px 6px;
+    border-radius:4px;
+    flex:none;
+  }
+  .dd-app-item:hover .dd-app-ref{
+    background:#fff;
+  }
+  .dd-app-name{
+    flex:1;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .dd-app-status{
+    font-size:.55rem;
+    font-weight:900;
+    text-transform:uppercase;
+    padding:2px 6px;
+    border-radius:999px;
+    flex:none;
+    letter-spacing:.04em;
+  }
+  .dd-app-status.pending{background:#FEF3E2;color:#B45309}
+  .dd-app-status.approved{background:#DCFCE7;color:#15803D}
+  .dd-app-status.rejected{background:#FEF2F2;color:#DC2626}
+  .dd-empty{
+    color:#94A3B8;
+    font-size:.7rem;
+    font-style:italic;
+    text-align:center;
+    padding:10px;
+  }
 
   .wrap{max-width:1120px;margin:0 auto;padding:26px 18px 40px}
   .view{display:none}
@@ -947,6 +1013,7 @@
   @media (max-width:860px){
     .user-name{display:none}
     .search-box{width:180px}
+    .user-dropdown{min-width:280px;max-width:340px}
   }
   @media (max-width:720px){
     .appbar{padding:12px 16px;gap:10px}
@@ -970,6 +1037,7 @@
     .mode-toggle{width:100%}
     .mode-btn{flex:1;text-align:center;padding:9px 12px;font-size:.6rem}
     .appbar-left{flex:1 1 100%}
+    .user-dropdown{min-width:0;width:calc(100vw - 32px);max-width:100%}
   }
 </style>
 </head>
@@ -1042,6 +1110,10 @@
           <span data-i18n="navApps">Permohonan</span>
           <span class="dd-badge" id="ddAppsCount">0</span>
         </button>
+
+        <!-- ===== SENARAI SEMUA PERMOHONAN DALAM DROPDOWN ===== -->
+        <div class="dd-apps-list" id="ddAppsList"></div>
+
         <button type="button" class="dd-item" id="ddHome" role="menuitem">
           <span data-i18n="navHome">Portal Utama</span>
         </button>
@@ -1170,9 +1242,6 @@
 
 /* ============================================================
    0) PORTAL AUTH URL
-   ------------------------------------------------------------
-   Tukar nilai ini mengikut lokasi portal auth anda.
-   Contoh: "login.html", "portal.html", "../index.html"
    ============================================================ */
 var AUTH_PORTAL_URL = "login.html";
 
@@ -1590,7 +1659,9 @@ var AUTH_PORTAL_URL = "login.html";
       modeMine: "Permohonan Saya",
       appsEmptyMine: "Anda belum menghantar sebarang permohonan.",
       appsEmptyMineDesc: "Permohonan yang anda hantar akan dipaparkan di sini.",
-      toastSyncAllFail: "Ralat memuatkan semua permohonan dari pelayan."
+      toastSyncAllFail: "Ralat memuatkan semua permohonan dari pelayan.",
+      ddEmpty: "Tiada permohonan.",
+      ddMore: "+ {0} lagi..."
     },
     en: {
       brandSmall: "FACULTY",
@@ -1724,7 +1795,9 @@ var AUTH_PORTAL_URL = "login.html";
       modeMine: "My Applications",
       appsEmptyMine: "You have not submitted any applications yet.",
       appsEmptyMineDesc: "Applications you submit will be displayed here.",
-      toastSyncAllFail: "Error loading all applications from server."
+      toastSyncAllFail: "Error loading all applications from server.",
+      ddEmpty: "No applications.",
+      ddMore: "+ {0} more..."
     }
   };
 
@@ -2526,7 +2599,7 @@ var AUTH_PORTAL_URL = "login.html";
       })
       .then(function (data) {
         setAllSubmitted(data);
-        updateModeCounts();
+        refreshNavCounts();      // <-- guna refreshNavCounts supaya dropdown + bell dikemas kini
         return getAllSubmitted();
       })
       .catch(function (err) {
@@ -2556,17 +2629,57 @@ var AUTH_PORTAL_URL = "login.html";
     catch (e) { window.scrollTo(0, 0); }
   }
 
-  function refreshNavCounts() {
-    var mine = visibleList();
-    setText("#ddAppsCount", mine.length);
+  /* ============================================================
+     RENDER DROPDOWN APPS (SEMUA PERMOHONAN)
+     ============================================================ */
+  function renderDropdownApps() {
+    var listEl = document.getElementById("ddAppsList");
+    if (!listEl) return;
 
+    var all = getAllSubmitted();
+    if (!all.length) {
+      listEl.innerHTML = '<div class="dd-empty">' + esc(t("ddEmpty")) + '</div>';
+      return;
+    }
+
+    var html = "";
+    for (var i = 0; i < all.length && i < 10; i++) {
+      var e = all[i];
+      var st = e.status || "pending";
+      html +=
+        '<div class="dd-app-item" data-ref="' + esc(e.ref) + '" title="' +
+          esc(typeName()) + ' · ' + esc(e.nama || "") + '">' +
+          '<span class="dd-app-ref">' + esc(e.ref) + '</span>' +
+          '<span class="dd-app-name">' + esc(e.nama || "—") + '</span>' +
+          '<span class="dd-app-status ' + st + '">' + esc(statusLabel(st)) + '</span>' +
+        '</div>';
+    }
+    if (all.length > 10) {
+      html += '<div class="dd-empty">' +
+        esc(t("ddMore").replace("{0}", all.length - 10)) + '</div>';
+    }
+    listEl.innerHTML = html;
+  }
+
+  function refreshNavCounts() {
+    var all  = getAllSubmitted();
+    var mine = visibleList();
+
+    /* Badge dropdown = jumlah SEMUA permohonan */
+    setText("#ddAppsCount", all.length);
+
+    /* Bell dot = kira SEMUA permohonan pending */
     var pending = 0;
-    for (var j = 0; j < mine.length; j++) {
-      if (!mine[j].status || mine[j].status === "pending") pending++;
+    for (var j = 0; j < all.length; j++) {
+      if (!all[j].status || all[j].status === "pending") pending++;
     }
     var dot = $("#bellDot");
     if (dot) dot.classList.toggle("show", pending > 0);
 
+    /* Senarai dropdown */
+    renderDropdownApps();
+
+    /* Mode counts dalam halaman apps */
     updateModeCounts();
   }
 
@@ -2612,6 +2725,8 @@ var AUTH_PORTAL_URL = "login.html";
     if (!wrap) return;
     wrap.classList.add("open");
     if (btn) btn.setAttribute("aria-expanded", "true");
+    /* Refresh dropdown list each time it's opened */
+    renderDropdownApps();
   }
   function closeUserMenu() {
     var wrap = $("#userWrap");
@@ -2836,7 +2951,10 @@ var AUTH_PORTAL_URL = "login.html";
 
   function openEntryDetail(ref) {
     var entry = findEntry(ref);
-    if (!entry) return;
+    if (!entry) {
+      toast(t("toastSyncFail"));
+      return;
+    }
 
     var shared = entry.shared || {
       nama: entry.nama, id: entry.id,
@@ -2947,6 +3065,7 @@ var AUTH_PORTAL_URL = "login.html";
           syncFromServer({ silent: true })
         ]).then(function () {
           renderApps();
+          refreshNavCounts();
         });
       } catch (err) { logError(err); }
     },
@@ -3017,7 +3136,25 @@ var AUTH_PORTAL_URL = "login.html";
       });
 
       var ddApps = $("#ddApps");
-      if (ddApps) ddApps.addEventListener("click", APP.goApps);
+      if (ddApps) ddApps.addEventListener("click", function (e) {
+        e.preventDefault();
+        closeUserMenu();
+        APP.goApps();
+      });
+
+      /* ===== Senarai semua permohonan dalam dropdown ===== */
+      var ddAppsList = document.getElementById("ddAppsList");
+      if (ddAppsList) {
+        ddAppsList.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var item = e.target.closest ? e.target.closest(".dd-app-item") : null;
+          if (!item) return;
+          var ref = item.dataset.ref;
+          if (!ref) return;
+          closeUserMenu();
+          openEntryDetail(ref);
+        });
+      }
 
       var ddHome = $("#ddHome");
       if (ddHome) ddHome.addEventListener("click", function (e) {
@@ -3036,10 +3173,11 @@ var AUTH_PORTAL_URL = "login.html";
       var bellBtn = $("#bellBtn");
       if (bellBtn) {
         bellBtn.addEventListener("click", function () {
-          var mine = visibleList();
+          /* Kira SEMUA permohonan pending */
+          var all = getAllSubmitted();
           var pending = 0;
-          for (var i = 0; i < mine.length; i++) {
-            if (!mine[i].status || mine[i].status === "pending") pending++;
+          for (var i = 0; i < all.length; i++) {
+            if (!all[i].status || all[i].status === "pending") pending++;
           }
           if (pending > 0) {
             toast(t("toastNotif").replace("{0}", pending));
@@ -3104,8 +3242,11 @@ var AUTH_PORTAL_URL = "login.html";
       renderForm();
       showView("form");
 
+      /* Muat data dari server */
       syncAllFromServer({ silent: true });
-      syncFromServer({ silent: true }).then(updateModeCounts);
+      syncFromServer({ silent: true }).then(function () {
+        refreshNavCounts();
+      });
 
       try {
         console.log("[AUTH] Signed in as", USER.name, "(" + USER.id + ") · role:", AUTH.rawRole, "→ app role:", USER.role);
