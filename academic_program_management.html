@@ -253,9 +253,30 @@
     .class-mini-chip .cm-count { font-size:10px; font-weight:900; color:#002D62; background:#fff; padding:2px 8px; border-radius:9999px; border:1px solid #CBD5E1; }
     .auto-badge { display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:5px; font-size:8px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; margin-left:6px; }
     .auto-badge i { font-size:7px; }
+    .session-filter-banner { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; flex-wrap:wrap; }
+    .session-filter-banner.all { background:#F0FDF4; border:1px solid #86EFAC; }
+    .session-filter-banner.scoped { background:#F5F3FF; border:1px solid #C4B5FD; }
+    .session-filter-banner .sf-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .session-filter-banner.all .sf-icon { background:rgba(22,163,74,.15); color:#15803D; }
+    .session-filter-banner.scoped .sf-icon { background:rgba(155,38,182,.15); color:#9B26B6; }
+    .session-filter-banner .sf-text { flex:1; min-width:0; }
+    .session-filter-banner .sf-label { font-size:9px; font-weight:900; letter-spacing:.15em; text-transform:uppercase; }
+    .session-filter-banner.all .sf-label { color:#15803D; }
+    .session-filter-banner.scoped .sf-label { color:#9B26B6; }
+    .session-filter-banner .sf-value { font-size:13px; font-weight:900; color:#002D62; margin-top:2px; }
+    .session-filter-banner .sf-count { font-size:10px; font-weight:700; color:#64748B; margin-top:2px; }
+    /* USER DROPDOWN */
+    .user-dropdown { opacity:0; visibility:hidden; transform:translateY(-8px); transition:all .22s cubic-bezier(.4,0,.2,1); }
+    .user-dropdown.open { opacity:1; visibility:visible; transform:translateY(0); }
+    /* AUTH BADGE */
+    .auth-role-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:9999px; font-size:9px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+    .auth-role-badge.admin { background:rgba(253,185,19,.18); color:#B45309; border:1px solid rgba(253,185,19,.4); }
+    .auth-role-badge.coordinator { background:rgba(155,38,182,.12); color:#9B26B6; border:1px solid rgba(155,38,182,.3); }
+    /* READ-ONLY MODE OVERLAY */
+    body.readonly-mode .edit-only { display:none !important; }
     @media print {
         body { background:#fff; }
-        .glass-nav, .site-footer, .main-tabs, .hero-banner, .filter-bar, .stat-card, button, .toast-container, .transfer-bar { display:none !important; }
+        .glass-nav, .site-footer, .main-tabs, .hero-banner, .filter-bar, .stat-card, button, .toast-container, .transfer-bar, .session-filter-banner { display:none !important; }
         main { margin:0 !important; padding:0 !important; max-width:100% !important; }
         .card { box-shadow:none !important; border:none !important; }
         .data-table thead th { background:#f0f0f0 !important; color:#000 !important; border-bottom:2px solid #000 !important; }
@@ -297,12 +318,34 @@
                     <button id="langBtnMs" onclick="setLanguage('ms')" class="active">BM</button>
                     <button id="langBtnEn" onclick="setLanguage('en')">EN</button>
                 </div>
-                <div class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-white/20">
-                    <div class="hidden sm:block text-right leading-tight">
-                        <p class="text-[11px] font-black text-white uppercase tracking-wide" data-i18n="nav_admin">ADMIN AKADEMIK</p>
-                        <p class="text-[9px] font-bold text-yellow-300 uppercase tracking-widest">FKK JOHOR</p>
+
+                <!-- USER MENU (AUTH) -->
+                <div class="relative">
+                    <button id="userMenuToggle" class="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-white/20 hover:opacity-90 transition">
+                        <div class="hidden sm:block text-right leading-tight">
+                            <p id="navUserName" class="text-[11px] font-black text-white uppercase tracking-wide">—</p>
+                            <p id="navUserRole" class="text-[9px] font-bold text-yellow-300 uppercase tracking-widest">—</p>
+                        </div>
+                        <div id="navAvatar" class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 border-white/40 text-white" style="background:#FDB913;">--</div>
+                        <i class="fas fa-chevron-down text-white/50 text-[10px] hidden sm:block"></i>
+                    </button>
+                    <div id="userDropdown" class="user-dropdown absolute right-0 top-[calc(100%+14px)] w-64 bg-white shadow-2xl border border-slate-200 z-50 rounded-2xl overflow-hidden">
+                        <div class="p-5 border-b border-slate-100 bg-slate-50">
+                            <p id="ddUserName" class="text-sm font-black leading-tight" style="color:#002D62;">—</p>
+                            <p id="ddUserEmail" class="text-[10px] font-bold text-slate-500 mt-1 truncate">—</p>
+                            <span id="ddUserRole" class="auth-role-badge admin mt-3">—</span>
+                        </div>
+                        <div class="py-2">
+                            <button id="auditJumpBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:bg-purple-50 transition" style="color:#334155;">
+                                <i class="fas fa-circle-info w-4" style="color:#9B26B6;"></i> <span>Info Sistem</span>
+                            </button>
+                        </div>
+                        <div class="border-t border-slate-100 py-2">
+                            <button id="logoutBtn" class="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-bold uppercase tracking-wider transition" style="color:#9B26B6;">
+                                <i class="fas fa-arrow-right-from-bracket w-4"></i> <span>Log Keluar</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 border-white/40 text-white" style="background:#FDB913;">AD</div>
                 </div>
             </div>
         </div>
@@ -336,11 +379,12 @@
                 <div class="mt-4 flex flex-wrap gap-2">
                     <span class="session-badge"><span class="dot"></span><i class="fas fa-calendar-days"></i><span id="activeSessionBadge">—</span></span>
                     <span class="session-badge" style="background:rgba(155,38,182,.2); color:#E9D5FF; border-color:rgba(155,38,182,.4);"><i class="fas fa-user-plus"></i><span id="currentIntakeBadge">—</span></span>
+                    <span class="session-badge" style="background:rgba(16,185,129,.15); color:#A7F3D0; border-color:rgba(16,185,129,.4);"><i class="fas fa-user-shield"></i><span id="heroRoleBadge">—</span></span>
                 </div>
             </div>
             <div class="shrink-0 flex flex-col gap-3 min-w-[260px]">
                 <div class="session-selector-wrap">
-                    <label><i class="fas fa-eye mr-1"></i><span data-i18n="viewing_session">SESI DIPAPAR</span></label>
+                    <label><i class="fas fa-filter mr-1"></i><span data-i18n="viewing_session">TAPIS SESI (SEMUA TAB)</span></label>
                     <select id="viewSessionSelect" onchange="setViewSession(this.value)"></select>
                 </div>
                 <div class="bg-white/15 border border-white/25 p-5 rounded-2xl float-anim">
@@ -400,7 +444,42 @@
 <div id="modalContainer"></div>
 <div id="toastContainer" class="toast-container"></div>
 
+<!-- ============================================================
+     AUTH: load cookie session helper BEFORE the main script
+============================================================= -->
+<script src="auth.js"></script>
+
 <script>
+/* ================================================================
+   AUTH GUARD — only admin & coordinator can access & edit
+   ================================================================ */
+(function() {
+    const session = FMSAuth.requireAuth(['admin', 'coordinator']);
+    if (!session) return;
+
+    // Keep session alive on user activity
+    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt =>
+        document.addEventListener(evt, () => FMSAuth.touch(), { passive: true })
+    );
+
+    const CURRENT_USER = {
+        id:       session.user.id       || '—',
+        name:     session.user.name     || '—',
+        email:    session.user.email    || '',
+        role:     session.role          || session.user.role || '—',
+        position: session.user.position || (session.role === 'admin' ? 'Administrator' : 'Coordinator'),
+        unit:     session.user.unit || session.user.lab || 'FKK Johor',
+        loginAt:  session.loginAt ? new Date(session.loginAt).toISOString() : new Date().toISOString()
+    };
+
+    // Expose untuk debugging
+    window.CURRENT_USER = CURRENT_USER;
+
+    // Helpers for role checks
+    window.isAdmin = () => CURRENT_USER.role === 'admin';
+    window.isCoordinator = () => CURRENT_USER.role === 'coordinator';
+    window.canEditAcademic = () => ['admin','coordinator'].includes(CURRENT_USER.role);
+
 /* ================================================================
    API CONSTANTS
    ================================================================ */
@@ -443,7 +522,7 @@ let appState = {
     classFilters: { program:'', semester:'' },
     rpLicFilters: { program:'', semester:'' },
     lastActiveSession: '',
-    viewSessionCode: ALL_SESSIONS,   /* DEFAULT: view all sessions */
+    viewSessionCode: ALL_SESSIONS,
     apiStudents: [],
     apiStaffs: [],
     apiPaAdvisors: [],
@@ -508,7 +587,7 @@ function getOldestSessionCode() {
 }
 function getViewSessionCode() {
     if (appState.viewSessionCode) return appState.viewSessionCode;
-    return ALL_SESSIONS;   /* fallback: view all */
+    return ALL_SESSIONS;
 }
 function isAllView() {
     return getViewSessionCode() === ALL_SESSIONS;
@@ -519,6 +598,7 @@ function setViewSession(code) {
     appState.classFilters.program = '';
     appState.rpLicFilters.program = '';
     appState.filters.program = '';
+    appState.filters.intake = '';
     renderContent();
     renderViewSessionSelector();
 }
@@ -538,7 +618,12 @@ function getSessionRpLic(code) {
     return appState.rpLicList.filter(r => (r.sessionCode || '') === c);
 }
 
-/* Sort helper for cross-session listing (latest session first, then by code) */
+function isStudentInViewSession(student) {
+    const viewCode = getViewSessionCode();
+    if (!viewCode || viewCode === ALL_SESSIONS) return true;
+    return String(student.intakeCode || '') === String(viewCode);
+}
+
 function sortBySessionDesc(list) {
     return list.slice().sort((a, b) => {
         const ai = getSessionLinearIndex(a.sessionCode) || 0;
@@ -547,13 +632,11 @@ function sortBySessionDesc(list) {
         return String(a.code || '').localeCompare(String(b.code || ''));
     });
 }
-/* Dedupe a list by a key (keep first occurrence) */
 function dedupeByKey(list, keyFn) {
     const seen = new Set();
     return list.filter(x => { const k = keyFn(x); if (seen.has(k)) return false; seen.add(k); return true; });
 }
 
-/* Migration for legacy data — assign to all sessions */
 function migrateSessionScoping() {
     const sessions = (appState.intakeSessions || []).slice();
     if (sessions.length === 0) return;
@@ -599,7 +682,6 @@ function renderSessionApplySelector(idPrefix) {
         return `<div class="session-apply-box"><p class="text-[11px] text-slate-500 text-center">Tiada sesi pengambilan. Sila tambah sesi terlebih dahulu.</p></div>`;
     }
     const checkboxes = sessions.map(s => {
-        // pre-select the currently viewed session (if not ALL); default all when ALL
         const preChecked = (viewCode === ALL_SESSIONS) ? true : (viewCode === s.code);
         return `
         <label class="session-apply-cb ${preChecked ? 'selected' : ''}" data-sc="${esc(s.code)}">
@@ -778,6 +860,7 @@ async function loadAllFromServer(silent) {
    ================================================================ */
 async function pushAllToServer(silent) {
     if (!appState._loaded) return false;
+    if (!canEditAcademic()) { showToast('⛔ Anda tiada kebenaran untuk mengemas kini data.', 'error'); return false; }
     showTransferPill('upload'); updateTransfer('upload', 5, false);
     setApiStatus('loading', 'MENGHANTAR…');
     const startTime = Date.now();
@@ -805,7 +888,8 @@ async function pushAllToServer(silent) {
                 assignedClass: getStudentClass(s.id) || '',
                 enrollmentDate: s.enrollmentDate || '', intakeCode: s.intakeCode || '',
                 status: s.status || 'Aktif'
-            }))
+            })),
+            _actor: { id: CURRENT_USER.id, name: CURRENT_USER.name, role: CURRENT_USER.role }
         };
         updateTransfer('upload', 40, false);
         const res = await apiPost('bulkSyncAll', payload);
@@ -880,6 +964,7 @@ async function simpanKeSheet() {
     const btn = document.getElementById('simpanBtn');
     const icon = document.getElementById('simpanIcon');
     if (!btn || !icon) return;
+    if (!canEditAcademic()) { showToast('⛔ Anda tiada kebenaran untuk menyimpan.', 'error'); return; }
     btn.disabled = true; btn.style.opacity = '0.7';
     icon.className = 'fas fa-circle-notch fa-spin';
     try {
@@ -1065,9 +1150,9 @@ const I18N = {
         hero_module:'MODUL PENGURUSAN AKADEMIK', hero_title:'Pengurusan Akademik', hero_subtitle:'FKK UiTM Johor',
         hero_desc:'Pusat kawalan untuk mengurus rekod pelajar, program, kurikulum, dan pembahagian kelas setiap semester.',
         hero_today:'Hari Ini', hero_total_records:'Jumlah Rekod', hero_records_suffix:'rekod pelajar aktif',
-        viewing_session:'SESI DIPAPAR',
+        viewing_session:'TAPIS SESI (SEMUA TAB)',
         all_sessions_view:'🌐 Semua Sesi',
-        all_sessions_notice:'Memaparkan semua sesi pengambilan',
+        all_sessions_notice:'Memaparkan data dari SEMUA sesi pengambilan',
         tab_students:'Pengurusan Pelajar', tab_programs:'Program Akademik', tab_studyplan:'Pelan Pengajian',
         tab_classes:'Pengurusan Kelas', tab_rplic:'RP & LIC', tab_intakes:'Sesi Pengambilan',
         footer_desc:'Universiti Teknologi MARA (UiTM) Cawangan Johor, Kampus Pasir Gudang.',
@@ -1204,6 +1289,7 @@ const I18N = {
         session_scoped_notice:'Data ditapis mengikut sesi.',
         view_session_notice:'Ditapis mengikut sesi pengambilan.',
         session_data_count:'Data Sesi Ini',
+        session_filter_label:'SESI DIPAPAR',
         template_download:'Template', template_upload:'Upload',
         template_download_title:'Muat Turun Template Kelas',
         template_upload_title:'Muat Naik Template Kelas',
@@ -1216,16 +1302,18 @@ const I18N = {
         template_new_students:'baharu',
         template_updated:'dikemaskini',
         template_invalid_rows:'tidak sah dilangkau',
-        template_read_error:'Gagal membaca fail'
+        template_read_error:'Gagal membaca fail',
+        auth_readonly:'Mod Baca Sahaja', auth_can_edit:'Anda boleh mengedit data akademik',
+        auth_logout:'Log Keluar', auth_signed_as:'Log masuk sebagai'
     },
     en: {
         logo_faculty:'FACULTY', logo_name:'CHEMICAL ENGINEERING', nav_admin:'ACADEMIC ADMIN',
         hero_module:'ACADEMIC MANAGEMENT MODULE', hero_title:'Academic Management', hero_subtitle:'FKK UiTM Johor',
         hero_desc:'Control center for managing student records, programs, curriculum, and class distribution.',
         hero_today:'Today', hero_total_records:'Total Records', hero_records_suffix:'active student records',
-        viewing_session:'VIEWING SESSION',
+        viewing_session:'SESSION FILTER (ALL TABS)',
         all_sessions_view:'🌐 All Sessions',
-        all_sessions_notice:'Showing all intake sessions',
+        all_sessions_notice:'Showing data from ALL intake sessions',
         tab_students:'Student Management', tab_programs:'Academic Programs', tab_studyplan:'Study Plan',
         tab_classes:'Class Management', tab_rplic:'RP & LIC', tab_intakes:'Intake Sessions',
         footer_desc:'Universiti Teknologi MARA (UiTM) Johor Branch, Pasir Gudang Campus.',
@@ -1362,6 +1450,7 @@ const I18N = {
         session_scoped_notice:'Data is scoped by session.',
         view_session_notice:'Filtered by intake session.',
         session_data_count:'This Session\'s Data',
+        session_filter_label:'VIEWING SESSION',
         template_download:'Template', template_upload:'Upload',
         template_download_title:'Download Class Template',
         template_upload_title:'Upload Class Template',
@@ -1374,7 +1463,9 @@ const I18N = {
         template_new_students:'new',
         template_updated:'updated',
         template_invalid_rows:'invalid rows skipped',
-        template_read_error:'Failed to read file'
+        template_read_error:'Failed to read file',
+        auth_readonly:'Read-Only Mode', auth_can_edit:'You can edit academic data',
+        auth_logout:'Sign Out', auth_signed_as:'Signed in as'
     }
 };
 
@@ -1422,7 +1513,10 @@ function renderStatusBadge(status) {
     return `<span class="badge-status ${getStatusClass(status)}"><i class="fas ${info.icon} text-[9px]"></i> ${esc(info.value)}</span>`;
 }
 
-function saveState() { scheduleSync('data-change'); }
+function saveState() { 
+    if (!canEditAcademic()) { showToast('⛔ Anda tiada kebenaran untuk mengubah data.', 'error'); return; }
+    scheduleSync('data-change'); 
+}
 
 /* ================================================================
    UTIL
@@ -1519,7 +1613,6 @@ function renderViewSessionSelector() {
         (getSessionLinearIndex(b.code) || 0) - (getSessionLinearIndex(a.code) || 0));
     const viewCode = getViewSessionCode();
     let html = '';
-    // "ALL SESSIONS" option always at top
     const totalProg = appState.programs.length;
     const totalSP = appState.studyPlans.length;
     const allLabel = `${t('all_sessions_view')} — ${totalProg} prog · ${totalSP} subj`;
@@ -1534,6 +1627,33 @@ function renderViewSessionSelector() {
         });
     }
     sel.innerHTML = html;
+}
+
+function renderSessionFilterBanner(extraCounts) {
+    const viewCode = getViewSessionCode();
+    const allView = isAllView();
+    const sessionName = getIntakeSessionByCode(viewCode);
+    if (allView) {
+        return `
+        <div class="session-filter-banner all">
+            <div class="sf-icon"><i class="fas fa-globe"></i></div>
+            <div class="sf-text">
+                <p class="sf-label">${t('all_sessions_notice')}</p>
+                <p class="sf-value">🌐 ${t('all_sessions_view')}</p>
+            </div>
+        </div>`;
+    }
+    const label = sessionName ? `${viewCode} · ${sessionName.sessionName}` : viewCode;
+    const extra = extraCounts ? `<p class="sf-count">${extraCounts}</p>` : '';
+    return `
+    <div class="session-filter-banner scoped">
+        <div class="sf-icon"><i class="fas fa-filter"></i></div>
+        <div class="sf-text">
+            <p class="sf-label">${t('view_session_notice')}</p>
+            <p class="sf-value"><span class="badge-intake ${sessionName && sessionName.type === 'sep' ? 'sep' : 'mac'}" style="font-size:10px; padding:3px 10px; margin-right:6px;">${esc(viewCode)}</span>${esc(label)}</p>
+            ${extra}
+        </div>
+    </div>`;
 }
 
 /* ================================================================
@@ -1562,9 +1682,11 @@ function exportStudentsExcel() {
         showToast(`${rows.length} ${t('toast_exported')}`, 'success');
     } catch (err) { console.error(err); showToast(t('toast_error'), 'error'); }
 }
+
 function getFilteredStudents() {
     const f = appState.filters;
     let list = getStudentsMerged().slice();
+    list = list.filter(s => isStudentInViewSession(s));
     if (f.program) list = list.filter(s => s.programCode === f.program);
     if (f.semester) list = list.filter(s => String(getEffectiveSemester(s)) === String(f.semester));
     if (f.kelas) list = list.filter(s => getStudentClass(s.id) === f.kelas);
@@ -1572,7 +1694,7 @@ function getFilteredStudents() {
         if (f.intake === '__NONE__') list = list.filter(s => !s.intakeCode);
         else {
             const validIds = new Set(getStudentsInIntakeViaClasses(f.intake).map(s => String(s.id)));
-            list = list.filter(s => validIds.has(String(s.id)));
+            list = list.filter(s => validIds.has(String(s.id)) || String(s.intakeCode || '') === String(f.intake));
         }
     }
     if (f.status) list = list.filter(s => (s.status || 'Aktif') === f.status);
@@ -1605,7 +1727,7 @@ function renderContent() {
    ================================================================ */
 function renderStudents() {
     const f = appState.filters;
-    const allList = getStudentsMerged();
+    const allList = getStudentsMerged().filter(s => isStudentInViewSession(s));
     const sessionPrograms = dedupeByKey(getSessionPrograms(), p => p.code);
     const programOptions = sessionPrograms.map(p => `<option value="${p.code}" ${f.program === p.code ? 'selected' : ''}>${p.code} — ${esc(p.name)}</option>`).join('');
     const semOptions = [1,2,3,4,5,6,7,8,9,10,11,12].map(s => `<option value="${s}" ${String(f.semester) === String(s) ? 'selected' : ''}>${t('sem')} ${s}</option>`).join('');
@@ -1621,6 +1743,11 @@ function renderStudents() {
     const statusCounts = {};
     STUDENT_STATUSES.forEach(s => statusCounts[s.value] = 0);
     allList.forEach(s => { const v = s.status || 'Aktif'; statusCounts[v] = (statusCounts[v] || 0) + 1; });
+
+    const viewSessionName = getIntakeSessionByCode(getViewSessionCode());
+    const extraCount = isAllView()
+        ? `${allList.length} ${t('students')} (semua sesi)`
+        : `${allList.length} ${t('students')} dalam sesi ${getViewSessionCode()}`;
 
     return `
         <div class="space-y-6 anim-up">
@@ -1638,6 +1765,7 @@ function renderStudents() {
                     <button onclick="exportStudentsExcel()" class="px-4 py-3 btn-navy rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-file-excel"></i> ${t('excel')}</button>
                 </div>
             </div>
+            ${renderSessionFilterBanner(extraCount)}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="stat-card stat-navy p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-user-graduate"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${allList.length}</p><p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10">${t('total_students')}</p></div>
                 <div class="stat-card stat-green p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-circle-check"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${statusCounts['Aktif'] || 0}</p><p class="text-[10px] font-black uppercase tracking-widest text-green-100 relative z-10">${t('status_active')}</p></div>
@@ -1870,10 +1998,9 @@ function renderPrograms() {
     const viewCode = getViewSessionCode();
     const allView = isAllView();
     let sessionPrograms = getSessionPrograms();
-    // sort latest session first when in ALL mode
     sessionPrograms = sortBySessionDesc(sessionPrograms);
     const allStudents = getStudentsMerged();
-    const totalStudents = allStudents.length;
+    const totalStudents = allStudents.filter(s => isStudentInViewSession(s)).length;
     const avgGot = sessionPrograms.length ? (sessionPrograms.reduce((a, p) => a + Number(p.gotRate || 0), 0) / sessionPrograms.length).toFixed(1) : '0.0';
     const sessionName = getIntakeSessionByCode(viewCode);
     const sessionLabel = sessionName ? `${viewCode} · ${sessionName.sessionName}` : viewCode || '—';
@@ -1887,12 +2014,10 @@ function renderPrograms() {
                     <span class="section-label">${t('program_module')}</span>
                     <h2 class="text-2xl sm:text-3xl font-black mt-2" style="color:#002D62;">${t('program_title')}</h2>
                     <p class="text-xs text-slate-500 font-medium mt-1">${t('program_desc')}</p>
-                    ${allView
-                        ? `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-globe mr-1"></i>${t('all_sessions_notice')}</p>`
-                        : `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-layer-group mr-1"></i>${t('view_session_notice')} · <span class="badge-intake ${getIntakeSessionByCode(viewCode)?.type === 'sep' ? 'sep' : 'mac'}" style="font-size:9px; padding:2px 8px;">${esc(sessionLabel)}</span></p>`}
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0"><button onclick="openAddProgramModal()" class="px-5 py-3 btn-gold rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-plus"></i> ${t('add_program')}</button></div>
             </div>
+            ${renderSessionFilterBanner(`${uniqueCodesInSession.size} prog · ${totalStudents} ${t('students')}`)}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="stat-card stat-navy p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-graduation-cap"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${uniqueCodesInSession.size}</p><p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10">${t('program_shown')}</p></div>
                 <div class="stat-card stat-purple p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-users"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${totalStudents}</p><p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10">${t('total_students')}</p></div>
@@ -1909,7 +2034,7 @@ function renderPrograms() {
             ` : `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 ${sessionPrograms.map(p => {
-                    const studentCount = allStudents.filter(s => s.programCode === p.code).length;
+                    const studentCount = allStudents.filter(s => s.programCode === p.code && isStudentInViewSession(s)).length;
                     const subjectCount = appState.studyPlans.filter(s => s.programCode === p.code && (s.sessionCode || '') === (p.sessionCode || '')).length;
                     const otherSessions = appState.programs.filter(x => x.code === p.code && x.sessionCode !== p.sessionCode).map(x => x.sessionCode);
                     const sessType = (getIntakeSessionByCode(p.sessionCode) || {}).type || 'mac';
@@ -2096,12 +2221,10 @@ function renderStudyPlan() {
                     <span class="section-label">${t('study_module')}</span>
                     <h2 class="text-2xl sm:text-3xl font-black mt-2" style="color:#002D62;">${t('study_title')}</h2>
                     <p class="text-xs text-slate-500 font-medium mt-1">${t('study_desc')}</p>
-                    ${allView
-                        ? `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-globe mr-1"></i>${t('all_sessions_notice')}</p>`
-                        : `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-layer-group mr-1"></i>${t('view_session_notice')} · <span class="badge-intake ${getIntakeSessionByCode(viewCode)?.type === 'sep' ? 'sep' : 'mac'}" style="font-size:9px; padding:2px 8px;">${esc(sessionLabel)}</span></p>`}
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0"><button onclick="openAddStudyPlanModal()" class="px-4 py-3 btn-gold rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-plus"></i> ${t('add_subject')}</button></div>
             </div>
+            ${renderSessionFilterBanner(`${list.length} subj · ${totalCredits} kredit`)}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="stat-card stat-navy p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-book"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${list.length}</p><p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10">${t('total_subjects')}</p></div>
                 <div class="stat-card stat-purple p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-star"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${totalCredits}</p><p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10">${t('total_credits')}</p></div>
@@ -2309,12 +2432,18 @@ function getUnassignedStudents(programCode, semester) {
     const classes = getClassesFor(programCode, semester);
     const assignedIds = new Set();
     classes.forEach(c => (c.studentIds || []).forEach(id => assignedIds.add(String(id))));
-    return getStudentsMerged().filter(s =>
-        s.programCode === programCode &&
-        String(getEffectiveSemester(s)) === String(semester) &&
-        !assignedIds.has(String(s.id)) &&
-        (s.status || 'Aktif') === 'Aktif'
-    );
+    const viewCode = getViewSessionCode();
+    const allView = (viewCode === ALL_SESSIONS);
+    return getStudentsMerged().filter(s => {
+        if (s.programCode !== programCode) return false;
+        if (String(getEffectiveSemester(s)) !== String(semester)) return false;
+        if (assignedIds.has(String(s.id))) return false;
+        if ((s.status || 'Aktif') !== 'Aktif') return false;
+        if (!allView && viewCode) {
+            if (String(s.intakeCode || '') !== String(viewCode)) return false;
+        }
+        return true;
+    });
 }
 function getClassesFor(programCode, semester) {
     const viewCode = getViewSessionCode();
@@ -2358,15 +2487,13 @@ function renderClasses() {
                     <span class="section-label">${t('class_module')}</span>
                     <h2 class="text-2xl sm:text-3xl font-black mt-2" style="color:#002D62;">${t('class_title')}</h2>
                     <p class="text-xs text-slate-500 font-medium mt-1">${t('class_desc')}</p>
-                    ${allView
-                        ? `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-globe mr-1"></i>${t('all_sessions_notice')}</p>`
-                        : `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-layer-group mr-1"></i>${t('view_session_notice')} · <strong>${esc(viewCode || '—')}</strong></p>`}
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0">
                     <button onclick="openAutoGenerateModal()" class="px-4 py-3 btn-purple rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-wand-magic-sparkles"></i> ${t('auto_generate')}</button>
                     <button onclick="openAddClassModal()" class="px-4 py-3 btn-gold rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-plus"></i> ${t('add_class')}</button>
                 </div>
             </div>
+            ${renderSessionFilterBanner(hasFilter ? `${totalClasses} kelas · ${totalAssigned} pelajar` : null)}
             <div class="filter-bar">
                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2"><i class="fas fa-filter" style="color:#FDB913;"></i> ${t('filter')}:</label>
                 <select onchange="setClassFilter('program', this.value)"><option value="">— ${t('program')} —</option>${programOptions}</select>
@@ -3115,7 +3242,7 @@ function openAutoGenerateModal() {
     if (!appState.classFilters.program || !appState.classFilters.semester) { showToast('Sila pilih program dan semester terlebih dahulu.', 'error'); return; }
     const f = appState.classFilters;
     const viewCode = getViewSessionCode();
-    const students = getStudentsMerged().filter(s => s.programCode === f.program && String(getEffectiveSemester(s)) === String(f.semester) && (s.status || 'Aktif') === 'Aktif');
+    const students = getStudentsMerged().filter(s => s.programCode === f.program && String(getEffectiveSemester(s)) === String(f.semester) && (s.status || 'Aktif') === 'Aktif' && isStudentInViewSession(s));
     const existing = getClassesFor(f.program, parseInt(f.semester));
     const nextLetter = nextClassLetter(f.program, parseInt(f.semester));
     const intakeOptions = (appState.intakeSessions || []).slice().sort((a,b) => getSessionLinearIndex(b.code) - getSessionLinearIndex(a.code)).map(s => {
@@ -3306,9 +3433,6 @@ function renderRpLic() {
                     <span class="section-label">${t('rp_module')}</span>
                     <h2 class="text-2xl sm:text-3xl font-black mt-2" style="color:#002D62;">${t('rp_title')}</h2>
                     <p class="text-xs text-slate-500 font-medium mt-1">${t('rp_note')}</p>
-                    ${allView
-                        ? `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-globe mr-1"></i>${t('all_sessions_notice')}</p>`
-                        : `<p class="text-[10px] font-bold mt-2" style="color:#9B26B6;"><i class="fas fa-layer-group mr-1"></i>${t('view_session_notice')} · <span class="badge-intake ${getIntakeSessionByCode(viewCode)?.type === 'sep' ? 'sep' : 'mac'}" style="font-size:9px; padding:2px 8px;">${esc(sessionLabel)}</span></p>`}
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0">
                     <button onclick="exportRpLicExcel()" class="px-4 py-3 btn-navy rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-file-excel"></i> ${t('export_excel')}</button>
@@ -3316,6 +3440,7 @@ function renderRpLic() {
                     <button onclick="openAddRpLicModal()" class="px-4 py-3 btn-gold rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><i class="fas fa-plus"></i> ${t('rp_add_subject')}</button>
                 </div>
             </div>
+            ${renderSessionFilterBanner(`${totalSubjects} subj · ${totalClasses} kelas`)}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="stat-card stat-navy p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-book"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${totalSubjects}</p><p class="text-[10px] font-black uppercase tracking-widest text-blue-100 relative z-10">${t('rp_total_subjects')}</p></div>
                 <div class="stat-card stat-purple p-6"><div class="flex items-start justify-between mb-4 relative z-10"><div class="stat-icon-box"><i class="fas fa-chalkboard"></i></div></div><p class="text-3xl font-black leading-none mb-2 relative z-10">${totalClasses}</p><p class="text-[10px] font-black uppercase tracking-widest text-purple-100 relative z-10">${t('rp_total_classes')}</p></div>
@@ -3919,97 +4044,107 @@ function extractProgramCode(program) {
     return m ? m[1] : String(program).split('-')[0].trim();
 }
 
-window.setLanguage = setLanguage;
-window.switchTab = switchTab;
-window.closeModal = closeModal;
-window.setStudentFilter = setStudentFilter;
-window.exportStudentsExcel = exportStudentsExcel;
-window.openEditStudentModal = openEditStudentModal;
-window.saveEditedStudent = saveEditedStudent;
-window.openAddProgramModal = openAddProgramModal;
-window.saveProgram = saveProgram;
-window.openEditProgramModal = openEditProgramModal;
-window.saveEditedProgram = saveEditedProgram;
-window.deleteProgram = deleteProgram;
-window.viewStudyPlanFor = viewStudyPlanFor;
-window.setStudyPlanFilter = setStudyPlanFilter;
-window.openAddStudyPlanModal = openAddStudyPlanModal;
-window.updatePrereqDropdown = updatePrereqDropdown;
-window.saveStudyPlanSubject = saveStudyPlanSubject;
-window.openEditStudyPlanModal = openEditStudyPlanModal;
-window.saveEditStudyPlanSubject = saveEditStudyPlanSubject;
-window.deleteStudyPlanSubject = deleteStudyPlanSubject;
-window.setClassFilter = setClassFilter;
-window.openAddClassModal = openAddClassModal;
-window.saveClassNew = saveClassNew;
-window.updateAddClassPreview = updateAddClassPreview;
-window.onAddClassLetterInput = onAddClassLetterInput;
-window.onAddClassIntakeChange = onAddClassIntakeChange;
-window.openEditClassModal = openEditClassModal;
-window.updateEditClassPreview = updateEditClassPreview;
-window.onEditClassLetterInput = onEditClassLetterInput;
-window.onEditClassIntakeChange = onEditClassIntakeChange;
-window.saveEditedClass = saveEditedClass;
-window.deleteClass = deleteClass;
-window.openAssignStudentModal = openAssignStudentModal;
-window.saveAssignStudentsToClass = saveAssignStudentsToClass;
-window.toggleAllStudentChecks = toggleAllStudentChecks;
-window.toggleAssignShowAll = toggleAssignShowAll;
-window.onAssignSearchInput = onAssignSearchInput;
-window.refreshAssignStudentList = refreshAssignStudentList;
-window.updateAssignSelectionCount = updateAssignSelectionCount;
-window.removeStudentFromClass = removeStudentFromClass;
-window.openMoveStudentModal = openMoveStudentModal;
-window.saveMoveStudent = saveMoveStudent;
-window.openAutoGenerateModal = openAutoGenerateModal;
-window.saveAutoGenerate = saveAutoGenerate;
-window.setRpLicFilter = setRpLicFilter;
-window.updateRpLic = updateRpLic;
-window.openAddLecturerModal = openAddLecturerModal;
-window.saveAddLecturer = saveAddLecturer;
-window.removeLecturerFromRpLic = removeLecturerFromRpLic;
-window.openEditRpLicModal = openEditRpLicModal;
-window.saveEditRpLic = saveEditRpLic;
-window.deleteRpLic = deleteRpLic;
-window.exportRpLicExcel = exportRpLicExcel;
-window.printRpLic = printRpLic;
-window.openAddRpLicModal = openAddRpLicModal;
-window.saveAddRpLic = saveAddRpLic;
-window.refreshAddRpLicFields = refreshAddRpLicFields;
-window.refreshEditRpLicFields = refreshEditRpLicFields;
-window.onAddRpLicSubjectChange = onAddRpLicSubjectChange;
-window.onEditRpLicSubjectChange = onEditRpLicSubjectChange;
-window.openAddIntakeModal = openAddIntakeModal;
-window.openEditIntakeModal = openEditIntakeModal;
-window.saveIntakeSession = saveIntakeSession;
-window.saveEditIntakeSession = saveEditIntakeSession;
-window.deleteIntakeSession = deleteIntakeSession;
-window.filterStudentsByIntake = filterStudentsByIntake;
-window.goToClassesForIntake = goToClassesForIntake;
-window.autoFillIntakeCode = autoFillIntakeCode;
-window.autoFillEditIntakeFields = autoFillEditIntakeFields;
-window.buildSessionName = buildSessionName;
-window.buildSessionPeriod = buildSessionPeriod;
-window.refreshSemestersNow = refreshSemestersNow;
-window.openChangeStatusModal = openChangeStatusModal;
-window.saveStudentStatus = saveStudentStatus;
-window.onStatusRadioChange = onStatusRadioChange;
-window.semakData = semakData;
-window.simpanKeSheet = simpanKeSheet;
-window.loadAllFromServer = loadAllFromServer;
-window.pushAllToServer = pushAllToServer;
-window.setViewSession = setViewSession;
-window.renderViewSessionSelector = renderViewSessionSelector;
-window.sessionApplySelectAll = sessionApplySelectAll;
-window.onSessionApplyToggle = onSessionApplyToggle;
-window.downloadClassTemplate = downloadClassTemplate;
-window.triggerUploadClassTemplate = triggerUploadClassTemplate;
-window.handleUploadClassTemplate = handleUploadClassTemplate;
+/* Expose all functions to window for inline onclick */
+Object.assign(window, {
+    setLanguage, switchTab, closeModal, setStudentFilter, exportStudentsExcel,
+    openEditStudentModal, saveEditedStudent, openAddProgramModal, saveProgram,
+    openEditProgramModal, saveEditedProgram, deleteProgram, viewStudyPlanFor,
+    setStudyPlanFilter, openAddStudyPlanModal, updatePrereqDropdown, saveStudyPlanSubject,
+    openEditStudyPlanModal, saveEditStudyPlanSubject, deleteStudyPlanSubject,
+    setClassFilter, openAddClassModal, saveClassNew, updateAddClassPreview,
+    onAddClassLetterInput, onAddClassIntakeChange, openEditClassModal,
+    updateEditClassPreview, onEditClassLetterInput, onEditClassIntakeChange,
+    saveEditedClass, deleteClass, openAssignStudentModal, saveAssignStudentsToClass,
+    toggleAllStudentChecks, toggleAssignShowAll, onAssignSearchInput, refreshAssignStudentList,
+    updateAssignSelectionCount, removeStudentFromClass, openMoveStudentModal, saveMoveStudent,
+    openAutoGenerateModal, saveAutoGenerate, setRpLicFilter, updateRpLic, openAddLecturerModal,
+    saveAddLecturer, removeLecturerFromRpLic, openEditRpLicModal, saveEditRpLic, deleteRpLic,
+    exportRpLicExcel, printRpLic, openAddRpLicModal, saveAddRpLic, refreshAddRpLicFields,
+    refreshEditRpLicFields, onAddRpLicSubjectChange, onEditRpLicSubjectChange,
+    openAddIntakeModal, openEditIntakeModal, saveIntakeSession, saveEditIntakeSession,
+    deleteIntakeSession, filterStudentsByIntake, goToClassesForIntake, autoFillIntakeCode,
+    autoFillEditIntakeFields, buildSessionName, buildSessionPeriod, refreshSemestersNow,
+    openChangeStatusModal, saveStudentStatus, onStatusRadioChange, semakData, simpanKeSheet,
+    loadAllFromServer, pushAllToServer, setViewSession, renderViewSessionSelector,
+    sessionApplySelectAll, onSessionApplyToggle, downloadClassTemplate, triggerUploadClassTemplate,
+    handleUploadClassTemplate
+});
+
+/* ================================================================
+   AUTH UI — user menu + logout
+   ================================================================ */
+function renderAuthUI() {
+    const initials = makeInitials(CURRENT_USER.name);
+    const roleLabel = CURRENT_USER.role === 'admin' ? 'Administrator' :
+                      CURRENT_USER.role === 'coordinator' ? 'Coordinator' :
+                      CURRENT_USER.role || '—';
+    const roleBadgeCls = CURRENT_USER.role === 'admin' ? 'admin' : 'coordinator';
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('navUserName', CURRENT_USER.name);
+    set('navUserRole', roleLabel);
+    set('navAvatar', initials);
+    set('ddUserName', CURRENT_USER.name);
+    set('ddUserEmail', CURRENT_USER.email);
+    set('heroRoleBadge', `Log masuk: ${roleLabel}`);
+
+    const ddRole = document.getElementById('ddUserRole');
+    if (ddRole) {
+        ddRole.className = 'auth-role-badge ' + roleBadgeCls;
+        ddRole.innerHTML = `<i class="fas ${CURRENT_USER.role === 'admin' ? 'fa-user-shield' : 'fa-user-tie'}"></i> ${roleLabel}`;
+    }
+
+    // Show / hide edit-only elements based on capability
+    if (!canEditAcademic()) document.body.classList.add('readonly-mode');
+    else document.body.classList.remove('readonly-mode');
+}
+
+function makeInitials(name) {
+    if (!name) return '--';
+    const parts = String(name).trim().split(/\s+/).filter(w =>
+        !/^(bin|binti|bin\.|binti\.|bt|a\/l|a\/p|dr\.?|en\.?|pn\.?|ir\.?)$/i.test(w));
+    if (parts.length === 0) return '--';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function toggleUserDropdown() {
+    const dd = document.getElementById('userDropdown');
+    if (dd) dd.classList.toggle('open');
+}
+function closeUserDropdown() {
+    const dd = document.getElementById('userDropdown');
+    if (dd) dd.classList.remove('open');
+}
+
+document.addEventListener('click', (e) => {
+    const toggle = document.getElementById('userMenuToggle');
+    const dd = document.getElementById('userDropdown');
+    if (!dd || !toggle) return;
+    if (!dd.contains(e.target) && !toggle.contains(e.target)) closeUserDropdown();
+});
 
 /* ================================================================
    INIT
    ================================================================ */
 (async function init() {
+    // Wire auth UI
+    renderAuthUI();
+    const userMenuToggle = document.getElementById('userMenuToggle');
+    if (userMenuToggle) userMenuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleUserDropdown(); });
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', () => {
+        try { FMSAuth.clearSession(); } catch(e) {}
+        window.location.replace('login.html');
+    });
+
+    const auditJumpBtn = document.getElementById('auditJumpBtn');
+    if (auditJumpBtn) auditJumpBtn.addEventListener('click', () => {
+        closeUserDropdown();
+        showToast(`Log masuk sebagai ${CURRENT_USER.name} (${CURRENT_USER.role})`, 'navy');
+    });
+
     updateToday();
     applyLanguage();
     renderContent();
@@ -4038,10 +4173,14 @@ window.handleUploadClassTemplate = handleUploadClassTemplate;
     }, 5 * 60 * 1000);
 })();
 
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeModal(); closeUserDropdown(); }
+});
 document.addEventListener('click', (e) => {
     if (e.target.classList && e.target.classList.contains('modal-backdrop')) closeModal();
 });
+
+})(); // end auth IIFE
 </script>
 </body>
 </html>
