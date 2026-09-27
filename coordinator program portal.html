@@ -960,8 +960,31 @@
             </div>
         </div>
         <div class="portal-menu-body">
+
+            <!-- ============================================================
+                 ADMINISTRATION
+            ============================================================ -->
             <div class="portal-section-title" data-i18n="portal_admin_label">Administration</div>
             <div class="flex flex-col">
+
+                <!-- ✅ PORTAL USER ACCOUNT MANAGEMENT -->
+                <a href="portal_user_account_management.html"
+                   data-href="portal_user_account_management.html"
+                   class="portal-link-item js-portal-nav">
+                    <i class="fas fa-users-gear"></i>
+                    <span data-i18n="portal_user_mgmt">Portal User Account Management</span>
+                    <i class="fas fa-chevron-right ml-auto text-[10px] text-slate-300"></i>
+                </a>
+
+                <!-- ✅ ACADEMIC PROGRAMME MANAGEMENT — link ke academic_program_management.html -->
+                <a href="academic_program_management.html"
+                   data-href="academic_program_management.html"
+                   class="portal-link-item js-portal-nav">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span data-i18n="portal_academic_mgmt">Academic Programme Management</span>
+                    <i class="fas fa-chevron-right ml-auto text-[10px] text-slate-300"></i>
+                </a>
+
                 <a href="resume_portal.html" class="portal-link-item">
                     <i class="fas fa-file-alt"></i>
                     <span data-i18n="portal_resume">Resume</span>
@@ -1749,6 +1772,8 @@
             portal_menu_title: "Portal Menu", portal_menu_sub: "Quick Access To All Systems",
             portal_menu_updated: "UPDATED 2026", portal_admin_label: "Administration",
             portal_resume: "Resume", portal_settings: "Account Settings",
+            portal_user_mgmt: "Portal User Account Management",
+            portal_academic_mgmt: "Academic Programme Management",
             portal_lab_label: "Laboratory Services",
             portal_loan_equipment: "Equipment & Apparatus Loan",
             portal_chemical_request: "Chemical Substance Request",
@@ -1858,6 +1883,8 @@
             portal_menu_title: "Menu Portal", portal_menu_sub: "Akses Pantas Ke Semua Sistem",
             portal_menu_updated: "DIKEMAS KINI 2026", portal_admin_label: "Pentadbiran",
             portal_resume: "Resume", portal_settings: "Tetapan Akaun",
+            portal_user_mgmt: "Pengurusan Akaun Pengguna Portal",
+            portal_academic_mgmt: "Pengurusan Program Akademik",
             portal_lab_label: "Perkhidmatan Makmal",
             portal_loan_equipment: "Pinjaman Alat Radas",
             portal_chemical_request: "Permohonan Bahan Kimia",
@@ -2085,7 +2112,9 @@
 
     /* =========================================================
        PORTAL MENU NAVIGATION
-       ✅ Pastikan "Pinjaman Alat Radas" terus ke pinjaman_alat_radas.html
+       ✅ "Academic Programme Management" → academic_program_management.html
+       ✅ "Portal User Account Management" → portal_user_account_management.html
+       ✅ "Pinjaman Alat Radas" → pinjaman_alat_radas.html
     ========================================================== */
     function initPortalNavigation() {
         document.querySelectorAll('.js-portal-nav').forEach(link => {
