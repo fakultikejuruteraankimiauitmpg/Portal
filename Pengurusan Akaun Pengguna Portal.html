@@ -662,6 +662,7 @@
                 <div>
                     <label class="field-label" data-i18n="um_role">Role / Jawatan</label>
                     <select id="uRole" class="field-input"></select>
+                    <p class="text-[9px] font-bold text-slate-400 mt-2 leading-relaxed" data-i18n="um_role_hint">Portal access role only. Lecturer in Charge &amp; Admin Safety are system roles — assign them in Role Management below.</p>
                 </div>
                 <div>
                     <label class="field-label" data-i18n="um_status">Status</label>
@@ -1023,6 +1024,26 @@
     ];
     const ADMIN_ROLES = ['admin','admin_system','ajk_obe','pensyarah_sumber','lecturer_in_charge','penasihat_akademik'];
 
+    /* =========================================================
+       ★★★ PORTAL ACCOUNTS — RESTRICTED ROLE SET ★★★
+       ---------------------------------------------------------
+       Roles selectable when Adding / Editing a portal account.
+       Only: Student · Academic Staff · Lab Staff · Coordinator
+       ---------------------------------------------------------
+       NOTE: "Lecturer in Charge" and "Admin Safety" are SYSTEM
+       ROLES / JAWATAN and are managed exclusively in the
+       "Role Management" section below — they are NOT selectable
+       when creating a portal account.
+    ========================================================== */
+    const PORTAL_ROLES = ['student','academic_staff','lab_staff','coordinator'];
+
+    const PORTAL_ROLE_GROUPS = [
+        { labelKey:'group_student',  roles:['student'] },
+        { labelKey:'group_support',  roles:['academic_staff','lab_staff','coordinator'] }
+    ];
+
+    /* FULL role list — used by Role Management (SYSTEM ROLE / JAWATAN)
+       This is where "Lecturer in Charge" and "Admin Safety" live. */
     const ROLE_GROUPS = [
         { labelKey:'group_student', roles:['student'] },
         { labelKey:'group_academic', roles:['pensyarah','pensyarah_kanan','profesor','profesor_madya'] },
@@ -1034,11 +1055,41 @@
 
     function isStaffRole(role) { return STAFF_ROLES.indexOf(role) !== -1; }
     function isAdminRole(role) { return ADMIN_ROLES.indexOf(role) !== -1; }
+    function isPortalRole(role) { return PORTAL_ROLES.indexOf(role) !== -1; }
     function roleMeta(role) { return ROLE_META[role] || ROLE_META.student; }
 
+    /* FULL list builder — Role Management section */
     function buildRoleOptions(currentRole) {
         let html = '';
         ROLE_GROUPS.forEach(function(g){
+            html += '<optgroup label="' + escapeHtml(t(g.labelKey)) + '">';
+            g.roles.forEach(function(r){
+                html += '<option value="' + r + '"' + (r === currentRole ? ' selected' : '') + '>'
+                     +  escapeHtml(roleLabel(r)) + '</option>';
+            });
+            html += '</optgroup>';
+        });
+        return html;
+    }
+
+    /* RESTRICTED list builder — Portal Accounts (Add / Edit User) section
+       Only Student · Academic Staff · Lab Staff · Coordinator
+       Safety net: if the user currently holds a system-only role
+       (e.g. Lecturer in Charge, Admin Safety, etc.), keep it visible
+       in a "Current Role (System)" group so it is never silently
+       overwritten by the Save action. */
+    function buildPortalRoleOptions(currentRole) {
+        let html = '';
+
+        if (currentRole && !isPortalRole(currentRole)) {
+            html += '<optgroup label="' + escapeHtml(t('group_current')) + '">'
+                 +    '<option value="' + escapeHtml(currentRole) + '" selected>'
+                 +      escapeHtml(roleLabel(currentRole))
+                 +    '</option>'
+                 +  '</optgroup>';
+        }
+
+        PORTAL_ROLE_GROUPS.forEach(function(g){
             html += '<optgroup label="' + escapeHtml(t(g.labelKey)) + '">';
             g.roles.forEach(function(r){
                 html += '<option value="' + r + '"' + (r === currentRole ? ' selected' : '') + '>'
@@ -1237,6 +1288,7 @@
             um_name_ph: "Enter full name",
             um_email: "Email",
             um_role: "Role / Jawatan",
+            um_role_hint: "Portal access role only. Lecturer in Charge & Admin Safety are system roles — assign them in Role Management below.",
             um_status: "Status",
             um_program: "Program / Department",
             um_program_ph: "e.g. Kejuruteraan Kimia",
@@ -1300,6 +1352,7 @@
             group_student: "Student", group_academic: "Academic Positions",
             group_science: "Science & Laboratory Positions", group_engineering: "Engineering Positions",
             group_support: "Support Positions", group_admin: "Administrator",
+            group_current: "Current Role (System)",
             group_total: "TOTAL",
 
             /* Auth identity */
@@ -1489,6 +1542,7 @@
             um_name_ph: "Masukkan nama penuh",
             um_email: "Emel",
             um_role: "Peranan / Jawatan",
+            um_role_hint: "Hanya peranan akses portal. Pensyarah Bertanggungjawab & Admin Keselamatan adalah peranan sistem — tetapkan dalam Pengurusan Peranan di bawah.",
             um_status: "Status",
             um_program: "Program / Jabatan",
             um_program_ph: "cth. Kejuruteraan Kimia",
@@ -1552,6 +1606,7 @@
             group_student: "Pelajar", group_academic: "Jawatan Akademik",
             group_science: "Jawatan Sains & Makmal", group_engineering: "Jawatan Kejuruteraan",
             group_support: "Jawatan Sokongan", group_admin: "Pentadbir",
+            group_current: "Peranan Semasa (Sistem)",
             group_total: "JUMLAH",
 
             /* Auth identity */
@@ -2235,7 +2290,10 @@
     pwdViewModal.addEventListener('click', function(e){ if (e.target === pwdViewModal) closePwdViewModal(); });
 
     /* =========================================================
-       USER MODAL (ADD / EDIT)
+       USER MODAL (ADD / EDIT)  —  PORTAL ACCOUNTS
+       ★ Role select uses buildPortalRoleOptions() — RESTRICTED SET
+       (Student · Academic Staff · Lab Staff · Coordinator)
+       Lecturer in Charge & Admin Safety are NOT selectable here.
     ========================================================== */
     const userModal = document.getElementById('userModal');
     const uId = document.getElementById('uId');
@@ -2267,7 +2325,8 @@
             const u = appState.users.find(function(x){ return String(x.id) === String(id); });
             if (!u) return;
             userModalTitle.textContent = t('um_edit');
-            uRole.innerHTML = buildRoleOptions(u.role);
+            /* ★ RESTRICTED ROLE LIST for Portal Accounts */
+            uRole.innerHTML = buildPortalRoleOptions(u.role);
             uId.value = u.id; uId.readOnly = true;
             uSession.value = u.sessionId || '';
             uName.value = u.name;
@@ -2281,7 +2340,8 @@
             userModalAvatar.textContent = makeInitials(u.name);
         } else {
             userModalTitle.textContent = t('um_add');
-            uRole.innerHTML = buildRoleOptions('student');
+            /* ★ RESTRICTED ROLE LIST for Portal Accounts */
+            uRole.innerHTML = buildPortalRoleOptions('student');
             uId.readOnly = false;
             uId.value = nextUserId();
             uRole.value = 'student';
@@ -2757,9 +2817,9 @@
 
         applyLanguage();
 
-        // Rebuild dynamic selects with translated group labels
+        // Rebuild Portal Accounts role select with translated group labels (RESTRICTED SET)
         const uRoleEl = document.getElementById('uRole');
-        if (uRoleEl) uRoleEl.innerHTML = buildRoleOptions(uRoleEl.value || 'student');
+        if (uRoleEl) uRoleEl.innerHTML = buildPortalRoleOptions(uRoleEl.value || 'student');
 
         // Re-render dynamic areas
         renderUsers();
@@ -2812,7 +2872,8 @@
         document.getElementById('btn-en').classList.toggle('active', currentLang === 'en');
         document.getElementById('btn-ms').classList.toggle('active', currentLang === 'ms');
 
-        if (uRole) uRole.innerHTML = buildRoleOptions('student');
+        // ★ Portal Accounts role select — RESTRICTED SET
+        if (uRole) uRole.innerHTML = buildPortalRoleOptions('student');
 
         applyLanguage();
 
