@@ -1297,16 +1297,28 @@
     if (!session) return;
 
     /* =========================================================
-       AUTO SIGN-OUT WHEN THE BROWSER / TAB IS CLOSED
+       TAB-BOUND SESSION
        ---------------------------------------------------------
-       sessionStorage only lives as long as the browser tab lives.
-       We stamp a marker on the first (just-logged-in) load of this
-       tab. If the admin page is later opened and the marker is
-       gone, it means the browser/tab was closed in the meantime —
-       so we destroy the session and bounce to the login page.
+       Matlamat:
+         • Refresh (F5) atau navigasi dalam tab → session KEKAL
+         • Tutup tab / browser               → session tamat
+         • Buka tab baru ke halaman admin    → session tamat
+
+       Cara ia berfungsi:
+         sessionStorage hanya hidup selagi tab yang sama wujud.
+         Pada muat pertama selepas login, kita set penanda
+         (TAB_ALIVE_KEY). Bila admin refresh, sessionStorage
+         masih ada → penanda dijumpai → session dikekalkan.
+         Bila browser/tab ditutup, browser akan auto-clear
+         sessionStorage → lawatan seterusnya gagal check penanda
+         dan user di-log out.
+
+       PENTING: JANGAN clear session pada event `pagehide` atau
+       `beforeunload` kerana kedua-duanya juga tercetus semasa
+       refresh (F5), menyebabkan user log-out setiap kali refresh.
     ========================================================== */
     const TAB_ALIVE_KEY  = 'fkkAdminTabAlive';
-    const LOGIN_GRACE_MS = 30000; // window allowed for the login → dashboard redirect
+    const LOGIN_GRACE_MS = 60000; // 60s window for login → dashboard redirect
 
     function enforceTabBoundSession() {
         // Same tab, page reload / in-app navigation → keep the session
@@ -1316,11 +1328,12 @@
         const justLoggedIn = isNaN(loginTime) ? true : (Date.now() - loginTime < LOGIN_GRACE_MS);
 
         if (justLoggedIn) {
+            // Fresh login redirect from login.html → stamp the tab and continue
             sessionStorage.setItem(TAB_ALIVE_KEY, '1');
             return true;
         }
 
-        // Browser was closed (or a brand-new tab was opened) → kill the session
+        // Brand-new tab (no marker) AND not a fresh login → kill the session
         try { FMSAuth.clearSession(); } catch (e) {}
         sessionStorage.removeItem(TAB_ALIVE_KEY);
         window.location.replace('login.html');
@@ -1329,17 +1342,15 @@
 
     if (!enforceTabBoundSession()) return;
 
-    // Safety net: if the tab is being discarded, drop the session immediately
-    window.addEventListener('pagehide', function (e) {
-        if (e.persisted) return;                 // bfcache restore → keep session
-        if (sessionStorage.getItem('fkkNavigating') === '1') return;
-        // Tab/browser closing — invalidate right away
-        try { FMSAuth.clearSession(); } catch (err) {}
-    });
-
-    // Keep session alive on user activity
-    ['click', 'keydown'].forEach(evt =>
-        document.addEventListener(evt, () => FMSAuth.touch(), { passive: true })
+    // Refresh the tab-alive timestamp on any user activity so that a long-lived
+    // session (e.g. open overnight) is not lost if the browser suspends the tab.
+    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt =>
+        document.addEventListener(evt, () => {
+            try {
+                sessionStorage.setItem(TAB_ALIVE_KEY, '1');
+                FMSAuth.touch();
+            } catch (e) {}
+        }, { passive: true })
     );
     /* ========================================================= */
 
