@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fakulti Kejuruteraan Kimia</title>
-    <link rel="preconnect" href="https://script.google.com" crossorigin>
-    <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <style>
@@ -196,30 +190,6 @@
     <!-- AUTH CHANGE: load the shared cookie session helper -->
     <script src="auth.js"></script>
 
-    <!-- EARLY REDIRECT: skip login page kalau session wujud (jalan sebelum Tailwind/Firebase load) -->
-    <script>
-        (function earlyRedirect() {
-            try {
-                if (window.FMSAuth && typeof FMSAuth.loadSession === 'function') {
-                    var existing = FMSAuth.loadSession();
-                    if (existing && existing.role) {
-                        var routes = {
-                            student:        "student portal.html",
-                            academic_staff: "academic staff portal.html",
-                            lab_staff:      "laboratory staff portal.html",
-                            coordinator:    "coordinator program portal.html",
-                            admin:          "admin portal.html",
-                            guest:          "pelawat portal.html"
-                        };
-                        if (routes[existing.role]) {
-                            window.location.replace(encodeURI(routes[existing.role]));
-                        }
-                    }
-                }
-            } catch (e) { /* silent */ }
-        })();
-    </script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -231,23 +201,8 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTf6R87uxIhon3uB5ZW4E2M3o37J58UMRDu494bBQESo1YmaAT0gPDTnmYgmd4gh2IKg/exec";
 
         /* ============================================================
-           WARM-UP: bangunkan Apps Script awal supaya cold start habis
-           sebelum user taip password
-           ============================================================ */
-        (function warmUp() {
-            try {
-                // Fire & forget, no-cors untuk elak CORS preflight
-                fetch(APPS_SCRIPT_URL + "?warmup=" + Date.now(), {
-                    method: "GET",
-                    mode: "no-cors",
-                    cache: "no-store",
-                    keepalive: true
-                }).catch(() => {});
-            } catch (_) {}
-        })();
-
-        /* ============================================================
            HALAMAN DESTINASI MENGIKUT PERANAN
+           (nama fail mesti sama dengan fail sebenar dalam folder yang sama)
            ============================================================ */
         const PORTAL_ROUTES = {
             student:        "student portal.html",
@@ -262,9 +217,11 @@
            NORMALISASI PERANAN
            ============================================================ */
         const ROLE_ALIASES = {
+            // Pelajar
             student: 'student',
             pelajar: 'student',
 
+            // Staf Akademik
             academic_staff: 'academic_staff',
             academicstaff: 'academic_staff',
             academic: 'academic_staff',
@@ -272,6 +229,7 @@
             pensyarah: 'academic_staff',
             staf_akademik: 'academic_staff',
 
+            // Staf Makmal
             lab_staff: 'lab_staff',
             labstaff: 'lab_staff',
             laboratory_staff: 'lab_staff',
@@ -279,16 +237,19 @@
             staf_makmal: 'lab_staff',
             makmal: 'lab_staff',
 
+            // Penyelaras Program
             coordinator: 'coordinator',
             coordinator_program: 'coordinator',
             program_coordinator: 'coordinator',
             penyelaras: 'coordinator',
             penyelaras_program: 'coordinator',
 
+            // Admin
             admin: 'admin',
             administrator: 'admin',
             pentadbir: 'admin',
 
+            // Pelawat
             guest: 'guest',
             visitor: 'guest',
             pelawat: 'guest'
@@ -300,6 +261,7 @@
             return ROLE_ALIASES[key] || key;
         }
 
+        /* Redirect ke portal dengan encoding nama fail (selamat untuk nama ada ruang) */
         function goToPortal(role) {
             const route = PORTAL_ROUTES[role];
             if (!route) return false;
@@ -308,11 +270,12 @@
         }
 
         const REQUEST_TIMEOUT_MS = 15000;
+        /* ============================================================ */
 
         let db, auth;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'fakulti-kej-kimia';
 
-        let currentMode = 'login';
+        let currentMode = 'login'; // 'login' atau 'guest'
         let currentLang = 'ms';
         let isSubmitting = false;
 
@@ -533,10 +496,8 @@
         }
 
         /* ============================================================
-           3) AUDIT TRAIL (Firebase) — LAZY, tidak block login
+           3) AUDIT TRAIL (Firebase) — pilihan
            ============================================================ */
-        let __fbReady = null;
-
         async function initFirebase() {
             try {
                 if (typeof __firebase_config === 'undefined' || !__firebase_config) return;
@@ -555,16 +516,8 @@
             }
         }
 
-        function ensureFirebase() {
-            if (!__fbReady) {
-                __fbReady = initFirebase().catch(() => {});
-            }
-            return __fbReady;
-        }
-
         async function logToFirebase(userId, role) {
             try {
-                await ensureFirebase();
                 if (!db || !auth || !auth.currentUser) return;
                 const loginsCol = collection(db, 'artifacts', appId, 'public', 'data', 'login_attempts');
                 await addDoc(loginsCol, {
@@ -598,15 +551,15 @@
                 }
                 setLoading(true);
 
+                // AUTH CHANGE: cookie-based session instead of sessionStorage
                 FMSAuth.saveSession({ id: inputValue, name: inputValue }, 'guest');
+
                 showStatus(t.success_guest.replace('{name}', inputValue), "success");
-
-                // Fire & forget audit log (tidak block redirect)
-                ensureFirebase();
+                console.log("➡️ Guest mode: akan redirect ke:", PORTAL_ROUTES.guest);
                 logToFirebase(inputValue, 'guest');
-
-                // Redirect cepat
-                setTimeout(() => { goToPortal('guest'); }, 200);
+                setTimeout(() => {
+                    goToPortal('guest');
+                }, 900);
                 return;
             }
 
@@ -651,15 +604,16 @@
                     return;
                 }
 
+                // AUTH CHANGE: save full user into cookie session
                 user.id = user.id || inputValue;
                 FMSAuth.saveSession(user, finalRole);
-                showStatus(t.success_msg.replace('{type}', labelForRole(finalRole)), "success");
 
-                // Fire & forget audit log + redirect cepat
-                ensureFirebase();
+                showStatus(t.success_msg.replace('{type}', labelForRole(finalRole)), "success");
                 logToFirebase(inputValue, finalRole);
 
-                setTimeout(() => { goToPortal(finalRole); }, 200);
+                setTimeout(() => {
+                    goToPortal(finalRole);
+                }, 900);
 
             } catch (err) {
                 console.error("Login error:", err);
@@ -674,8 +628,15 @@
             }
         });
 
-        // Init (Firebase TIDAK di-init di sini lagi — hanya bila perlu)
+        // Init
+        initFirebase();
         updateUI();
+
+        // AUTH CHANGE: if already logged in, skip login page entirely
+        const existing = FMSAuth.loadSession();
+        if (existing && PORTAL_ROUTES[existing.role]) {
+            window.location.replace(encodeURI(PORTAL_ROUTES[existing.role]));
+        }
     </script>
 </body>
 </html>
